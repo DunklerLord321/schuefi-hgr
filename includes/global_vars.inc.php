@@ -1,14 +1,11 @@
 <?php 
 global $login_user;
-$login_user = 'sec_login';
 global $login_user_passwd;
-$login_user_passwd = 'Ad2vDvxFXzwJInY4';
-
 global $dbuser;
-$dbuser = 'schuefi';
 global $dbuser_passwd;
-$dbuser_passwd = '5qvx4xOTLkTt4Aj1';
-
+$login_user = 'sec_login';
+$dbuser = 'schuefi';
+require 'includes/db_data.php';
 global $year;
 $year = '1617';
 

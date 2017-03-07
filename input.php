@@ -14,7 +14,6 @@ if (isset ( $_GET ['lehrer'] ) && $_GET ['lehrer'] == 1) {
 	$show_formular_lehrer = false;
 	$show_formular_schueler = true;
 }
-echo strcmp ( "Russisch", '' );
 if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset ( $_SESSION ['account'] ) && (strcmp ( $_SESSION ['account'], 'normal' ) == 0 || strcmp ( $_SESSION ['account'], 'root' ) == 0) && if_logged_in ( $_SESSION ['userid'] )) {
 	if (isset ( $_GET ['input'] ) && ($_GET ['input'] == 1 || $_GET ['input'] == 2)) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
