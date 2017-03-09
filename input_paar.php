@@ -137,12 +137,12 @@ if ($show_formular_paar) {
 	$return = $return_prep->fetch ();
 	while ( $return != false ) {
 		// echo $return ['id'] . " " . $return ['vname'] . " " . $return ['nname'] . " " . $return ['email'] . " " . $return ['klassenstufe'] . " " . $return ['klasse_kurs'] . " " . $return ['fach1'] . " " . $return ['fach1_lehrer'] . "<br>";
-		echo "<option value=\"" . $return ['id'] . "_1\">" . $return ['vname'] . " " . $return ['nname'] . " - " . $return ['fach1'] . "</option>";
+		echo "<option value=\"" . $return ['id'] . "_1\">" . $return ['vname'] . " " . $return ['nname'] . " - " . get_faecher_lesbar($return ['fach1']) . "</option>";
 		if (strlen ( $return ['fach2'] ) > 0) {
-			echo "<option value=\"" . $return ['id'] . "_2\">" . $return ['vname'] . " " . $return ['nname'] . " - " . $return ['fach2'] . "</option>";
+			echo "<option value=\"" . $return ['id'] . "_2\">" . $return ['vname'] . " " . $return ['nname'] . " - " . get_faecher_lesbar($return ['fach2']) . "</option>";
 		}
 		if (strlen ( $return ['fach3'] ) > 0) {
-			echo "<option value=\"" . $return ['id'] . "_3\">" . $return ['vname'] . " " . $return ['nname'] . " - " . $return ['fach3'] . "</option>";
+			echo "<option value=\"" . $return ['id'] . "_3\">" . $return ['vname'] . " " . $return ['nname'] . " - " . get_faecher_lesbar($return ['fach3']) . "</option>";
 		}
 		$return = $return_prep->fetch ();
 	}

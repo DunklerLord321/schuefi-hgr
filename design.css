@@ -16,6 +16,7 @@ body{
 	border-color: gray;
 	padding: 10px;
 	padding-left: 3%;
+	margin-right: 5%;
 }
 
 select {
@@ -155,4 +156,15 @@ input{
 .links:hover{
 	color: black;
 	background-color: #EAF50B;
+}
+
+.time_output{
+	width: 80%;
+	text-align: left;
+}
+.time_output th,td {
+	border-bottom: 1px solid #ddd;
+}
+.time_output tr:LAST-CHILD {
+	border-bottom: none;
 }

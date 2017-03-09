@@ -27,7 +27,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 		'fach3' => $_POST ['fach3'],
 		'fach3_lehrer' => $_POST ['fach3_lehrer'],
 		'email' => $_POST ['email'],
-		'klasse_kurs' => $_POST ['klasse_kurs'],
+		'klasse' => $_POST ['klasse'],
 		'klassenstufe' => $_POST ['klassenstufe'],
 		'klassenlehrer_name' => $_POST ['klassenlehrer'],
 		'telefon' => $_POST ['telefon'],
@@ -45,7 +45,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 		);
 		$person = validate_input($person);
 		if(!is_array($person)) {
-			echo "Es trat ein Fehler auf: $person";
+			echo "Es trat ein Fehler auf: $person<br><br>";
 		} else {
 			if ($_GET ['input'] == 1) {
 				echo "try";
@@ -60,7 +60,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 				if ($found_user !== false) {
 					echo "Dieser Schüler existiert bereits";
 				} else {
-					echo "success";
+//					echo "success";
 					if (strcmp ( $fach2, '' ) == 0) {
 						$fach2 = NULL;
 						$fach2_lehrer = NULL;
@@ -75,7 +75,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 							'nname' => $person['nname'],
 							'email' => $person['email'],
 							'klassenstufe' => $person['klassenstufe'],
-							'klasse' => $person['klasse_kurs'],
+							'klasse' => $person['klasse'],
 							'klassenlehrer_name' => $person['klassenlehrer_name'],
 							'fach1' => $person['fach1'],
 							'fach1_lehrer' => $person['fach1_lehrer'],
@@ -126,7 +126,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 							'nname' => $nname,
 							'email' => $email,
 							'klassenstufe' => $klassenstufe,
-							'klasse' => $klasse_kurs,
+							'klasse' => $klasse,
 							'klassenlehrer_name' => $klassenlehrer_name,
 							'fach1' => $fach1,
 							'fach1_lehrer' => $fach1_lehrer,
@@ -180,25 +180,25 @@ if ($show_formular_schueler) {
 			Vorname:
 			<span style="float: right; width: 50%;">Nachname:</span>
 			<br>
-			<input type="text" maxlength="49" name="vname" autofocus required="required" style="width: 40%;">
-			<input type="text" maxlength="49" name="nname" required="required" style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
+			<input type="text" maxlength="49" name="vname" autofocus required style="width: 40%;">
+			<input type="text" maxlength="49" name="nname" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
 			<br>
 			<br>
 			Klassenstufe:
 			<span style="float: right; width: 50%;">Klasse/Kurs:</span>
 			<br>
-			<input type="number" name="klassenstufe" min="5" max="12" required="required" style="width: 40%;">
-			<input type="text" pattern="([ABCDabcdl123456]|[lL][12])" name="klasse_kurs" required="required" style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
+			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;">
+			<input type="text" pattern="([ABCDabcdl123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
 			<br>
 			<br>
 			Klassenlehrer:
 			<br>
-			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required="required">
+			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required>
 			<br>
 			<br>
 			Geburtstag
 			<br>
-			<input type="date">
+			<input type="text" id="datepicker">
 			<br>
 			<br>
 			Email:
@@ -213,7 +213,7 @@ if ($show_formular_schueler) {
 			<br>
 			<div style="width: 20%; display: inline-block;">
 				<h3>1.Fach:</h3>
-				<select name="fach1" required="required">
+				<select name="fach1" required>
 				<?php 
 				for ($i = 0; $i < count($faecher); $i++) {
 					echo "<option value=".$faecher[$i].">".$faecher_lesbar[$i]."</option>";
@@ -336,30 +336,30 @@ if ($show_formular_lehrer) {
 			Vorname:
 			<span style="float: right; width: 50%;">Nachname:</span>
 			<br>
-			<input type="text" maxlength="49" name="vname" autofocus required="required" style="width: 40%;">
-			<input type="text" maxlength="49" name="nname" required="required" style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
+			<input type="text" maxlength="49" name="vname" autofocus required style="width: 40%;">
+			<input type="text" maxlength="49" name="nname" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
 			<br>
 			<br>
 			Klassenstufe:
 			<span style="float: right; width: 50%;">Klasse/Kurs:</span>
 			<br>
-			<input type="number" name="klassenstufe" min="5" max="12" required="required" style="width: 40%;">
-			<input type="text" pattern="[ABCDabcdl123456]" required="required" name="klasse_kurs" style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
+			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;">
+			<input type="text" pattern="[ABCDabcdl123456]" required name="klasse" style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
 			<br>
 			<br>
 			Klassenlehrer:
 			<br>
-			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required="required">
+			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required>
 			<br>
 			<br>
 			Geburtstag
 			<br>
-			<input type="date">
+			<input type="text" id="datepicker">
 			<br>
 			<br>
 			Email:
 			<br>
-			<input type="email" class="textinput" maxlength="49" name="email" required="required">
+			<input type="email" class="textinput" maxlength="49" name="email" required>
 			<br>
 			<br>
 			Telefon
@@ -368,7 +368,7 @@ if ($show_formular_lehrer) {
 			<br>
 			<div style="width: 20%; display: inline-block;">
 				<h3>1.Fach:</h3>
-				<select name="fach1" required="required">
+				<select name="fach1" required>
 				<?php 
 				for ($i = 0; $i < count($faecher); $i++) {
 					echo "<option value=".$faecher[$i].">".$faecher_lesbar[$i]."</option>";
@@ -379,7 +379,7 @@ if ($show_formular_lehrer) {
 				<br>
 				Fachlehrer
 				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach1_lehrer">
+				<input type="text" class="textinput" maxlength="49" name="fach1_lehrer" required>
 				<br>
 			</div>
 			<div style="width: 20%; display: inline-block; margin-left: 10%;">
