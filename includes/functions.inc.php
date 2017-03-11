@@ -145,20 +145,21 @@ function validate_input($sl, $is_output = FALSE) {
 	$sl['fach2_lehrer'] = strip_tags($sl['fach2_lehrer']);
 	$sl['fach3_lehrer'] = strip_tags($sl['fach3_lehrer']);
 	$sl['klassenlehrer_name'] = strip_tags($sl['klassenlehrer_name']);
-	$sl['klasse_kurs'] = strip_tags($sl['klasse_kurs']);
+	$sl['klasse'] = strip_tags($sl['klasse']);
 	$sl['comment'] = strip_tags($sl['comment']);
 	if(!is_int($sl['telefon']) && $sl['telefon'] != NULL) {
 		echo "FEHLER";
 	}
-	if (strcmp ( $fach2, '' ) == 0) {
-		$fach2 = NULL;
-		$fach2_lehrer = NULL;
+	if (strcmp ( $sl['fach2'], '' ) == 0) {
+		$sl['fach2'] = '';
+		$sl['fach2_lehrer'] = NULL;
 	}
-	if (strcmp ( $fach3, '' ) == 0) {
-		$fach3 = NULL;
-		$fach3_lehrer = NULL;
-	}	
-	$error;
+	if (strcmp ( $sl['fach3'], '' ) == 0) {
+		echo "TEST";
+		$sl['fach3'] = '';
+		$sl['fach3_lehrer'] = NULL;
+	}
+	$error = "";
 	if(!isset($sl['vname']) || strlen($sl['vname']) < 3 || strlen($sl['vname']) > 49) {
 //		echo "<br><br>Bitte gib einen Vornamen an, der zwischen 3 und 49 Zeichen lang ist.";
 		$error = $error."<br><br>Bitte gib einen Vornamen an, der zwischen 3 und 49 Zeichen lang ist.";
@@ -191,6 +192,7 @@ function validate_input($sl, $is_output = FALSE) {
 //		echo "<br><br>Bitte wähle ein korrektes Fach aus.";
 		$error = $error."<br><br>Bitte wähle ein korrektes Fach aus.";
 	}
+	echo array_search($sl['fach2'], $faecher);
 	if(!isset($sl['fach2']) || array_search($sl['fach2'], $faecher) === false) {
 //		echo "<br><br>Bitte wähle ein korrektes 2.Fach aus.";
 		$error = $error."<br><br>Bitte wähle ein korrektes 2.Fach aus.";
@@ -231,7 +233,7 @@ function validate_input($sl, $is_output = FALSE) {
 		$sl['fach2_lehrer'] = htmlspecialchars($sl['fach2_lehrer'],  ENT_QUOTES, 'UTF-8');
 		$sl['fach3_lehrer'] = htmlspecialchars($sl['fach3_lehrer'],  ENT_QUOTES, 'UTF-8');
 		$sl['klassenlehrer_name'] = htmlspecialchars($sl['klassenlehrer_name'],  ENT_QUOTES, 'UTF-8');
-		$sl['klasse_kurs'] = htmlspecialchars($sl['klasse_kurs'],  ENT_QUOTES, 'UTF-8');
+		$sl['klasse'] = htmlspecialchars($sl['klasse'],  ENT_QUOTES, 'UTF-8');
 		$sl['comment'] = htmlspecialchars($sl['comment'],  ENT_QUOTES, 'UTF-8');
 	}
 //	return "<br><br>Error";

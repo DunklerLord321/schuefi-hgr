@@ -1,5 +1,6 @@
 <?php
 session_start ();
+error_reporting(E_ALL);
 $ret = strtok ( $_SERVER ['PHP_SELF'], "/" );
 while ( $ret !== false ) {
 	$ret = strtok ( "/" );
@@ -57,8 +58,8 @@ var interval = 6000;
 				<?php if(strcmp($active, "content.php") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>><a
 				href="content.php">Hauptseite</a></li>
 			<li
-				<?php if(strcmp($active, "index.php") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>><a
-				href="index.php">Login</a></li>
+				<?php if(strcmp($active, "settings.php") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>><a
+				href="settings.php">Einstellungen</a></li>
 			<li class="navigation_li"><a href="content.php" id="log_in">
 			<script type="text/javascript"> function get_user_logged_in_ajax() {
 				if (window.XMLHttpRequest) {

@@ -55,7 +55,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					$fach3_lehrer = NULL;
 				}
 				// $return_prep = $pdo_insert->prepare ( "UPDATE schueler (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
-				$return_prep = $pdo_insert->prepare ( "UPDATE schueler SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
+				$return_prep = $pdo_insert->prepare ( "UPDATE ".$schueler_table." SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
 				$return = $return_prep->execute ( array (
 						'vname' => $vname,
 						'nname' => $nname,
@@ -96,7 +96,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					$fach3 = NULL;
 					$fach3_lehrer = NULL;
 				}
-				$return_prep = $pdo_insert->prepare ( "UPDATE lehrer SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
+				$return_prep = $pdo_insert->prepare ( "UPDATE ".$lehrer_table." SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
 				$return = $return_prep->execute ( array (
 						'vname' => $vname,
 						'nname' => $nname,
@@ -147,7 +147,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 
 if ($show_formular_schueler) {
 	$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-	$return_prep = $pdo_insert->prepare ( "SELECT * FROM schueler WHERE id = :id" );
+	$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$schueler_table." WHERE id = :id" );
 	$return = $return_prep->execute ( array (
 			'id' => $_GET ['fschuel'] 
 	) );
@@ -209,9 +209,9 @@ if ($show_formular_schueler) {
 				<?php 
 				for ($i = 0; $i < count($faecher); $i++) {
 					if(strcmp($schueler['fach1'], $faecher[$i]) == 0) {
-						echo "<option value=".$faecher[$i]." selected >".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\" selected >".$faecher_lesbar[$i]."</option>";
 					}else{
-						echo "<option value=".$faecher[$i].">".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\">".$faecher_lesbar[$i]."</option>";
 					}
 				}
 				?>
@@ -230,9 +230,9 @@ if ($show_formular_schueler) {
 				<?php 
 				for ($i = 0; $i < count($faecher); $i++) {
 					if(strcmp($schueler['fach2'], $faecher[$i]) == 0) {
-						echo "<option value=".$faecher[$i]." selected >".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\" selected >".$faecher_lesbar[$i]."</option>";
 					}else{
-						echo "<option value=".$faecher[$i].">".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\">".$faecher_lesbar[$i]."</option>";
 					}
 				}
 				?>
@@ -251,9 +251,9 @@ if ($show_formular_schueler) {
 				<?php 
 				for ($i = 0; $i < count($faecher); $i++) {
 					if(strcmp($schueler['fach3'], $faecher[$i]) == 0) {
-						echo "<option value=".$faecher[$i]." selected >".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\" selected >".$faecher_lesbar[$i]."</option>";
 					}else{
-						echo "<option value=".$faecher[$i].">".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\">".$faecher_lesbar[$i]."</option>";
 					}
 				}
 				?>
@@ -330,7 +330,7 @@ if ($show_formular_schueler) {
 }
 if ($show_formular_lehrer) {
 	$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-	$return_prep = $pdo_insert->prepare ( "SELECT * FROM lehrer WHERE id = :id" );
+	$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$lehrer_table." WHERE id = :id" );
 	$return = $return_prep->execute ( array (
 			'id' => $_GET ['flehr'] 
 	) );
@@ -392,9 +392,9 @@ if ($show_formular_lehrer) {
 				<?php 
 				for ($i = 0; $i < count($faecher); $i++) {
 					if(strcmp($lehrer['fach1'], $faecher[$i]) == 0) {
-						echo "<option value=".$faecher[$i]." selected >".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\" selected >".$faecher_lesbar[$i]."</option>";
 					}else{
-						echo "<option value=".$faecher[$i].">".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\">".$faecher_lesbar[$i]."</option>";
 					}
 				}
 				?>
@@ -413,9 +413,9 @@ if ($show_formular_lehrer) {
 				<?php 
 				for ($i = 0; $i < count($faecher); $i++) {
 					if(strcmp($lehrer['fach2'], $faecher[$i]) == 0) {
-						echo "<option value=".$faecher[$i]." selected >".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\" selected >".$faecher_lesbar[$i]."</option>";
 					}else{
-						echo "<option value=".$faecher[$i].">".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\">".$faecher_lesbar[$i]."</option>";
 					}
 				}
 				?>
@@ -434,9 +434,9 @@ if ($show_formular_lehrer) {
 				<?php 
 				for ($i = 0; $i < count($faecher); $i++) {
 					if(strcmp($lehrer['fach3'], $faecher[$i]) == 0) {
-						echo "<option value=".$faecher[$i]." selected >".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\" selected >".$faecher_lesbar[$i]."</option>";
 					}else{
-						echo "<option value=".$faecher[$i].">".$faecher_lesbar[$i]."</option>";
+						echo "<option value=\"".$faecher[$i]."\">".$faecher_lesbar[$i]."</option>";
 					}
 				}
 				?>

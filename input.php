@@ -49,7 +49,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 		} else {
 			if ($_GET ['input'] == 1) {
 				echo "try";
-				$return_prep = $pdo_insert->prepare ( "SELECT * FROM schueler WHERE vname = :vname AND nname = :nname AND `".$year."` = true" );
+				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$schueler_table." WHERE vname = :vname AND nname = :nname AND `".$year."` = true" );
 				$return = $return_prep->execute ( array (
 						'vname' => $person['vname'],
 						'nname' => $person['nname']
@@ -61,15 +61,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					echo "Dieser Schüler existiert bereits";
 				} else {
 //					echo "success";
-					if (strcmp ( $fach2, '' ) == 0) {
-						$fach2 = NULL;
-						$fach2_lehrer = NULL;
-					}
-					if (strcmp ( $fach3, '' ) == 0) {
-						$fach3 = NULL;
-						$fach3_lehrer = NULL;
-					}
-					$return_prep = $pdo_insert->prepare ( "INSERT INTO schueler (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
+					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".$schueler_table." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
 					$return = $return_prep->execute ( array (
 							'vname' => $person['vname'],
 							'nname' => $person['nname'],
@@ -101,7 +93,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					}
 				}
 			} elseif ($_GET ['input'] == 2) {
-				$return_prep = $pdo_insert->prepare ( "SELECT * FROM lehrer WHERE vname = :vname AND nname = :nname" );
+				$return_prep = $pdo_insert->prepare ( "SELECT * ".$lehrer_table." WHERE vname = :vname AND nname = :nname" );
 				$return = $return_prep->execute ( array (
 						'vname' => $vname,
 						'nname' => $nname 
@@ -112,15 +104,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 				if ($found_user !== false)
 					echo "Dieser Lehrer existiert bereits";
 				else {
-					if (strcmp ( $fach2, '' ) == 0) {
-						$fach2 = NULL;
-						$fach2_lehrer = NULL;
-					}
-					if (strcmp ( $fach3, '' ) == 0) {
-						$fach3 = NULL;
-						$fach3_lehrer = NULL;
-					}
-					$return_prep = $pdo_insert->prepare ( "INSERT INTO lehrer (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
+					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".$lehrer_table." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
 					$return = $return_prep->execute ( array (
 							'vname' => $vname,
 							'nname' => $nname,

@@ -18,7 +18,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 	}
 	if ($show_formular_lehrer) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_query = $pdo_insert->query ( "SELECT * FROM lehrer WHERE 1" );
+		$return_query = $pdo_insert->query ( "SELECT * FROM ".$lehrer_table." WHERE 1" );
 		if ($return_query == false) {
 			echo "EIN PROBLEM";
 		} else {
@@ -42,10 +42,12 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 					}
 					echo "<br>Email:   " . $lehrer ['email'] . "<br>Klassenlehrer/Tutor: " . $lehrer ['klassenlehrer_name'];
 					echo "<br>1.Fach:   " . get_faecher_lesbar($lehrer ['fach1']) . " bei " . $lehrer ['fach1_lehrer'];
-					if (strlen ( $lehrer ['fach2'] ) != 0)
+					if (isset($lehrer['fach2']) && strlen ( $lehrer ['fach2'] ) != 0) {
 						echo "<br>2.Fach:   " . get_faecher_lesbar($lehrer ['fach2']) . " bei " . $lehrer ['fach2_lehrer'];
-					if (strlen ( $lehrer ['fach3'] ) != 0)
+					}
+					if (isset($lehrer['fach3']) && strlen ( $lehrer ['fach3'] ) != 0) {
 						echo "<br>3.Fach:   " .get_faecher_lesbar($lehrer ['fach3']) . " bei " . $lehrer ['fach3_lehrer'];
+					}
 					?>
 					<br><br>
 					<table class="time_output">
@@ -99,7 +101,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 	}
 	if ($show_formular_schueler) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_query = $pdo_insert->query ( "SELECT * FROM schueler WHERE 1" );
+		$return_query = $pdo_insert->query ( "SELECT * FROM ".$schueler_table." WHERE 1" );
 		if ($return_query == false) {
 			echo "EIN PROBLEM";
 		} else {
