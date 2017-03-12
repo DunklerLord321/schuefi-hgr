@@ -6,12 +6,12 @@ global $dbuser_passwd;
 $login_user = 'sec_login';
 $dbuser = 'schuefi';
 require 'includes/db_data.php';
-global $year;
-$year = '1617';
+//global $year;
+//$year = '1617';
 global $lehrer_table;
-$lehrer_table = "lehrer1617";
+$lehrer_table = "`lehrer-1617`";
 global $schueler_table;
-$schueler_table = "schueler1617";
+$schueler_table = "`schueler-1617`";
 //um in <select> angezeignet zu werden
 global $faecher_lesbar;
 $faecher_lesbar = array(

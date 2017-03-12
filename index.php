@@ -39,33 +39,33 @@ if (isset ( $_GET ['login'] ) && $_GET ['login'] == 1) {
 	if ($user !== false && password_verify ( $passwort, $user ['passwd'] ) && $user ['count_login'] < 5) {
 		session_regenerate_id ();
 		$_SESSION ['userid'] = $user ['id'];
-		echo "hhahahha";
 		$_SESSION ['username'] = $user ['email'];
 		$_SESSION ['vname'] = $user ['vname'];
 		$_SESSION ['nname'] = $user ['nname'];
 		$_SESSION ['account'] = $user ['account'];
 		log_in ( $user ['id'] );
-		echo "log in";
+		$statement = $pdo_login->prepare ( "UPDATE users SET count_login = 0 WHERE email = :email" );
+		$result = $statement->execute ( array (
+				'email' => $email
+		) );
 		$output = "Hallo " . utf8_encode ( $_SESSION ['vname'] ) . " " . utf8_encode ( $_SESSION ['nname'] ) . "!<br><br>Du wurdest erfolgreich angemeldet.<br><br>
 		<meta http-equiv=\"refresh\" content=\"3;url=content.php\"
 		<br>Du wirst in 3 Sekunden auttomatisch auf die Hauptseite weitergeleitet.<br><br>
  		Für manuelle Weiterleitung hier klicken: <a href=\"content.php\">Hautpseite</a>";
 		$show_anmelden = false;
-		echo "success";
 	} else {
 		$errorMessage = "E-Mail oder Passwort war ungültig<br>";
 		if ($user !== false) {
-			$statement = $pdo_login->prepare ( "UPDATE users SET count_login = :count WHERE email = :email" );
-			// echo "prepare";
-			$result = $statement->execute ( array (
-					'count' => $user ['count_login'] + 1,
-					'email' => $email 
-			) );
-			if ($user ['count_login'] > 5) {
+			if ($user ['count_login'] >= 5) {
 				$output = "Sie haben sich mindestens fünfmal versucht, mit falschem Passwort anzumelden.<br><br> Bitte kontaktieren sie den Admin.";
 				unset ( $errorMessage );
 				$show_anmelden = false;
 			}
+			$statement = $pdo_login->prepare ( "UPDATE users SET count_login = :count WHERE email = :email" );
+			$result = $statement->execute ( array (
+					'count' => $user ['count_login'] + 1,
+					'email' => $email 
+			) );
 		} else {
 			$show_anmelden = true;
 		}

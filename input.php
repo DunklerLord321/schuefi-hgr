@@ -4,6 +4,9 @@ require 'includes/global_vars.inc.php';
 if (! function_exists ( 'get_users_logged_in' )) {
 	include 'includes/functions.inc.php';
 }
+
+
+
 echo "<h2>Eingabe</h2>";
 $show_formular_schueler = true;
 $show_formular_lehrer = false;
@@ -49,7 +52,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 		} else {
 			if ($_GET ['input'] == 1) {
 				echo "try";
-				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$schueler_table." WHERE vname = :vname AND nname = :nname AND `".$year."` = true" );
+				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$schueler_table." WHERE vname = :vname AND nname = :nname");
 				$return = $return_prep->execute ( array (
 						'vname' => $person['vname'],
 						'nname' => $person['nname']

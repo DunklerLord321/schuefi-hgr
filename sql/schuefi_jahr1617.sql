@@ -26,10 +26,10 @@ USE `schuefi`;
 -- --------------------------------------------------------
 
 --
--- Table structure for table `lehrer1617`
+-- Table structure for table `lehrer-1617`
 --
 
-CREATE TABLE `lehrer1617` (
+CREATE TABLE `lehrer-1617` (
   `id` int(11) NOT NULL,
   `vname` varchar(50) COLLATE latin1_general_ci NOT NULL,
   `nname` varchar(50) COLLATE latin1_general_ci NOT NULL,
@@ -68,10 +68,10 @@ CREATE TABLE `lehrer1617` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
 --
--- Dumping data for table `lehrer1617`
+-- Dumping data for table `lehrer-1617`
 --
 
-INSERT INTO `lehrer1617` (`id`, `vname`, `nname`, `email`, `telefon`, `klassenstufe`, `klasse`, `klassenlehrer_name`, `geburtstag`, `fach1`, `fach1_lehrer`, `fach1_nachweis`, `fach2`, `fach2_lehrer`, `fach2_nachweis`, `fach3`, `fach3_lehrer`, `fach3_nachweis`, `status`, `mo_anfang`, `mo_ende`, `di_anfang`, `di_ende`, `mi_anfang`, `mi_ende`, `do_anfang`, `do_ende`, `fr_anfang`, `fr_ende`, `last_update`, `hinzugefügt`, `1617`, `1718`, `1819`, `comment`) VALUES
+INSERT INTO `lehrer-1617` (`id`, `vname`, `nname`, `email`, `telefon`, `klassenstufe`, `klasse`, `klassenlehrer_name`, `geburtstag`, `fach1`, `fach1_lehrer`, `fach1_nachweis`, `fach2`, `fach2_lehrer`, `fach2_nachweis`, `fach3`, `fach3_lehrer`, `fach3_nachweis`, `status`, `mo_anfang`, `mo_ende`, `di_anfang`, `di_ende`, `mi_anfang`, `mi_ende`, `do_anfang`, `do_ende`, `fr_anfang`, `fr_ende`, `last_update`, `hinzugefügt`, `1617`, `1718`, `1819`, `comment`) VALUES
 (1, 'Martin', 'Zietz', 'martin.zietz@t-online.de', NULL, 12, '6', 'Frau Schimek', NULL, 'ma', 'Frau Schimek', 0, NULL, NULL, 0, NULL, NULL, 0, NULL, '15:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '2017-02-13 08:35:47', '2017-02-13 09:35:47', 0, 0, 0, NULL),
 (2, 'Carolin', 'Seffer', 'carolin_seffer@yahoo.de', NULL, 12, '1', 'Frau Bachmann', NULL, 'eng', 'Frau Bachmann', 0, NULL, NULL, 0, NULL, NULL, 0, NULL, '14:45:00', '16:45:00', '00:00:00', '00:00:00', '12:45:00', '16:00:00', '12:45:00', '16:00:00', '14:00:00', '16:00:00', '2017-02-14 08:00:23', '2017-02-14 09:00:23', 0, 0, 0, NULL);
 
@@ -81,7 +81,7 @@ INSERT INTO `lehrer1617` (`id`, `vname`, `nname`, `email`, `telefon`, `klassenst
 -- Table structure for table `paare`
 --
 
-CREATE TABLE `paare1617` (
+CREATE TABLE `paare-1617` (
   `id` int(11) NOT NULL,
   `id_lehrer` int(11) NOT NULL,
   `id_schueler` int(11) NOT NULL,
@@ -96,7 +96,7 @@ CREATE TABLE `paare1617` (
 -- Table structure for table `schueler`
 --
 
-CREATE TABLE `schueler1617` (
+CREATE TABLE `schueler-1617` (
   `id` int(11) NOT NULL,
   `vname` varchar(50) COLLATE latin1_general_ci NOT NULL,
   `nname` varchar(50) COLLATE latin1_general_ci NOT NULL,
@@ -135,10 +135,10 @@ CREATE TABLE `schueler1617` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
 --
--- Dumping data for table `schueler1617`
+-- Dumping data for table `schueler-1617`
 --
 
-INSERT INTO `schueler1617` (`id`, `vname`, `nname`, `email`, `telefon`, `klassenstufe`, `klasse`, `klassenlehrer_name`, `geburtstag`, `fach1`, `fach1_lehrer`, `fach1_themenbezogen`, `fach2`, `fach2_lehrer`, `fach2_themenbezogen`, `fach3`, `fach3_lehrer`, `fach3_themenbezogen`, `status`, `mo_anfang`, `mo_ende`, `di_anfang`, `di_ende`, `mi_anfang`, `mi_ende`, `do_anfang`, `do_ende`, `fr_anfang`, `fr_ende`, `last_update`, `hinzugefügt`, `1617`, `1718`, `1819`, `comment`) VALUES
+INSERT INTO `schueler-1617` (`id`, `vname`, `nname`, `email`, `telefon`, `klassenstufe`, `klasse`, `klassenlehrer_name`, `geburtstag`, `fach1`, `fach1_lehrer`, `fach1_themenbezogen`, `fach2`, `fach2_lehrer`, `fach2_themenbezogen`, `fach3`, `fach3_lehrer`, `fach3_themenbezogen`, `status`, `mo_anfang`, `mo_ende`, `di_anfang`, `di_ende`, `mi_anfang`, `mi_ende`, `do_anfang`, `do_ende`, `fr_anfang`, `fr_ende`, `last_update`, `hinzugefügt`, `1617`, `1718`, `1819`, `comment`) VALUES
 (3, 'Albert', 'Sagawe', 'katrinsagawe@gmail.com', NULL, 7, 'b', 'Frau Rabe', NULL, 'eng', 'Frau Peschel', 0, NULL, NULL, 0, NULL, NULL, 0, NULL, '12:50:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '12:50:00', '00:00:00', '12:50:00', '00:00:00', '2017-03-04 06:42:22', '2017-03-04 07:42:22', 1, 0, 0, NULL),
 (11, 'Marc', 'Roggentin', 'Marc_Sachsen@online.de', NULL, 9, 'b', 'Herr Stange', NULL, 'ma', 'Frau Peschel', 0, 'eng', 'Frau Bachmann', 0, NULL, NULL, 0, NULL, '14:15:00', '15:15:00', '00:00:00', '00:00:00', '14:15:00', '15:15:00', '00:00:00', '00:00:00', '00:00:00', '00:00:00', '2017-02-11 11:17:42', '2017-02-11 12:17:42', 1, 0, 0, NULL),
 (16, 'Isabelle', 'Sagawe', 'katrinsagawe@gmail.com', NULL, 6, 'a', 'Frau Ganzer', NULL, 'eng', 'Frau Peschel', 0, 'fra', 'Frau Muche', 0, NULL, NULL, 0, NULL, '00:00:00', '00:00:00', '11:50:00', '00:00:00', '11:50:00', '00:00:00', '14:00:00', '00:00:00', '00:00:00', '00:00:00', '2017-03-04 06:50:03', '2017-03-04 07:50:03', 1, 0, 0, NULL),
@@ -153,21 +153,21 @@ INSERT INTO `schueler1617` (`id`, `vname`, `nname`, `email`, `telefon`, `klassen
 --
 -- Indexes for table `lehrer`
 --
-ALTER TABLE `lehrer1617`
+ALTER TABLE `lehrer-1617`
   ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `paare`
 --
-ALTER TABLE `paare1617`
+ALTER TABLE `paare-1617`
   ADD PRIMARY KEY (`id`),
   ADD KEY `paare_ibfk_2` (`id_schueler`),
   ADD KEY `paare_ibfk_1` (`id_lehrer`);
 
 --
--- Indexes for table `schueler1617`
+-- Indexes for table `schueler-1617`
 --
-ALTER TABLE `schueler1617`
+ALTER TABLE `schueler-1617`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -177,17 +177,17 @@ ALTER TABLE `schueler1617`
 --
 -- AUTO_INCREMENT for table `lehrer`
 --
-ALTER TABLE `lehrer1617`
+ALTER TABLE `lehrer-1617`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `paare`
 --
-ALTER TABLE `paare1617`
+ALTER TABLE `paare-1617`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `schueler`
 --
-ALTER TABLE `schueler1617`
+ALTER TABLE `schueler-1617`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 --
 -- Constraints for dumped tables
@@ -196,9 +196,9 @@ ALTER TABLE `schueler1617`
 --
 -- Constraints for table `paare`
 --
-ALTER TABLE `paare1617`
-  ADD CONSTRAINT `paare_ibfk_1` FOREIGN KEY (`id_lehrer`) REFERENCES `lehrer1617` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `paare_ibfk_2` FOREIGN KEY (`id_schueler`) REFERENCES `schueler1617` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `paare-1617`
+  ADD CONSTRAINT `paare_ibfk_1` FOREIGN KEY (`id_lehrer`) REFERENCES `lehrer-1617` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `paare_ibfk_2` FOREIGN KEY (`id_schueler`) REFERENCES `schueler-1617` (`id`) ON UPDATE CASCADE;
 --
 -- Database: `schuefi_login`
 --
