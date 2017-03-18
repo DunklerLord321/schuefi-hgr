@@ -11,15 +11,78 @@ function get_faecher_lesbar($fach) {
 	return "Kein Fach gefunden.";
 }
 
+function get_next_year() {
+	$year = get_prop("current_year");
+	$allyears = get_prop("all_years");
+	$allyears = explode('_', $allyears[1]);
+	$year = intval($year[1]);
+	$year += 101;
+	if(array_search($year, $allyears) === false) {
+		return false;
+	}
+	return $year;
+}
+
+function get_current_table($schueler_lehrer_paare) {
+	$year = get_prop("current_year");
+	if(strcmp($schueler_lehrer_paare,"schueler") == 0)
+		return "`schueler-$year[1]`";
+	if(strcmp($schueler_lehrer_paare,"lehrer") == 0)
+		return "`lehrer-$year[1]`";
+	if(strcmp($schueler_lehrer_paare,"paare") == 0)
+		return "`paare-$year[1]`";
+			}
+
+function get_prop($key) {
+	if (! isset ( $login_user )) {
+		include "includes/global_vars.inc.php";
+	}
+	$pdo_login = new PDO ( 'mysql:host=localhost;dbname=schuefi', $dbuser, $dbuser_passwd );
+	$ret_prep = $pdo_login->prepare ( "SELECT * FROM `settings` WHERE `key` LIKE :key_value" );
+	$return = $ret_prep->execute ( array (
+			'key_value' => $key,
+	) );
+	if($return === false) {
+		return false;
+	}else{
+		$return = $ret_prep->fetch();
+		if($return === false)
+			return false;
+		return $return;
+	}
+}
+
+function set_prop($key, $value) {
+	if (! isset ( $login_user )) {
+		include "includes/global_vars.inc.php";
+	}
+	$pdo_login = new PDO ( 'mysql:host=localhost;dbname=schuefi', $dbuser, $dbuser_passwd );
+	$ret_prep = $pdo_login->prepare ( "SELECT * FROM `settings` WHERE `key` = :key" );
+	$return = $ret_prep->execute ( array (
+			'key' => $key
+	) );
+	//test, ob key existiert
+	if($return === false) {
+		return false;
+	}else{
+		$ret_prep = $pdo_login->prepare ( "UPDATE `settings` SET `value` = :value WHERE `key` = :key" );
+		$return = $ret_prep->execute ( array (
+				'value' => strip_tags($value),
+				'key' => strip_tags($key)
+		) );
+		return true;
+	}
+}
+
 function return_schueler_40($schueler) {
 	$output = "<fieldset style=\"padding: 40px; width: 40%; display: inline-block;line-height: 150%;\">
   <legend><b>Schüler: " . $schueler ['vname'] . " " . $schueler ['nname'] . "</b></legend>
-  Name: " . $schueler ['vname'] . " " . $schueler ['nname'] . "<br>Email: " . $schueler ['email'] . "<br>Klassenlehrer/Tutor: " . $schueler ['klassenlehrer_name'] . "<br>1.Fach: " . $schueler ['fach1'] . " bei " . $schueler ['fach1_lehrer'];
+  Name: " . $schueler ['vname'] . " " . $schueler ['nname'] . "<br>Email: " . $schueler ['email'] . "<br>Klassenlehrer/Tutor: " . $schueler ['klassenlehrer_name'] . "<br>1.Fach: " . get_faecher_lesbar($schueler ['fach1']) . " bei " . $schueler ['fach1_lehrer'];
 	if (strlen ( $schueler ['fach2'] ) != 0) {
-		$output = $output . "<br>2.Fach: " . $schueler ['fach2'] . " bei " . $schueler ['fach2_lehrer'];
+		$output = $output . "<br>2.Fach: " . get_faecher_lesbar($schueler ['fach2']) . " bei " . $schueler ['fach2_lehrer'];
 	}
 	if (strlen ( $schueler ['fach3'] ) != 0) {
-		$output = $output . "<br>3.Fach: " . $schueler ['fach3'] . " bei " . $schueler ['fach3_lehrer'];
+		$output = $output . "<br>3.Fach: " . get_faecher_lesbar($schueler ['fach3']) . " bei " . $schueler ['fach3_lehrer'];
 	}
 	$output = $output . "<br><br>
 	<table class=\"time_output\">
@@ -155,7 +218,6 @@ function validate_input($sl, $is_output = FALSE) {
 		$sl['fach2_lehrer'] = NULL;
 	}
 	if (strcmp ( $sl['fach3'], '' ) == 0) {
-		echo "TEST";
 		$sl['fach3'] = '';
 		$sl['fach3_lehrer'] = NULL;
 	}
@@ -192,7 +254,6 @@ function validate_input($sl, $is_output = FALSE) {
 //		echo "<br><br>Bitte wähle ein korrektes Fach aus.";
 		$error = $error."<br><br>Bitte wähle ein korrektes Fach aus.";
 	}
-	echo array_search($sl['fach2'], $faecher);
 	if(!isset($sl['fach2']) || array_search($sl['fach2'], $faecher) === false) {
 //		echo "<br><br>Bitte wähle ein korrektes 2.Fach aus.";
 		$error = $error."<br><br>Bitte wähle ein korrektes 2.Fach aus.";

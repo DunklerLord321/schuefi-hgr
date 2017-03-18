@@ -53,7 +53,7 @@ if (isset ( $_GET ['input'] ) && ($_GET ['input'] == 1 || $_GET ['input'] == 2) 
 				$show_formular_paar = true;
 				$gewaehltes_fach = $gewaehlter_schueler ['fach' . $paar_schueler_fach];
 				echo $gewaehltes_fach;
-				echo "Dieser Schüler existiert bereits<br>";
+				echo "<br><div style=\"display:flex;\">";
 				echo return_schueler_40($gewaehlter_schueler);
 				
 				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$lehrer_table." WHERE klassenstufe > :klasse AND (fach1 = :fach1 OR fach2 = :fach1 OR fach3 = :fach1)" );
@@ -71,19 +71,19 @@ if (isset ( $_GET ['input'] ) && ($_GET ['input'] == 1 || $_GET ['input'] == 2) 
 					echo "<fieldset style=\"padding: 40px; width: 40%; display: inline-block;line-height: 150%;\">";
 					echo "<legend><b>Lehrer: " . $test_lehrer ['vname'] . " " . $test_lehrer ['nname'] . "</b></legend>";
 					echo "Name:    " . $test_lehrer ['vname'] . " " . $test_lehrer ['nname'] . "<br>Email:   " . $test_lehrer ['email'] . "<br>Klassenlehrer/Tutor: " . $test_lehrer ['klassenlehrer_name'];
-					echo "<br>1.Fach:   " . $test_lehrer ['fach1'] . " bei " . $test_lehrer ['fach1_lehrer'];
+					echo "<br>1.Fach:   " . get_faecher_lesbar($test_lehrer ['fach1']) . " bei " . $test_lehrer ['fach1_lehrer'];
 					if (strlen ( $test_lehrer ['fach2'] ) != 0) {
-						echo "<br>2.Fach:   " . $test_lehrer ['fach2'] . " bei " . $test_lehrer ['fach2_lehrer'];
+						echo "<br>2.Fach:   " . get_faecher_lesbar($test_lehrer ['fach2']) . " bei " . $test_lehrer ['fach2_lehrer'];
 					}
 					if (strlen ( $test_lehrer ['fach3'] ) != 0) {
-						echo "<br>3.Fach:   " . $test_lehrer ['fach3'] . " bei " . $test_lehrer ['fach3_lehrer'];
+						echo "<br>3.Fach:   " . get_faecher_lesbar($test_lehrer ['fach3']) . " bei " . $test_lehrer ['fach3_lehrer'];
 					}
 					echo "<br>Montag von " . $test_lehrer ['mo_anfang'] . " bis " . $test_lehrer ['mo_ende'];
 					echo "<br>Dienstag von " . $test_lehrer ['di_anfang'] . " bis " . $test_lehrer ['di_ende'];
 					echo "<br>Mittwoch von " . $test_lehrer ['mi_anfang'] . " bis " . $test_lehrer ['mi_ende'];
 					echo "<br>Donnerstag von " . $test_lehrer ['do_anfang'] . " bis " . $test_lehrer ['do_ende'];
 					echo "<br>Freitag von " . $test_lehrer ['fr_anfang'] . " bis " . $test_lehrer ['fr_ende'];
-					echo "</fieldset>";
+					echo "</fieldset></div>";
 					$times = array (
 							'mo_anfang',
 							'mo_ende',

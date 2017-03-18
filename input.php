@@ -270,7 +270,7 @@ if ($show_formular_schueler) {
 					<br>
 				</div>
 				<div id="zeitdiv" style="display: inline-block; width: 25%;">
-					Mttwoch Anfang:
+					Mitwoch Anfang:
 					<br>
 					<input type="time" value="00:00" name="mi_anfang" class="input_time">
 					<br>
@@ -425,7 +425,7 @@ if ($show_formular_lehrer) {
 					<br>
 				</div>
 				<div style="display: inline-block; width: 25%;">
-					Mttwoch Anfang:
+					Mitwoch Anfang:
 					<br>
 					<input type="time" value="00:00" name="mi_anfang" class="input_time">
 					<br>

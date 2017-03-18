@@ -9,6 +9,49 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 	$show_formular_schueler = false;
 	$show_formular_lehrer = false;
 	
+	if(isset ($_GET['deletelehr']) && is_numeric($_GET['deletelehr'])) {
+		?>
+ 		<form action="<?php echo $_SERVER['PHP_SELF']."?deleteconfirmlehr=".$_GET['deletelehr'];?>" method="post">
+		Achtung! Dieser Vorgang kann nicht rückgängig gemacht werden.<br> 
+		Trotzdem fortsetzen?<br><br>
+		<input type="submit" value="Ok">
+		</form>
+		<?php 
+	}
+	if(isset ($_GET['deleteconfirmlehr']) && is_numeric($_GET['deleteconfirmlehr'])) {
+		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
+		$return_query = $pdo_insert->prepare( "DELETE FROM ".$lehrer_table." WHERE id = :id" );
+		$return = $return_query->execute(array (
+				'id' => $_GET['deleteconfirmlehr']
+		));
+		if($return == false) {
+			echo "Ein Problem ist aufgetreten";
+		}else{
+			echo "Löschen war erfolgreich";
+		}
+	}
+	if(isset ($_GET['deleteschuel']) && is_numeric($_GET['deleteschuel'])) {
+		?>
+	 		<form action="<?php echo $_SERVER['PHP_SELF']."?deleteconfirmschuel=".$_GET['deleteschuel'];?>" method="post">
+			Achtung! Dieser Vorgang kann nicht rückgängig gemacht werden.<br> 
+			Trotzdem fortsetzen?<br><br>
+			<input type="submit" value="Ok">
+			</form>
+			<?php 
+		}
+		if(isset ($_GET['deleteconfirmschuel']) && is_numeric($_GET['deleteconfirmschuel'])) {
+			$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
+			$return_query = $pdo_insert->prepare( "DELETE FROM ".$schueler_table." WHERE id = :id" );
+			$return = $return_query->execute(array (
+					'id' => $_GET['deleteconfirmschuel']
+			));
+			if($return == false) {
+				echo "Ein Problem ist aufgetreten";
+			}else{
+				echo "Löschen war erfolgreich";
+			}
+		}
+		
 	if (isset ( $_GET ['lehrer'] ) && $_GET ['lehrer'] == 1) {
 		$show_formular_lehrer = true;
 		$show_formular_schueler = false;
@@ -90,6 +133,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 					<?php
 					}
 					?>
+					<br><br><br><br><a href="<?php echo $_SERVER['PHP_SELF'];?>?deletelehr=<?php echo $lehrer['id'];?>" class="links">Lösche Lehrer</a>
 					</div>
 				</div>
 				</fieldset>
@@ -127,8 +171,8 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 					echo "<br>1.Fach:   " . get_faecher_lesbar($schueler ['fach1']) . " bei " . $schueler ['fach1_lehrer'];
 					if (strlen ( $schueler ['fach2'] ) != 0)
 						echo "<br>2.Fach:   " . get_faecher_lesbar($schueler ['fach2']) . " bei " . $schueler ['fach2_lehrer'];
-						if (strlen ( $schueler ['fach3'] ) != 0)
-							echo "<br>3.Fach:   " .get_faecher_lesbar($schueler ['fach3']) . " bei " . $schueler ['fach3_lehrer'];
+					if (strlen ( $schueler ['fach3'] ) != 0)
+						echo "<br>3.Fach:   " .get_faecher_lesbar($schueler ['fach3']) . " bei " . $schueler ['fach3_lehrer'];
 						?>
 					<br><br>
 					<table class="time_output">
@@ -167,8 +211,9 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 					<?php
 					if (date ( 'm', mktime ( 0, 0, 0, 7, 0 ) ) < 9 && date ( 'm', mktime ( 0, 0, 0, 7 ) ) > 6) {
 					?><br><br><br><br>
-					<a href="change.php?fschuel=<?php echo $schueler['id'];?>" class="links">Übernehmen ins nächste Jahr</a>
+					<a href="change.php?next_yearschuel=<?php echo $schueler['id'];?>" class="links">Übernehmen ins nächste Jahr</a>
 					<?php }?>
+					<br><br><br><br><a href="<?php echo $_SERVER['PHP_SELF'];?>?deleteschuel=<?php echo $schueler['id'];?>" class="links">Lösche Schüler</a>
 					</div>
 					</div>
 					</fieldset>
