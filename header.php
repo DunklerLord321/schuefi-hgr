@@ -10,6 +10,7 @@ while ( $ret !== false ) {
 		$test = $ret;
 	}
 }
+if(isset($_SESSION['userid']) && isset($_SESSION['username']) && isset($_SESSION['account'])) {
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -125,3 +126,53 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] )) {
 	</nav>
 	<!-- - div endet in letzter Zeile   -->
 	<div class="content">
+	<?php 
+}elseif(strcmp($active, "index.php") == 0) {
+	?>
+		<!DOCTYPE html>
+	<html lang="de">
+	<head>
+	<meta charset="UTF-8">
+	<title>Verwaltung der Daten der Schülerfirma</title>
+	<meta name="verwaltung"
+		content="Verwalte die Daten der Schülerfirma 'Schüler helfen Schülern' einfach und automatisiert.">
+	<link href="design.css" rel="stylesheet">
+	</head>
+	<body>
+		<nav>
+			<ul class="navigation">
+				<!-- -- <li class="navigation_li"><a href="index.php">Login</a></li> -->
+				<li class="navigation_li"><a href="index.php">Du bist nicht angemeldet. Anmelden</a></li>
+			</ul>
+		</nav>
+		<div class="content">
+	<?php
+		
+}else{
+	?>
+	<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Verwaltung der Daten der Schülerfirma</title>
+<meta name="verwaltung"
+	content="Verwalte die Daten der Schülerfirma 'Schüler helfen Schülern' einfach und automatisiert.">
+<link href="design.css" rel="stylesheet">
+</head>
+<body>
+	<nav>
+		<ul class="navigation">
+			<!-- -- <li class="navigation_li"><a href="index.php">Login</a></li> -->
+			<li class="navigation_li"><a href="index.php">Du bist nicht angemeldet. Anmelden</a></li>
+		</ul>
+	</nav>
+	<div class="content">
+		<h1>Logout</h1>
+		<br>Sie wurden leider vom System abgemeldet. Bitte melden Sie sich erneut an.<br>
+		<br> <a href="index.php">Hier geht es zum Login.</a>
+	</div>
+</body>
+</html>
+<?php
+	die();
+}

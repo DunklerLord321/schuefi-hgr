@@ -20,7 +20,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 	}
 	if(isset ($_GET['deleteconfirmlehr']) && is_numeric($_GET['deleteconfirmlehr'])) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_query = $pdo_insert->prepare( "DELETE FROM ".$lehrer_table." WHERE id = :id" );
+		$return_query = $pdo_insert->prepare( "DELETE FROM ".get_current_table("lehrer")." WHERE id = :id" );
 		$return = $return_query->execute(array (
 				'id' => $_GET['deleteconfirmlehr']
 		));
@@ -41,7 +41,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 		}
 		if(isset ($_GET['deleteconfirmschuel']) && is_numeric($_GET['deleteconfirmschuel'])) {
 			$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-			$return_query = $pdo_insert->prepare( "DELETE FROM ".$schueler_table." WHERE id = :id" );
+			$return_query = $pdo_insert->prepare( "DELETE FROM ".get_current_table("schueler")." WHERE id = :id" );
 			$return = $return_query->execute(array (
 					'id' => $_GET['deleteconfirmschuel']
 			));
@@ -61,7 +61,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 	}
 	if ($show_formular_lehrer) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_query = $pdo_insert->query ( "SELECT * FROM ".$lehrer_table." WHERE 1" );
+		$return_query = $pdo_insert->query ( "SELECT * FROM ".get_current_table("lehrer")." WHERE 1" );
 		if ($return_query == false) {
 			echo "EIN PROBLEM";
 		} else {
@@ -129,7 +129,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 					<?php
 					if (date ( 'm', mktime ( 0, 0, 0, 7, 0 ) ) < 9 && date ( 'm', mktime ( 0, 0, 0, 7 ) ) > 6) {
 					?>
-					<br><br><br><br><a href="change.php?flehr=<?php echo $lehrer['id'];?>" class="links">Übernehmen ins nächste Jahr</a>
+					<br><br><br><br><a href="change.php?next_yearlehr=<?php echo $lehrer['id'];?>" class="links">Übernehmen ins nächste Jahr</a>
 					<?php
 					}
 					?>
@@ -145,7 +145,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 	}
 	if ($show_formular_schueler) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_query = $pdo_insert->query ( "SELECT * FROM ".$schueler_table." WHERE 1" );
+		$return_query = $pdo_insert->query ( "SELECT * FROM ".get_current_table("schueler")." WHERE 1" );
 		if ($return_query == false) {
 			echo "EIN PROBLEM";
 		} else {

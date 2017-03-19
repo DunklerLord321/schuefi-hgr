@@ -52,10 +52,7 @@ CREATE TABLE `lehrer-" . $newyear . "` (
   `fr_anfang` time DEFAULT NULL,
   `fr_ende` time DEFAULT NULL,
   `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `hinzugefügt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `1617` tinyint(1) DEFAULT '0',
-  `1718` tinyint(1) DEFAULT '0',
-  `1819` tinyint(1) DEFAULT '0',
+  `hinzugefuegt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `comment` varchar(500) COLLATE latin1_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 		
@@ -99,10 +96,7 @@ CREATE TABLE `schueler-" . $newyear . "` (
   `fr_anfang` time DEFAULT NULL,
   `fr_ende` time DEFAULT NULL,
   `last_update` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `hinzugefügt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `1617` tinyint(1) DEFAULT '0',
-  `1718` tinyint(1) DEFAULT '0',
-  `1819` tinyint(1) DEFAULT '0',
+  `hinzugefuegt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `comment` varchar(500) COLLATE latin1_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 		
@@ -127,8 +121,8 @@ ALTER TABLE `schueler-" . $newyear . "`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 		
 ALTER TABLE `paare-" . $newyear . "`
-  ADD CONSTRAINT `paare_ibfk_1` FOREIGN KEY (`id_lehrer`) REFERENCES `lehrer-" . $newyear . "` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `paare_ibfk_2` FOREIGN KEY (`id_schueler`) REFERENCES `schueler-" . $newyear . "` (`id`) ON UPDATE CASCADE;";
+  ADD FOREIGN KEY (`id_lehrer`) REFERENCES `lehrer-" . $newyear . "` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT,
+  ADD FOREIGN KEY (`id_schueler`) REFERENCES `schueler-" . $newyear . "` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT;";
 			$return_query = $pdo_query->query ( $sql );
 			if ($return_query != false) {
 				$years = get_prop ( "all_years" );

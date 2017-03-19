@@ -52,7 +52,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 		} else {
 			if ($_GET ['input'] == 1) {
 				echo "try";
-				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$schueler_table." WHERE vname = :vname AND nname = :nname");
+				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".get_current_table("schueler")." WHERE vname = :vname AND nname = :nname");
 				$return = $return_prep->execute ( array (
 						'vname' => $person['vname'],
 						'nname' => $person['nname']
@@ -64,7 +64,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					echo "Dieser Schüler existiert bereits";
 				} else {
 //					echo "success";
-					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".$schueler_table." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
+					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".get_current_table("schueler")." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
 					$return = $return_prep->execute ( array (
 							'vname' => $person['vname'],
 							'nname' => $person['nname'],
@@ -96,7 +96,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					}
 				}
 			} elseif ($_GET ['input'] == 2) {
-				$return_prep = $pdo_insert->prepare ( "SELECT * ".$lehrer_table." WHERE vname = :vname AND nname = :nname" );
+				$return_prep = $pdo_insert->prepare ( "SELECT * ".get_current_table("lehrer")." WHERE vname = :vname AND nname = :nname" );
 				$return = $return_prep->execute ( array (
 						'vname' => $vname,
 						'nname' => $nname 
@@ -107,7 +107,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 				if ($found_user !== false)
 					echo "Dieser Lehrer existiert bereits";
 				else {
-					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".$lehrer_table." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
+					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".get_current_table("lehrer")." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
 					$return = $return_prep->execute ( array (
 							'vname' => $vname,
 							'nname' => $nname,

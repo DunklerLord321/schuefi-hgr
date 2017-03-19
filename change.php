@@ -55,7 +55,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					$fach3_lehrer = NULL;
 				}
 				// $return_prep = $pdo_insert->prepare ( "UPDATE schueler (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
-				$return_prep = $pdo_insert->prepare ( "UPDATE " . $schueler_table . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
+				$return_prep = $pdo_insert->prepare ( "UPDATE " . get_current_table("schueler") . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
 				$return = $return_prep->execute ( array (
 						'vname' => $vname,
 						'nname' => $nname,
@@ -96,7 +96,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					$fach3 = NULL;
 					$fach3_lehrer = NULL;
 				}
-				$return_prep = $pdo_insert->prepare ( "UPDATE " . $lehrer_table . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
+				$return_prep = $pdo_insert->prepare ( "UPDATE " . get_current_table("lehrer") . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
 				$return = $return_prep->execute ( array (
 						'vname' => $vname,
 						'nname' => $nname,
@@ -143,12 +143,11 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 		}
 		$schueler = $return_prep->fetch ();
 		$pdo_insert->exec("SET NAMES 'utf8'");
-		var_dump($schueler);
 		if ($schueler == false) {
 			echo "EIN PROBLEM";
 		} else {
 			if (get_next_year () == false) {
-				echo "Das gewünschte Schuljahr existiert noch nicht. Bitte wende dich an den Admin";
+				echo "Das gewünschte Schuljahr existiert noch nicht. Bitte wende dich an den Admin!";
 			} else {
 				$schuelertabel = "`schueler-" . get_next_year () . "`";
 				$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $schuelertabel . " WHERE vname = :vname AND nname = :nname" );
@@ -162,11 +161,11 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 				} else {
 					$klasse = intval($schueler['klassenstufe']);
 					$klasse += 1;
-					echo "Achtung: <br><i>Der Schüler geht automatisch in die nächste Klassenstufe. Falls er sitzengebieben ist, muss das per Hand geändert werden.<br></i>";
+					echo "Achtung: <br><i>Der Schüler geht automatisch in die nächste Klassenstufe. Falls er sitzengebieben ist, muss das per Hand geändert werden.<br>Alle anderen Daten, auch wann der Schüler Zeit hat, werden einfach übernommen.</i>";
 					if($klasse > 12) {
 						echo "Der Schüler müsste die zwölfte Klassen bereits verlassen haben";
 					}
-					if($klasse > 10) {
+					if($klasse == 11) {
 						echo "Achtung: Der Schüler geht nun in die Oberstufe. Der Kurs muss bitte erneut eingegeben werden.";
 					}
 					$schueler['klassenstufe'] = $klasse;
@@ -196,12 +195,83 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 							'fr_ende' => $schueler ['fr_ende'] 
 					) );
 					if ($return) {
-						echo "<br>Daten erfolgreich hinzugefügt";
+						echo "<br>Schüler erfolgreich übernommen";
 					}
 				}
 			}
 		}
 	}
+	if (isset ( $_GET ['next_yearlehr'] )) {
+		var_dump(get_current_table("lehrer"));
+		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
+		$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . get_current_table("lehrer") . " WHERE id = :id" );
+		$return = $return_prep->execute ( array (
+				'id' => $_GET ['next_yearlehr']
+		) );
+		if ($return == false) {
+			echo "EIn PRoblem ist aufgetreten!";
+		}
+		$lehrer = $return_prep->fetch ();
+		$pdo_insert->exec("SET NAMES 'utf8'");
+		if ($lehrer == false) {
+			echo "EIN PROBLEM";
+		} else {
+			if (get_next_year () == false) {
+				echo "Das gewünschte Schuljahr existiert noch nicht. Bitte wende dich an den Admin!";
+			} else {
+				$lehrertabel = "`lehrer-" . get_next_year () . "`";
+				$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $lehrertabel . " WHERE vname = :vname AND nname = :nname" );
+				$return = $return_prep->execute ( array (
+						'vname' => $lehrer ['vname'],
+						'nname' => $lehrer ['nname']
+				) );
+				$testlehrer = $return_prep->fetch ();
+				if ($testlehrer !== false) {
+					echo "Dieser Lehrer existiert bereits im nächsten Jahr";
+				} else {
+					$klasse = intval($lehrer['klassenstufe']);
+					$klasse += 1;
+					echo "Achtung: <br><i>Der Lehrer geht automatisch in die nächste Klassenstufe. Falls er sitzengebieben ist, muss das per Hand geändert werden.<br></i>";
+					if($klasse > 12) {
+						echo "<br><b>Der Lehrer müsste die zwölfte Klassen bereits verlassen haben</b>";
+					}
+					if($klasse == 11) {
+						echo "<br>Achtung: Der Lehrer geht nun in die Oberstufe. Der Kurs muss bitte erneut eingegeben werden.";
+					}
+					$lehrer['klassenstufe'] = $klasse;
+					$return_prep = $pdo_insert->prepare ( "INSERT INTO " . $lehrertabel . " (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
+					$return = $return_prep->execute ( array (
+							'vname' => $lehrer ['vname'],
+							'nname' => $lehrer ['nname'],
+							'email' => $lehrer ['email'],
+							'klassenstufe' => $lehrer ['klassenstufe'],
+							'klasse' => $lehrer ['klasse'],
+							'klassenlehrer_name' => $lehrer ['klassenlehrer_name'],
+							'fach1' => $lehrer ['fach1'],
+							'fach1_lehrer' => $lehrer ['fach1_lehrer'],
+							'fach2' => $lehrer ['fach2'],
+							'fach2_lehrer' => $lehrer ['fach2_lehrer'],
+							'fach3' => $lehrer ['fach3'],
+							'fach3_lehrer' => $lehrer ['fach3_lehrer'],
+							'mo_anfang' => $lehrer ['mo_anfang'],
+							'mo_ende' => $lehrer ['mo_ende'],
+							'di_anfang' => $lehrer ['di_anfang'],
+							'di_ende' => $lehrer ['di_ende'],
+							'mi_anfang' => $lehrer ['mi_anfang'],
+							'mi_ende' => $lehrer ['mi_ende'],
+							'do_anfang' => $lehrer ['do_anfang'],
+							'do_ende' => $lehrer ['do_ende'],
+							'fr_anfang' => $lehrer ['fr_anfang'],
+							'fr_ende' => $lehrer ['fr_ende']
+					) );
+					if ($return) {
+						echo "<br>Lehrer erfolgreich übernommen";
+					}
+				}
+			}
+		}
+	}
+	
 } else {
 	if (! isset ( $_SESSION ['userid'] ) || ! isset ( $_SESSION ['username'] ) || ! if_logged_in ( $_SESSION ['userid'] )) {
 		$show_formular_schueler = false;
@@ -218,7 +288,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 
 if ($show_formular_schueler) {
 	$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-	$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $schueler_table . " WHERE id = :id" );
+	$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . get_current_table("schueler") . " WHERE id = :id" );
 	$return = $return_prep->execute ( array (
 			'id' => $_GET ['fschuel'] 
 	) );
@@ -401,7 +471,7 @@ if ($show_formular_schueler) {
 }
 if ($show_formular_lehrer) {
 	$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-	$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $lehrer_table . " WHERE id = :id" );
+	$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . get_current_table("lehrer") . " WHERE id = :id" );
 	$return = $return_prep->execute ( array (
 			'id' => $_GET ['flehr'] 
 	) );

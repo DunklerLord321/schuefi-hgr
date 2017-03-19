@@ -42,7 +42,7 @@ if (isset ( $_GET ['input'] ) && ($_GET ['input'] == 1 || $_GET ['input'] == 2) 
 		echo "Ein Problem ist aufgetreten. Bitte gib die Daten erneut ein";
 	} else {
 		if ($_GET ['input'] == 1) {
-			$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$schueler_table." WHERE id = :id" );
+			$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".get_current_table("schueler")." WHERE id = :id" );
 			$return = $return_prep->execute ( array (
 					'id' => $paar_schueler_id 
 			) );
@@ -56,7 +56,7 @@ if (isset ( $_GET ['input'] ) && ($_GET ['input'] == 1 || $_GET ['input'] == 2) 
 				echo "<br><div style=\"display:flex;\">";
 				echo return_schueler_40($gewaehlter_schueler);
 				
-				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".$lehrer_table." WHERE klassenstufe > :klasse AND (fach1 = :fach1 OR fach2 = :fach1 OR fach3 = :fach1)" );
+				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".get_current_table("lehrer")." WHERE klassenstufe > :klasse AND (fach1 = :fach1 OR fach2 = :fach1 OR fach3 = :fach1)" );
 				$return = $return_prep->execute ( array (
 						'klasse' => $gewaehlter_schueler ['klassenstufe'],
 						'fach1' => $gewaehltes_fach 
@@ -133,7 +133,7 @@ if ($show_formular_paar) {
 			<select name="paar_schueler">
 	<?php
 	$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-	$return_prep = $pdo_insert->query ( "SELECT * FROM ".$schueler_table."" );
+	$return_prep = $pdo_insert->query ( "SELECT * FROM ".get_current_table("schueler")."" );
 	$return = $return_prep->fetch ();
 	while ( $return != false ) {
 		// echo $return ['id'] . " " . $return ['vname'] . " " . $return ['nname'] . " " . $return ['email'] . " " . $return ['klassenstufe'] . " " . $return ['klasse_kurs'] . " " . $return ['fach1'] . " " . $return ['fach1_lehrer'] . "<br>";
