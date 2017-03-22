@@ -104,9 +104,7 @@ ALTER TABLE `lehrer-" . $newyear . "`
   ADD PRIMARY KEY (`id`);
 		
 ALTER TABLE `paare-" . $newyear . "`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `paare_ibfk_2` (`id_schueler`),
-  ADD KEY `paare_ibfk_1` (`id_lehrer`);
+  ADD PRIMARY KEY (`id`);
 		
 ALTER TABLE `schueler-" . $newyear . "`
   ADD PRIMARY KEY (`id`);
@@ -135,7 +133,8 @@ ALTER TABLE `paare-" . $newyear . "`
 	}
 	if (isset ( $_GET ['delyear'] ) && $_GET ['delyear'] == 1 && isset ( $_POST ['delyear'] ) && is_numeric ( $_POST ['delyear'] )) {
 		// echo $_POST['delyear'];
-		$return = $pdo_query->query ( "SHOW TABLES like '%" . $_POST ['delyear'] . "'" );
+		$delyear = strip_tags($_POST['delyear']);
+ 		$return = $pdo_query->query ( "SHOW TABLES like '%" . $_POST ['delyear'] . "'" );
 		if ($return === false) {
 			echo "<br>Ein Fehler ist passiert";
 		} else {
@@ -154,6 +153,7 @@ ALTER TABLE `paare-" . $newyear . "`
 				$lehrertable = "lehrer-" . $_POST ['delyear'];
 				$schuelertable = "schueler-" . $_POST ['delyear'];
 				$paartable = "paare-" . $_POST ['delyear'];
+				$pdo_query->query("SET foreign_key_checks = 0");
 				$sql = "DROP TABLES `" . $lehrertable . "`, `" . $schuelertable . "`, `" . $paartable . "`;";
 				// echo $sql;
 				$return = $pdo_query->query ( $sql );
@@ -167,6 +167,7 @@ ALTER TABLE `paare-" . $newyear . "`
 					if (set_prop ( "all_years", $years ) == false)
 						echo "<br><b>Fehler</b><br>";
 					echo "<br>Schuljahr wurde erfolgreich gelöscht.<br>";
+					$pdo_query->query("SET foreign_key_checks = 1");
 				}
 			}
 		}
@@ -230,7 +231,7 @@ if (isset ( $_SESSION ['account'] ) && (strcmp ( $_SESSION ['account'], 'normal'
 	$allyears = explode ( "_", $allyears [1] );
 	echo "Aktuelles Schuljahr:<br>$year[1]";
 	?>
-<form action="<?php echo $_SERVER['PHP_SELF']?>?set_current=1" method="post">
+	<form action="<?php echo $_SERVER['PHP_SELF']?>?set_current=1" method="post">
 	<select name="current_year"><?php
 	for($i = 0; $i < count ( $allyears ); $i ++) {
 		if (strcmp ( $year [1], $allyears [$i] ) == 0)

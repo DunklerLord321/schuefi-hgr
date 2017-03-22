@@ -51,7 +51,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 			echo "Es trat ein Fehler auf: $person<br><br>";
 		} else {
 			if ($_GET ['input'] == 1) {
-				echo "try";
+//				echo "try";
 				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".get_current_table("schueler")." WHERE vname = :vname AND nname = :nname");
 				$return = $return_prep->execute ( array (
 						'vname' => $person['vname'],
@@ -64,7 +64,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					echo "Dieser Schüler existiert bereits";
 				} else {
 //					echo "success";
-					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".get_current_table("schueler")." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
+					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".get_current_table("schueler")." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende, telefon, comment) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende, :telefon, :comment)" );
 					$return = $return_prep->execute ( array (
 							'vname' => $person['vname'],
 							'nname' => $person['nname'],
@@ -87,7 +87,9 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 							'do_anfang' => $person['do_anfang'],
 							'do_ende' => $person['do_ende'],
 							'fr_anfang' => $person['fr_anfang'],
-							'fr_ende' => $person['fr_ende']
+							'fr_ende' => $person['fr_ende'],
+							'telefon' => $person['telefon'],
+							'comment' => $person['comment']
 					) );
 					if ($return) {
 						echo "<br>Daten erfolgreich hinzugefügt";
@@ -96,10 +98,11 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					}
 				}
 			} elseif ($_GET ['input'] == 2) {
-				$return_prep = $pdo_insert->prepare ( "SELECT * ".get_current_table("lehrer")." WHERE vname = :vname AND nname = :nname" );
+//				echo get_current_table("lehrer");
+				$return_prep = $pdo_insert->prepare ( "SELECT * FROM ".get_current_table("lehrer")." WHERE vname = :vname AND nname = :nname" );
 				$return = $return_prep->execute ( array (
-						'vname' => $vname,
-						'nname' => $nname 
+						'vname' => $person['vname'],
+						'nname' => $person['nname']
 				) );
 				if (! $return)
 					echo "Es gab ein Problem";
@@ -107,31 +110,36 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 				if ($found_user !== false)
 					echo "Dieser Lehrer existiert bereits";
 				else {
-					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".get_current_table("lehrer")." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
+//					echo "Inserting...";
+//					var_dump($person);
+					$return_prep = $pdo_insert->prepare ( "INSERT INTO ".get_current_table("lehrer")." (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende, telefon, comment) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende, :telefon, :comment)" );
 					$return = $return_prep->execute ( array (
-							'vname' => $vname,
-							'nname' => $nname,
-							'email' => $email,
-							'klassenstufe' => $klassenstufe,
-							'klasse' => $klasse,
-							'klassenlehrer_name' => $klassenlehrer_name,
-							'fach1' => $fach1,
-							'fach1_lehrer' => $fach1_lehrer,
-							'fach2' => $fach2,
-							'fach2_lehrer' => $fach2_lehrer,
-							'fach3' => $fach3,
-							'fach3_lehrer' => $fach3_lehrer,
-							'mo_anfang' => $mo_anfang,
-							'mo_ende' => $mo_ende,
-							'di_anfang' => $di_anfang,
-							'di_ende' => $di_ende,
-							'mi_anfang' => $mi_anfang,
-							'mi_ende' => $mi_ende,
-							'do_anfang' => $do_anfang,
-							'do_ende' => $do_ende,
-							'fr_anfang' => $fr_anfang,
-							'fr_ende' => $fr_ende 
+							'vname' => $person['vname'],
+							'nname' => $person['nname'],
+							'email' => $person['email'],
+							'klassenstufe' => $person['klassenstufe'],
+							'klasse' => $person['klasse'],
+							'klassenlehrer_name' => $person['klassenlehrer_name'],
+							'fach1' => $person['fach1'],
+							'fach1_lehrer' => $person['fach1_lehrer'],
+							'fach2' => $person['fach2'],
+							'fach2_lehrer' => $person['fach2_lehrer'],
+							'fach3' => $person['fach3'],
+							'fach3_lehrer' => $person['fach3_lehrer'],
+							'mo_anfang' => $person['mo_anfang'],
+							'mo_ende' => $person['mo_ende'],
+							'di_anfang' => $person['di_anfang'],
+							'di_ende' => $person['di_ende'],
+							'mi_anfang' => $person['mi_anfang'],
+							'mi_ende' => $person['mi_ende'],
+							'do_anfang' => $person['do_anfang'],
+							'do_ende' => $person['do_ende'],
+							'fr_anfang' => $person['fr_anfang'],
+							'fr_ende' => $person['fr_ende'],
+							'telefon' => $person['telefon'],
+							'comment' => $person['comment']
 					) );
+					var_dump($return_prep->errorInfo());
 					if ($return) {
 						echo "Der Lehrer wurde erfolgreich hinzugefügt.";
 						$show_formular_schueler = false;

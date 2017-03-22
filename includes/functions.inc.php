@@ -11,6 +11,15 @@ function get_faecher_lesbar($fach) {
 	return "Kein Fach gefunden.";
 }
 
+function get_all_years() {
+	$allyears = get_prop("all_years");
+	$allyears = explode('_', $allyears[1]);
+	if($allyears === false) {
+		return false;
+	}
+	return $allyears;
+}
+
 function get_next_year() {
 	$year = get_prop("current_year");
 	$allyears = get_prop("all_years");
@@ -210,9 +219,7 @@ function validate_input($sl, $is_output = FALSE) {
 	$sl['klassenlehrer_name'] = strip_tags($sl['klassenlehrer_name']);
 	$sl['klasse'] = strip_tags($sl['klasse']);
 	$sl['comment'] = strip_tags($sl['comment']);
-	if(!is_int($sl['telefon']) && $sl['telefon'] != NULL) {
-		echo "FEHLER";
-	}
+
 	if (strcmp ( $sl['fach2'], '' ) == 0) {
 		$sl['fach2'] = '';
 		$sl['fach2_lehrer'] = NULL;
@@ -248,6 +255,11 @@ function validate_input($sl, $is_output = FALSE) {
 	if(!isset($sl['email']) || (!filter_var($sl['email'], FILTER_VALIDATE_EMAIL) && !preg_match("/^\+?([0-9\/ -]+)$/", $sl['telefon']) )) {
 //		echo "<br><br>Bitte gib eine korrekte E-Mail-Adresse oder Telefonnummer an.";
 		$error = $error."<br><br>Bitte gib eine korrekte E-Mail-Adresse oder Telefonnummer an.";
+	}
+	
+	//wichtig, da DB integer erwartet
+	if(strlen($sl['telefon']) == 0) {
+		$sl['telefon'] = 0;
 	}
 	
 	if(!isset($sl['fach1']) || array_search($sl['fach1'], $faecher) === false || strlen($sl['fach1']) == 0) {

@@ -7,6 +7,8 @@
 -- Server version: 5.7.17-0ubuntu0.16.04.1
 -- PHP Version: 7.0.15-0ubuntu0.16.04.4
 
+-- Version 1.0
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
@@ -178,9 +180,8 @@ ALTER TABLE `lehrer-1617`
 -- Indexes for table `paare-1617`
 --
 ALTER TABLE `paare-1617`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `paare_ibfk_2` (`id_schueler`),
-  ADD KEY `paare_ibfk_1` (`id_lehrer`);
+  ADD PRIMARY KEY (`id`);
+
 --
 -- Indexes for table `schueler-1617`
 --
