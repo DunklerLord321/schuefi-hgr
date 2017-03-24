@@ -9,44 +9,50 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 	$show_formular_schueler = false;
 	$show_formular_lehrer = false;
 	
-	if(isset ($_GET['deletelehr']) && is_numeric($_GET['deletelehr'])) {
+	if(isset ($_GET['deletelehr']) && is_numeric($_GET['deletelehr']) && isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
 		?>
- 		<form action="<?php echo $_SERVER['PHP_SELF']."?deleteconfirmlehr=".$_GET['deletelehr'];?>" method="post">
+ 		<form action="<?php echo $_SERVER['PHP_SELF']."?deleteconfirmlehr=".$_GET['deletelehr']."&year=".$_GET['year'];?>" method="post">
 		Achtung! Dieser Vorgang kann nicht rückgängig gemacht werden.<br> 
 		Trotzdem fortsetzen?<br><br>
 		<input type="submit" value="Ok">
 		</form>
 		<?php 
 	}
-	if(isset ($_GET['deleteconfirmlehr']) && is_numeric($_GET['deleteconfirmlehr'])) {
+	if(isset ($_GET['deleteconfirmlehr']) && is_numeric($_GET['deleteconfirmlehr']) && isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_query = $pdo_insert->prepare( "DELETE FROM ".get_current_table("lehrer")." WHERE id = :id" );
+		$return_query = $pdo_insert->prepare( "DELETE FROM `lehrer-".$_GET['year']."` WHERE id = :id" );
 		$return = $return_query->execute(array (
 				'id' => $_GET['deleteconfirmlehr']
 		));
 		if($return == false) {
 			echo "Ein Problem ist aufgetreten";
+			if($return_query->errorInfo()[1] == 1451) {
+				echo "<br><br><b>Bitte löse vorher sämtliche Nachhilfepaare mit diesem Lehrer auf!</b>";
+			}
 		}else{
 			echo "Löschen war erfolgreich";
 		}
 	}
-	if(isset ($_GET['deleteschuel']) && is_numeric($_GET['deleteschuel'])) {
+	if(isset ($_GET['deleteschuel']) && is_numeric($_GET['deleteschuel']) && isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
 		?>
-	 		<form action="<?php echo $_SERVER['PHP_SELF']."?deleteconfirmschuel=".$_GET['deleteschuel'];?>" method="post">
+	 		<form action="<?php echo $_SERVER['PHP_SELF']."?deleteconfirmschuel=".$_GET['deleteschuel']."&year=".$_GET['year'];?>" method="post">
 			Achtung! Dieser Vorgang kann nicht rückgängig gemacht werden.<br> 
 			Trotzdem fortsetzen?<br><br>
 			<input type="submit" value="Ok">
 			</form>
 			<?php 
 		}
-		if(isset ($_GET['deleteconfirmschuel']) && is_numeric($_GET['deleteconfirmschuel'])) {
+		if(isset ($_GET['deleteconfirmschuel']) && is_numeric($_GET['deleteconfirmschuel']) && isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
 			$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-			$return_query = $pdo_insert->prepare( "DELETE FROM ".get_current_table("schueler")." WHERE id = :id" );
+			$return_query = $pdo_insert->prepare( "DELETE FROM `schueler-".$_GET['year']."` WHERE id = :id" );
 			$return = $return_query->execute(array (
 					'id' => $_GET['deleteconfirmschuel']
 			));
 			if($return == false) {
 				echo "Ein Problem ist aufgetreten";
+				if($return_query->errorInfo()[1] == 1451) {
+					echo "<br><br><b>Bitte löse vorher sämtliche Nachhilfepaare mit diesem Schüler auf!</b>";
+				}
 			}else{
 				echo "Löschen war erfolgreich";
 			}
@@ -59,9 +65,49 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 		$show_formular_lehrer = false;
 		$show_formular_schueler = true;
 	}
+	if($show_formular_lehrer || $show_formular_schueler) {
+		$year = get_prop ( "current_year" );
+		$allyears = get_prop ( "all_years" );
+		$allyears = explode ( "_", $allyears [1] );
+		echo "Wähle Schuljahr:<br>";
+		?>
+			<form action="<?php echo $_SERVER['PHP_SELF']."?".$_SERVER['QUERY_STRING'];?>" method="get">
+			<?php
+			if($show_formular_lehrer) {
+				echo "<input type=\"hidden\" value=\"".$_GET['lehrer']."\" name=\"lehrer\">";
+			}else{
+				echo "<input type=\"hidden\" value=\"".$_GET['schueler']."\" name=\"schueler\">";
+			}
+			echo "<select name=\"year\">";
+			for($i = 0; $i < count ( $allyears ); $i ++) {
+				echo "<option value=\"$allyears[$i]\"";
+				if(isset($_GET['year']) && strcmp($_GET['year'], $allyears[$i]) == 0) {
+					echo " selected";
+				}
+				if (strcmp ( $year [1], $allyears [$i] ) == 0) {
+					if(!isset($_GET['year'])) {
+						echo " selected>$allyears[$i] - aktuelles Schuljahr</option>";
+					}
+					echo ">$allyears[$i] - aktuelles Schuljahr</option>";
+				} else
+					echo ">$allyears[$i]</option>";
+			}
+			?></select><br><br>
+			<input type="submit" value="Zeige"><br><br><br>
+			</form>
+			<?php
+	}
+	if(isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
+		$table_schueler = "`schueler-".$_GET['year']."`";
+		$table_lehrer = "`lehrer-".$_GET['year']."`";
+	}else {
+		$table_schueler = get_current_table ( "schueler" );
+		$table_lehrer = get_current_table("lehrer");
+		$_GET['year'] = get_prop("current_year")[1];
+	}
 	if ($show_formular_lehrer) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_query = $pdo_insert->query ( "SELECT * FROM ".get_current_table("lehrer")." WHERE 1" );
+		$return_query = $pdo_insert->query ( "SELECT * FROM ".$table_lehrer." WHERE 1" );
 		if ($return_query == false) {
 			echo "EIN PROBLEM";
 		} else {
@@ -125,15 +171,15 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 					</table>
 					</div>
 					<div style="width: 48%; display: inline-block; margin-left: 1%;">
-					<a href="change.php?flehr=<?php echo $lehrer['id'];?>" class="links">Änder die Daten</a>
+					<a href="change.php?flehr=<?php echo $lehrer['id']."&year=".$_GET['year'];?>" class="links">Änder die Daten</a>
 					<?php
-					if (date ( 'm', mktime ( 0, 0, 0, 7, 0 ) ) < 9 && date ( 'm', mktime ( 0, 0, 0, 7 ) ) > 6) {
+					if (date ( 'm', mktime ( 0, 0, 0, 7, 0 ) ) < 9 && date ( 'm', mktime ( 0, 0, 0, 7 ) ) > 6 && $_GET['year'] == get_prop("current_year")[1]) {
 					?>
 					<br><br><br><br><a href="change.php?next_yearlehr=<?php echo $lehrer['id'];?>" class="links">Übernehmen ins nächste Jahr</a>
 					<?php
 					}
 					?>
-					<br><br><br><br><a href="<?php echo $_SERVER['PHP_SELF'];?>?deletelehr=<?php echo $lehrer['id'];?>" class="links">Lösche Lehrer</a>
+					<br><br><br><br><a href="<?php echo $_SERVER['PHP_SELF'];?>?deletelehr=<?php echo $lehrer['id']."&year=".$_GET['year'];?>" class="links">Lösche Lehrer</a>
 					</div>
 				</div>
 				</fieldset>
@@ -145,7 +191,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 	}
 	if ($show_formular_schueler) {
 		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_query = $pdo_insert->query ( "SELECT * FROM ".get_current_table("schueler")." WHERE 1" );
+		$return_query = $pdo_insert->query ( "SELECT * FROM ".$table_schueler." WHERE 1" );
 		if ($return_query == false) {
 			echo "EIN PROBLEM";
 		} else {
@@ -207,13 +253,13 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && if_log
 					</table>
 					</div>
 					<div style="width: 40%; display: inline-block; margin-left: 1%;">
-					<a href="change.php?fschuel=<?php echo $schueler['id'];?>" class="links">Änder die Daten</a>
+					<a href="change.php?fschuel=<?php echo $schueler['id']."&year=".$_GET['year'];?>" class="links">Änder die Daten</a>
 					<?php
-					if (date ( 'm', mktime ( 0, 0, 0, 7, 0 ) ) < 9 && date ( 'm', mktime ( 0, 0, 0, 7 ) ) > 6) {
+					if (date ( 'm', mktime ( 0, 0, 0, 7, 0 ) ) < 9 && date ( 'm', mktime ( 0, 0, 0, 7 ) ) > 6 && $_GET['year'] == get_prop("current_year")[1]) {
 					?><br><br><br><br>
 					<a href="change.php?next_yearschuel=<?php echo $schueler['id'];?>" class="links">Übernehmen ins nächste Jahr</a>
 					<?php }?>
-					<br><br><br><br><a href="<?php echo $_SERVER['PHP_SELF'];?>?deleteschuel=<?php echo $schueler['id'];?>" class="links">Lösche Schüler</a>
+					<br><br><br><br><a href="<?php echo $_SERVER['PHP_SELF'];?>?deleteschuel=<?php echo $schueler['id']."&year=".$_GET['year'];?>" class="links">Lösche Schüler</a>
 					</div>
 					</div>
 					</fieldset>

@@ -162,7 +162,6 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 			echo "EIn PRoblem ist aufgetreten!";
 		}
 		$schueler = $return_prep->fetch ();
-		$pdo_insert->exec ( "SET NAMES 'utf8'" );
 		if ($schueler == false) {
 			echo "EIN PROBLEM";
 		} else {
@@ -217,8 +216,8 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					if ($return) {
 						$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $schuelertabel . " WHERE vname = :vname AND nname = :nname" );
 						$return = $return_prep->execute ( array (
-								'vname' => $lehrer ['vname'],
-								'nname' => $lehrer ['nname']
+								'vname' => $schueler ['vname'],
+								'nname' => $schueler ['nname']
 						) );
 						if ($return == false) {
 							echo "EIn PRoblem ist aufgetreten!";
@@ -228,7 +227,7 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 							echo "EIn Problem liegt vor!";
 						}else{
 							echo "<br>Schüler erfolgreich übernommen";
-							echo "<br><br><a href=\"" . $_SERVER ['PHP_SELF'] . "?fschuel=" . $testschueler ['id'] . "\" class=\"links\">Bearbeite den Schüler</a><br><br>";
+							echo "<br><br><a href=\"" . $_SERVER ['PHP_SELF'] . "?fschuel=" . $testschueler ['id'] . "&year=".get_next_year()."\" class=\"links\">Bearbeite den Schüler</a><br><br>";
 						}
 					}
 				}
@@ -246,7 +245,6 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 			echo "EIn PRoblem ist aufgetreten!";
 		}
 		$lehrer = $return_prep->fetch ();
-		$pdo_insert->exec ( "SET NAMES 'utf8'" );
 		if ($lehrer == false) {
 			echo "EIN PROBLEM";
 		} else {
@@ -355,6 +353,10 @@ if ($show_formular_schueler) {
 	if ($schueler == false) {
 		echo "EIN PROBLEM";
 	} else {
+		$schueler = validate_input($schueler, true);
+		if(is_string($schueler)) {
+			echo "EIn Fehler ist passiert: $schueler";
+		}else {
 		$_SESSION ['schuelerid'] = $_GET ['fschuel'];
 		?>
 <div class="formular_class">
@@ -439,7 +441,7 @@ if ($show_formular_schueler) {
 				<br>
 				Fachlehrer
 				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach2_lehrer">
+				<input type="text" class="textinput" maxlength="49" name="fach2_lehrer" value="<?php echo $schueler['fach2_lehrer'];?>">
 				<br>
 			</div>
 			<div style="width: 20%; display: inline-block; margin-left: 10%;">
@@ -460,7 +462,7 @@ if ($show_formular_schueler) {
 				<br>
 				Fachlehrer
 				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach3_lehrer">
+				<input type="text" class="textinput" maxlength="49" name="fach3_lehrer" value="<?php echo $schueler['fach3_lehrer'];?>">
 				<br>
 			</div>
 			<br>
@@ -524,6 +526,7 @@ if ($show_formular_schueler) {
 	</form>
 </div>
 <?php
+		}
 	}
 }
 if ($show_formular_lehrer) {
@@ -545,6 +548,10 @@ if ($show_formular_lehrer) {
 	if ($lehrer == false) {
 		echo "EIN PROBLEM";
 	} else {
+		$lehrer = validate_input($lehrer, true);
+		if(is_string($lehrer)) {
+			echo "EIn Fehler ist passiert: $lehrer";
+		}else{
 		$_SESSION ['lehrerid'] = $_GET ['flehr'];
 		?>
 <div class="formular_class">
@@ -629,7 +636,7 @@ if ($show_formular_lehrer) {
 				<br>
 				Fachlehrer
 				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach2_lehrer">
+				<input type="text" class="textinput" maxlength="49" name="fach2_lehrer" value="<?php echo $lehrer['fach2_lehrer'];?>">
 				<br>
 			</div>
 			<div style="width: 20%; display: inline-block; margin-left: 10%;">
@@ -650,7 +657,7 @@ if ($show_formular_lehrer) {
 				<br>
 				Fachlehrer
 				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach3_lehrer">
+				<input type="text" class="textinput" maxlength="49" name="fach3_lehrer" value="<?php echo $lehrer['fach3_lehrer'];?>">
 				<br>
 			</div>
 			<br>
@@ -715,6 +722,7 @@ if ($show_formular_lehrer) {
 	</form>
 </div>
 <?php
+		}
 	}
 }
 ?>

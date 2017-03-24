@@ -108,15 +108,21 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] )) {
 				<?php if(strcmp($active, "input_paar.php") == 0) { echo "class=\"active\""; }?>><a
 				href="input_paar.php?paar=1"> Neues Paar</a></li>
 			<li
-				<?php if(strcmp($active, "output.php") == 0 && strcmp($_SERVER['QUERY_STRING'], "schueler=1") == 0) { echo "class=\"active\""; }?>><a
+				<?php if(strcmp($active, "output.php") == 0 && strpos($_SERVER['QUERY_STRING'], "schueler=1") !== false) { echo "class=\"active\""; }?>><a
 				href="output.php?schueler=1"> Ausgeben der Schüler</a></li>
-				<?php if(strcmp($active, "change.php") == 0 && strpos($_SERVER['QUERY_STRING'], 'schuel') != false){?>
+				<?php if(strcmp($active, "output.php") == 0 && (strpos($_SERVER['QUERY_STRING'], 'deleteschuel') !== false || strpos($_SERVER['QUERY_STRING'], 'deleteconfirmschuel') !== false)) {?>
+					<li class="active"><a href="output.php" style="text-align: right;"> Löschen eines Schülers</a></li><?php
+				}?>
+				<?php if(strcmp($active, "change.php") == 0 && strpos($_SERVER['QUERY_STRING'], 'schuel') !== false){?>
 					<li class="active"><a href="output.php" style="text-align: right;"> Ändern eines Schülers</a></li><?php
 				}?>
 			<li
-				<?php if(strcmp($active, "output.php") == 0 && strcmp($_SERVER['QUERY_STRING'], "lehrer=1") == 0) { echo "class=\"active\""; }?>><a
+				<?php if(strcmp($active, "output.php") == 0 && strpos($_SERVER['QUERY_STRING'], "lehrer=1") !== false) { echo "class=\"active\""; }?>><a
 				href="output.php?lehrer=1"> Ausgeben der Lehrer</a></li>
-				<?php if(strcmp($active, "change.php") == 0 && strpos($_SERVER['QUERY_STRING'], 'lehr') != false){?>
+				<?php if(strcmp($active, "output.php") == 0 && (strpos($_SERVER['QUERY_STRING'], 'deletelehr') !== false || strpos($_SERVER['QUERY_STRING'], 'deleteconfirmlehr') !== false)) {?>
+					<li class="active"><a href="output.php" style="text-align: right;"> Löschen eines Lehrers</a></li><?php
+				}?>
+				<?php if(strcmp($active, "change.php") == 0 && strpos($_SERVER['QUERY_STRING'], 'lehr') !== false){?>
 					<li class="active"><a href="output.php" style="text-align: right;"> Ändern eines Lehrers</a></li><?php
 				}?>
 			<li
