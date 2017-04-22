@@ -16,6 +16,7 @@ body{
 	border-color: gray;
 	padding: 10px;
 	padding-left: 3%;
+	padding-right: 3%;
 	margin-right: 5%;
 }
 
@@ -61,6 +62,9 @@ input{
 .nav_seite li {
 	border-bottom: 1px solid #bbb;
 }
+.nav_seite li:HOVER{
+	background-color: #0E87FF;
+}
 .nav_seite a {
 	display: block;
 	text-align: center;
@@ -85,6 +89,9 @@ input{
 	padding: 20px 40px;
 	color: white;
 	text-decoration: none;
+}
+.navigation_li a:HOVER {
+	background-color: #0E87FF;
 }
 .active{
 	background-color: #EAF50B;
@@ -167,4 +174,41 @@ input{
 }
 .time_output tr:LAST-CHILD {
 	border-bottom: none;
+}
+
+.mail_steps {
+	background-color: #848484;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	width: 100%;	
+}
+.mail_steps li{
+	float: left;
+	width: 33.2%;
+	border-left: 1px solid white;
+}
+
+.mail_steps li a{
+	display: block;
+	text-decoration: none;
+	text-align: center;
+	padding: 10px 2px;
+}
+
+.mail_steps_active {
+	background-color: #585858;
+}
+.mail_steps li a:HOVER {
+	background-color: #424242;
+}
+.mail_steps li a:VISITED {
+	text-decoration: none;
+	color: black;
+}
+
+#textarea1{
+	padding: 5px;
+	margin-top: 10px;
 }

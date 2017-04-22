@@ -1,10 +1,4 @@
 <?php
-require 'header.php';
-require 'includes/global_vars.inc.php';
-if (! function_exists ( 'get_users_logged_in' )) {
-	include 'includes/functions.inc.php';
-}
-
 /*************************************************************************************************************
  * Get-Parameter: 
  * flehr = id eines Lehrer aus aktuellem Jahr; ruft Formular mit aktuellen Werten als Vorgabe auf
@@ -15,69 +9,67 @@ if (! function_exists ( 'get_users_logged_in' )) {
  * 
  * 
  */
-
-
-echo "<h2>Ändern der Schülerdaten</h2>";
-$show_formular_schueler = false;
-$show_formular_lehrer = false;
-if (isset ( $_GET ['flehr'] )) {
-	$show_formular_lehrer = true;
+if (isset($user) && $user->runscript()) {
+	echo "<h2>Ändern der Schülerdaten</h2>";
 	$show_formular_schueler = false;
-} else if (isset ( $_GET ['fschuel'] )) {
 	$show_formular_lehrer = false;
-	$show_formular_schueler = true;
-}
-if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset ( $_SESSION ['account'] ) && (strcmp ( $_SESSION ['account'], 'normal' ) == 0 || strcmp ( $_SESSION ['account'], 'root' ) == 0) && if_logged_in ( $_SESSION ['userid'] )) {
-	if (isset ( $_GET ['change'] ) && ($_GET ['change'] == 1 || $_GET ['change'] == 2)) {
-		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$vname = $_POST ['vname'];
-		$nname = $_POST ['nname'];
-		$fach1 = $_POST ['fach1'];
-		$fach1_lehrer = $_POST ['fach1_lehrer'];
-		$fach2 = $_POST ['fach2'];
-		$fach2_lehrer = $_POST ['fach2_lehrer'];
-		$fach3 = $_POST ['fach3'];
-		$fach3_lehrer = $_POST ['fach3_lehrer'];
-		$email = $_POST ['email'];
-		$klasse_kurs = $_POST ['klasse_kurs'];
-		$klassenstufe = $_POST ['klassenstufe'];
-		$klassenlehrer_name = $_POST ['klassenlehrer'];
-		$telefon = $_POST ['telefon'];
-		$mo_anfang = $_POST ['mo_anfang'];
-		$mo_ende = $_POST ['mo_ende'];
-		$di_anfang = $_POST ['di_anfang'];
-		$di_ende = $_POST ['di_ende'];
-		$mi_anfang = $_POST ['mi_anfang'];
-		$mi_ende = $_POST ['mi_ende'];
-		$do_anfang = $_POST ['do_anfang'];
-		$do_ende = $_POST ['do_ende'];
-		$fr_anfang = $_POST ['fr_anfang'];
-		$fr_ende = $_POST ['fr_ende'];
-		if(isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
-			$table_schueler = "`schueler-".$_GET['year']."`";
-			$table_lehrer = "`lehrer-".$_GET['year']."`";
-		}else {
-			$table_schueler = get_current_table ( "schueler" );
+	if (isset($_GET['flehr'])) {
+		$show_formular_lehrer = true;
+		$show_formular_schueler = false;
+	} else if (isset($_GET['fschuel'])) {
+		$show_formular_lehrer = false;
+		$show_formular_schueler = true;
+	}
+	if (isset($_GET['change']) && ($_GET['change'] == 1 || $_GET['change'] == 2)) {
+		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
+		$vname = $_POST['vname'];
+		$nname = $_POST['nname'];
+		$fach1 = $_POST['fach1'];
+		$fach1_lehrer = $_POST['fach1_lehrer'];
+		$fach2 = $_POST['fach2'];
+		$fach2_lehrer = $_POST['fach2_lehrer'];
+		$fach3 = $_POST['fach3'];
+		$fach3_lehrer = $_POST['fach3_lehrer'];
+		$email = $_POST['email'];
+		$klasse_kurs = $_POST['klasse_kurs'];
+		$klassenstufe = $_POST['klassenstufe'];
+		$klassenlehrer_name = $_POST['klassenlehrer'];
+		$telefon = $_POST['telefon'];
+		$mo_anfang = $_POST['mo_anfang'];
+		$mo_ende = $_POST['mo_ende'];
+		$di_anfang = $_POST['di_anfang'];
+		$di_ende = $_POST['di_ende'];
+		$mi_anfang = $_POST['mi_anfang'];
+		$mi_ende = $_POST['mi_ende'];
+		$do_anfang = $_POST['do_anfang'];
+		$do_ende = $_POST['do_ende'];
+		$fr_anfang = $_POST['fr_anfang'];
+		$fr_ende = $_POST['fr_ende'];
+		if (isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
+			$table_schueler = "`schueler-" . $_GET['year'] . "`";
+			$table_lehrer = "`lehrer-" . $_GET['year'] . "`";
+		} else {
+			$table_schueler = get_current_table("schueler");
 			$table_lehrer = get_current_table("lehrer");
 			$_GET['year'] = get_prop("current_year")[1];
 		}
 		
-//		echo "<br>" . $vname . "  " . $nname . "  " . $fach1 . "  " . $email . $klasse_kurs . $klassenstufe . $klassenlehrer_name . "fachlehrer:" . $fach1_lehrer;
-		if (strlen ( $vname ) == 0 || strlen ( $nname ) == 0 || (strlen ( $email ) == 0 && $telefon = 0) || ! isset ( $fach1 ) || strlen ( $fach1_lehrer ) == 0 || strlen ( $klassenlehrer_name ) == 0 || strlen ( $klasse_kurs ) == 0 || ! isset ( $klassenstufe )) {
+		// echo "<br>" . $vname . " " . $nname . " " . $fach1 . " " . $email . $klasse_kurs . $klassenstufe . $klassenlehrer_name . "fachlehrer:" . $fach1_lehrer;
+		if (strlen($vname) == 0 || strlen($nname) == 0 || (strlen($email) == 0 && $telefon = 0) || !isset($fach1) || strlen($fach1_lehrer) == 0 || strlen($klassenlehrer_name) == 0 || strlen($klasse_kurs) == 0 || !isset($klassenstufe)) {
 			echo "Ein Problem ist aufgetreten. Bitte gib die Daten erneut ein";
 		} else {
-			if ($_GET ['change'] == 1) {
-				if (strcmp ( $fach2, '' ) == 0) {
+			if ($_GET['change'] == 1) {
+				if (strcmp($fach2, '') == 0) {
 					$fach2 = NULL;
 					$fach2_lehrer = NULL;
 				}
-				if (strcmp ( $fach3, '' ) == 0) {
+				if (strcmp($fach3, '') == 0) {
 					$fach3 = NULL;
 					$fach3_lehrer = NULL;
 				}
 				// $return_prep = $pdo_insert->prepare ( "UPDATE schueler (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
-				$return_prep = $pdo_insert->prepare ( "UPDATE " . $table_schueler . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
-				$return = $return_prep->execute ( array (
+				$return_prep = $pdo_insert->prepare("UPDATE " . $table_schueler . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id");
+				$return = $return_prep->execute(array(
 						'vname' => $vname,
 						'nname' => $nname,
 						'email' => $email,
@@ -100,25 +92,25 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 						'do_ende' => $do_ende,
 						'fr_anfang' => $fr_anfang,
 						'fr_ende' => $fr_ende,
-						'id' => $_SESSION ['schuelerid'] 
-				) );
+						'id' => $_SESSION['schuelerid']
+				));
 				if ($return) {
 					echo "<br>Die Daten des Schüler wurden erfolgreich geändert.";
 					$show_formular_schueler = false;
 					$show_formular_lehrer = false;
-					unset ( $_SESSION ['schuelerid'] );
+					unset($_SESSION['schuelerid']);
 				}
-			} elseif ($_GET ['change'] == 2) {
-				if (strcmp ( $fach2, '' ) == 0) {
+			} elseif ($_GET['change'] == 2) {
+				if (strcmp($fach2, '') == 0) {
 					$fach2 = NULL;
 					$fach2_lehrer = NULL;
 				}
-				if (strcmp ( $fach3, '' ) == 0) {
+				if (strcmp($fach3, '') == 0) {
 					$fach3 = NULL;
 					$fach3_lehrer = NULL;
 				}
-				$return_prep = $pdo_insert->prepare ( "UPDATE " . $table_lehrer . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id" );
-				$return = $return_prep->execute ( array (
+				$return_prep = $pdo_insert->prepare("UPDATE " . $table_lehrer . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id");
+				$return = $return_prep->execute(array(
 						'vname' => $vname,
 						'nname' => $nname,
 						'email' => $email,
@@ -141,44 +133,44 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 						'do_ende' => $do_ende,
 						'fr_anfang' => $fr_anfang,
 						'fr_ende' => $fr_ende,
-						'id' => $_SESSION ['lehrerid'] 
-				) );
+						'id' => $_SESSION['lehrerid']
+				));
 				if ($return) {
 					echo "Die Daten des Lehrers wurden erfolgreich geändert.";
 					$show_formular_schueler = false;
 					$show_formular_lehrer = false;
-					unset ( $_SESSION ['lehrerid'] );
+					unset($_SESSION['lehrerid']);
 				}
 			}
 		}
 	}
-	if (isset ( $_GET ['next_yearschuel'] )) {
-		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . get_current_table ( "schueler" ) . " WHERE id = :id" );
-		$return = $return_prep->execute ( array (
-				'id' => $_GET ['next_yearschuel'] 
-		) );
+	if (isset($_GET['next_yearschuel'])) {
+		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
+		$return_prep = $pdo_insert->prepare("SELECT * FROM " . get_current_table("schueler") . " WHERE id = :id");
+		$return = $return_prep->execute(array(
+				'id' => $_GET['next_yearschuel']
+		));
 		if ($return == false) {
 			echo "EIn PRoblem ist aufgetreten!";
 		}
-		$schueler = $return_prep->fetch ();
+		$schueler = $return_prep->fetch();
 		if ($schueler == false) {
 			echo "EIN PROBLEM";
 		} else {
-			if (get_next_year () == false) {
+			if (get_next_year() == false) {
 				echo "Das gewünschte Schuljahr existiert noch nicht. Bitte wende dich an den Admin!";
 			} else {
-				$schuelertabel = "`schueler-" . get_next_year () . "`";
-				$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $schuelertabel . " WHERE vname = :vname AND nname = :nname" );
-				$return = $return_prep->execute ( array (
-						'vname' => $schueler ['vname'],
-						'nname' => $schueler ['nname'] 
-				) );
-				$testschueler = $return_prep->fetch ();
+				$schuelertabel = "`schueler-" . get_next_year() . "`";
+				$return_prep = $pdo_insert->prepare("SELECT * FROM " . $schuelertabel . " WHERE vname = :vname AND nname = :nname");
+				$return = $return_prep->execute(array(
+						'vname' => $schueler['vname'],
+						'nname' => $schueler['nname']
+				));
+				$testschueler = $return_prep->fetch();
 				if ($testschueler !== false) {
 					echo "Dieser Schüler existiert bereits im nächsten Jahr";
 				} else {
-					$klasse = intval ( $schueler ['klassenstufe'] );
+					$klasse = intval($schueler['klassenstufe']);
 					$klasse += 1;
 					echo "Achtung: <br><i>Der Schüler geht automatisch in die nächste Klassenstufe. Falls er sitzengebieben ist, muss das per Hand geändert werden.<br>Alle anderen Daten, auch wann der Schüler Zeit hat, werden einfach übernommen.</i>";
 					if ($klasse > 12) {
@@ -187,84 +179,84 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					if ($klasse == 11) {
 						echo "Achtung: Der Schüler geht nun in die Oberstufe. Der Kurs muss bitte erneut eingegeben werden.";
 					}
-					$schueler ['klassenstufe'] = $klasse;
-					$return_prep = $pdo_insert->prepare ( "INSERT INTO " . $schuelertabel . " (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
-					$return = $return_prep->execute ( array (
-							'vname' => $schueler ['vname'],
-							'nname' => $schueler ['nname'],
-							'email' => $schueler ['email'],
-							'klassenstufe' => $schueler ['klassenstufe'],
-							'klasse' => $schueler ['klasse'],
-							'klassenlehrer_name' => $schueler ['klassenlehrer_name'],
-							'fach1' => $schueler ['fach1'],
-							'fach1_lehrer' => $schueler ['fach1_lehrer'],
-							'fach2' => $schueler ['fach2'],
-							'fach2_lehrer' => $schueler ['fach2_lehrer'],
-							'fach3' => $schueler ['fach3'],
-							'fach3_lehrer' => $schueler ['fach3_lehrer'],
-							'mo_anfang' => $schueler ['mo_anfang'],
-							'mo_ende' => $schueler ['mo_ende'],
-							'di_anfang' => $schueler ['di_anfang'],
-							'di_ende' => $schueler ['di_ende'],
-							'mi_anfang' => $schueler ['mi_anfang'],
-							'mi_ende' => $schueler ['mi_ende'],
-							'do_anfang' => $schueler ['do_anfang'],
-							'do_ende' => $schueler ['do_ende'],
-							'fr_anfang' => $schueler ['fr_anfang'],
-							'fr_ende' => $schueler ['fr_ende'] 
-					) );
+					$schueler['klassenstufe'] = $klasse;
+					$return_prep = $pdo_insert->prepare("INSERT INTO " . $schuelertabel . " (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)");
+					$return = $return_prep->execute(array(
+							'vname' => $schueler['vname'],
+							'nname' => $schueler['nname'],
+							'email' => $schueler['email'],
+							'klassenstufe' => $schueler['klassenstufe'],
+							'klasse' => $schueler['klasse'],
+							'klassenlehrer_name' => $schueler['klassenlehrer_name'],
+							'fach1' => $schueler['fach1'],
+							'fach1_lehrer' => $schueler['fach1_lehrer'],
+							'fach2' => $schueler['fach2'],
+							'fach2_lehrer' => $schueler['fach2_lehrer'],
+							'fach3' => $schueler['fach3'],
+							'fach3_lehrer' => $schueler['fach3_lehrer'],
+							'mo_anfang' => $schueler['mo_anfang'],
+							'mo_ende' => $schueler['mo_ende'],
+							'di_anfang' => $schueler['di_anfang'],
+							'di_ende' => $schueler['di_ende'],
+							'mi_anfang' => $schueler['mi_anfang'],
+							'mi_ende' => $schueler['mi_ende'],
+							'do_anfang' => $schueler['do_anfang'],
+							'do_ende' => $schueler['do_ende'],
+							'fr_anfang' => $schueler['fr_anfang'],
+							'fr_ende' => $schueler['fr_ende']
+					));
 					if ($return) {
-						$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $schuelertabel . " WHERE vname = :vname AND nname = :nname" );
-						$return = $return_prep->execute ( array (
-								'vname' => $schueler ['vname'],
-								'nname' => $schueler ['nname']
-						) );
+						$return_prep = $pdo_insert->prepare("SELECT * FROM " . $schuelertabel . " WHERE vname = :vname AND nname = :nname");
+						$return = $return_prep->execute(array(
+								'vname' => $schueler['vname'],
+								'nname' => $schueler['nname']
+						));
 						if ($return == false) {
 							echo "EIn PRoblem ist aufgetreten!";
 						}
-						$testschueler = $return_prep->fetch ();
+						$testschueler = $return_prep->fetch();
 						if ($testschueler === false) {
 							echo "EIn Problem liegt vor!";
-						}else{
+						} else {
 							echo "<br>Schüler erfolgreich übernommen";
-							echo "<br><br><a href=\"" . $_SERVER ['PHP_SELF'] . "?fschuel=" . $testschueler ['id'] . "&year=".get_next_year()."\" class=\"links\">Bearbeite den Schüler</a><br><br>";
+							echo "<br><br><a href=\"" . htmlspecialchars($_SERVER['PHP_SELF']) . "?fschuel=" . $testschueler['id'] . "&year=" . get_next_year() . "\" class=\"links\">Bearbeite den Schüler</a><br><br>";
 						}
 					}
 				}
 			}
 		}
 	}
-	if (isset ( $_GET ['next_yearlehr'] )) {
-		var_dump ( get_current_table ( "lehrer" ) );
-		$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-		$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . get_current_table ( "lehrer" ) . " WHERE id = :id" );
-		$return = $return_prep->execute ( array (
-				'id' => $_GET ['next_yearlehr'] 
-		) );
+	if (isset($_GET['next_yearlehr'])) {
+		var_dump(get_current_table("lehrer"));
+		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
+		$return_prep = $pdo_insert->prepare("SELECT * FROM " . get_current_table("lehrer") . " WHERE id = :id");
+		$return = $return_prep->execute(array(
+				'id' => $_GET['next_yearlehr']
+		));
 		if ($return == false) {
 			echo "EIn PRoblem ist aufgetreten!";
 		}
-		$lehrer = $return_prep->fetch ();
+		$lehrer = $return_prep->fetch();
 		if ($lehrer == false) {
 			echo "EIN PROBLEM";
 		} else {
-			if (get_next_year () == false) {
+			if (get_next_year() == false) {
 				echo "Das gewünschte Schuljahr existiert noch nicht. Bitte wende dich an den Admin!";
 			} else {
-				$lehrertabel = "`lehrer-" . get_next_year () . "`";
-				$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $lehrertabel . " WHERE vname = :vname AND nname = :nname" );
-				$return = $return_prep->execute ( array (
-						'vname' => $lehrer ['vname'],
-						'nname' => $lehrer ['nname'] 
-				) );
+				$lehrertabel = "`lehrer-" . get_next_year() . "`";
+				$return_prep = $pdo_insert->prepare("SELECT * FROM " . $lehrertabel . " WHERE vname = :vname AND nname = :nname");
+				$return = $return_prep->execute(array(
+						'vname' => $lehrer['vname'],
+						'nname' => $lehrer['nname']
+				));
 				if ($return == false) {
 					echo "EIn PRoblem ist aufgetreten!";
 				}
-				$testlehrer = $return_prep->fetch ();
+				$testlehrer = $return_prep->fetch();
 				if ($testlehrer !== false) {
 					echo "Dieser Lehrer existiert bereits im nächsten Jahr";
 				} else {
-					$klasse = intval ( $lehrer ['klassenstufe'] );
+					$klasse = intval($lehrer['klassenstufe']);
 					$klasse += 1;
 					echo "Achtung: <br><i>Der Lehrer geht automatisch in die nächste Klassenstufe. Falls er sitzengebieben ist, muss das per Hand geändert werden.<br></i>";
 					if ($klasse > 12) {
@@ -273,92 +265,79 @@ if (isset ( $_SESSION ['userid'] ) && isset ( $_SESSION ['username'] ) && isset 
 					if ($klasse == 11) {
 						echo "<br>Achtung: Der Lehrer geht nun in die Oberstufe. Der Kurs muss bitte erneut eingegeben werden.";
 					}
-					$lehrer ['klassenstufe'] = $klasse;
-					$return_prep = $pdo_insert->prepare ( "INSERT INTO " . $lehrertabel . " (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
-					$return = $return_prep->execute ( array (
-							'vname' => $lehrer ['vname'],
-							'nname' => $lehrer ['nname'],
-							'email' => $lehrer ['email'],
-							'klassenstufe' => $lehrer ['klassenstufe'],
-							'klasse' => $lehrer ['klasse'],
-							'klassenlehrer_name' => $lehrer ['klassenlehrer_name'],
-							'fach1' => $lehrer ['fach1'],
-							'fach1_lehrer' => $lehrer ['fach1_lehrer'],
-							'fach2' => $lehrer ['fach2'],
-							'fach2_lehrer' => $lehrer ['fach2_lehrer'],
-							'fach3' => $lehrer ['fach3'],
-							'fach3_lehrer' => $lehrer ['fach3_lehrer'],
-							'mo_anfang' => $lehrer ['mo_anfang'],
-							'mo_ende' => $lehrer ['mo_ende'],
-							'di_anfang' => $lehrer ['di_anfang'],
-							'di_ende' => $lehrer ['di_ende'],
-							'mi_anfang' => $lehrer ['mi_anfang'],
-							'mi_ende' => $lehrer ['mi_ende'],
-							'do_anfang' => $lehrer ['do_anfang'],
-							'do_ende' => $lehrer ['do_ende'],
-							'fr_anfang' => $lehrer ['fr_anfang'],
-							'fr_ende' => $lehrer ['fr_ende'] 
-					) );
+					$lehrer['klassenstufe'] = $klasse;
+					$return_prep = $pdo_insert->prepare("INSERT INTO " . $lehrertabel . " (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)");
+					$return = $return_prep->execute(array(
+							'vname' => $lehrer['vname'],
+							'nname' => $lehrer['nname'],
+							'email' => $lehrer['email'],
+							'klassenstufe' => $lehrer['klassenstufe'],
+							'klasse' => $lehrer['klasse'],
+							'klassenlehrer_name' => $lehrer['klassenlehrer_name'],
+							'fach1' => $lehrer['fach1'],
+							'fach1_lehrer' => $lehrer['fach1_lehrer'],
+							'fach2' => $lehrer['fach2'],
+							'fach2_lehrer' => $lehrer['fach2_lehrer'],
+							'fach3' => $lehrer['fach3'],
+							'fach3_lehrer' => $lehrer['fach3_lehrer'],
+							'mo_anfang' => $lehrer['mo_anfang'],
+							'mo_ende' => $lehrer['mo_ende'],
+							'di_anfang' => $lehrer['di_anfang'],
+							'di_ende' => $lehrer['di_ende'],
+							'mi_anfang' => $lehrer['mi_anfang'],
+							'mi_ende' => $lehrer['mi_ende'],
+							'do_anfang' => $lehrer['do_anfang'],
+							'do_ende' => $lehrer['do_ende'],
+							'fr_anfang' => $lehrer['fr_anfang'],
+							'fr_ende' => $lehrer['fr_ende']
+					));
 					if ($return) {
-						$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $lehrertabel . " WHERE vname = :vname AND nname = :nname" );
-						$return = $return_prep->execute ( array (
-								'vname' => $lehrer ['vname'],
-								'nname' => $lehrer ['nname']
-						) );
+						$return_prep = $pdo_insert->prepare("SELECT * FROM " . $lehrertabel . " WHERE vname = :vname AND nname = :nname");
+						$return = $return_prep->execute(array(
+								'vname' => $lehrer['vname'],
+								'nname' => $lehrer['nname']
+						));
 						if ($return == false) {
 							echo "EIn PRoblem ist aufgetreten!";
 						}
-						$testlehrer = $return_prep->fetch ();
+						$testlehrer = $return_prep->fetch();
 						if ($testlehrer === false) {
 							echo "EIn Problem liegt vor!";
-						}else{
+						} else {
 							echo "<br>Lehrer erfolgreich übernommen";
-							echo "<br><br><a href=\"" . $_SERVER ['PHP_SELF'] . "?flehr=" . $testlehrer ['id'] . "&year=".get_next_year()."\" class=\"links\">Bearbeite den Lehrer</a><br><br>";
+							echo "<br><br><a href=\"" . htmlspecialchars($_SERVER['PHP_SELF']) . "?flehr=" . $testlehrer['id'] . "&year=" . get_next_year() . "\" class=\"links\">Bearbeite den Lehrer</a><br><br>";
 						}
 					}
 				}
 			}
 		}
 	}
-} else {
-	if (! isset ( $_SESSION ['userid'] ) || ! isset ( $_SESSION ['username'] ) || ! if_logged_in ( $_SESSION ['userid'] )) {
-		$show_formular_schueler = false;
-		$show_formular_lehrer = false;
-		$show_formular_paar = false;
-	}
-	if (isset ( $_SESSION ['account'] ) && strcmp ( $_SESSION ['account'], 'view-only' ) == 0) {
-		echo "Sie sind leider nicht berechtigt, neue Daten einzugeben!";
-		$show_formular_schueler = false;
-		$show_formular_lehrer = false;
-		$show_formular_paar = false;
-	}
-}
-
-if ($show_formular_schueler) {
-	$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-	if(isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
-		$table = "`schueler-".$_GET['year']."`";
-	}else {
-		$table = get_current_table ( "schueler" );
-		$_GET['year'] = get_prop("current_year")[1];
-	}
-	$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $table . " WHERE id = :id" );
-	$return = $return_prep->execute ( array (
-			'id' => $_GET ['fschuel'] 
-	) );
-	if ($return == false) {
-		echo "EIn PRoblem ist aufgetreten!";
-	}
-	$schueler = $return_prep->fetch ();
-	if ($schueler == false) {
-		echo "EIN PROBLEM";
-	} else {
-		$schueler = validate_input($schueler, true);
-		if(is_string($schueler)) {
-			echo "EIn Fehler ist passiert: $schueler";
-		}else {
-		$_SESSION ['schuelerid'] = $_GET ['fschuel'];
-		?>
+	
+	if ($show_formular_schueler) {
+		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
+		if (isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
+			$table = "`schueler-" . $_GET['year'] . "`";
+		} else {
+			$table = get_current_table("schueler");
+			$_GET['year'] = get_prop("current_year")[1];
+		}
+		$return_prep = $pdo_insert->prepare("SELECT * FROM " . $table . " WHERE id = :id");
+		$return = $return_prep->execute(array(
+				'id' => $_GET['fschuel']
+		));
+		if ($return == false) {
+			echo "EIn PRoblem ist aufgetreten!";
+		}
+		$schueler = $return_prep->fetch();
+		if ($schueler == false) {
+			echo "EIN PROBLEM";
+		} else {
+			$schueler = validate_input($schueler, true);
+			if (is_string($schueler)) {
+				echo "EIn Fehler ist passiert: $schueler";
+			} else {
+				$_SESSION['schuelerid'] = $_GET['fschuel'];
+				?>
 <div class="formular_class">
 	<form action="?change=1&year=<?php echo $_GET['year'];?>" method="POST">
 		<fieldset style="padding: 40px;">
@@ -407,14 +386,14 @@ if ($show_formular_schueler) {
 				<br>
 				<select name="fach1">
 				<?php
-		for($i = 0; $i < count ( $faecher ); $i ++) {
-			if (strcmp ( $schueler ['fach1'], $faecher [$i] ) == 0) {
-				echo "<option value=\"" . $faecher [$i] . "\" selected >" . $faecher_lesbar [$i] . "</option>";
-			} else {
-				echo "<option value=\"" . $faecher [$i] . "\">" . $faecher_lesbar [$i] . "</option>";
-			}
-		}
-		?>
+				for($i = 0; $i < count($faecher); $i++) {
+					if (strcmp($schueler['fach1'], $faecher[$i]) == 0) {
+						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
+					} else {
+						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
+					}
+				}
+				?>
 				</select>
 				<br>
 				<br>
@@ -428,14 +407,14 @@ if ($show_formular_schueler) {
 				<br>
 				<select name="fach2">
 				<?php
-		for($i = 0; $i < count ( $faecher ); $i ++) {
-			if (strcmp ( $schueler ['fach2'], $faecher [$i] ) == 0) {
-				echo "<option value=\"" . $faecher [$i] . "\" selected >" . $faecher_lesbar [$i] . "</option>";
-			} else {
-				echo "<option value=\"" . $faecher [$i] . "\">" . $faecher_lesbar [$i] . "</option>";
-			}
-		}
-		?>
+				for($i = 0; $i < count($faecher); $i++) {
+					if (strcmp($schueler['fach2'], $faecher[$i]) == 0) {
+						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
+					} else {
+						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
+					}
+				}
+				?>
 				</select>
 				<br>
 				<br>
@@ -449,14 +428,14 @@ if ($show_formular_schueler) {
 				<br>
 				<select name="fach3">
 				<?php
-		for($i = 0; $i < count ( $faecher ); $i ++) {
-			if (strcmp ( $schueler ['fach3'], $faecher [$i] ) == 0) {
-				echo "<option value=\"" . $faecher [$i] . "\" selected >" . $faecher_lesbar [$i] . "</option>";
-			} else {
-				echo "<option value=\"" . $faecher [$i] . "\">" . $faecher_lesbar [$i] . "</option>";
-			}
-		}
-		?>
+				for($i = 0; $i < count($faecher); $i++) {
+					if (strcmp($schueler['fach3'], $faecher[$i]) == 0) {
+						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
+					} else {
+						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
+					}
+				}
+				?>
 				</select>
 				<br>
 				<br>
@@ -526,34 +505,34 @@ if ($show_formular_schueler) {
 	</form>
 </div>
 <?php
+			}
 		}
 	}
-}
-if ($show_formular_lehrer) {
-	$pdo_insert = new PDO ( "mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd );
-	if(isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
-		$table = "`lehrer-".$_GET['year']."`";
-	}else {
-		$table = get_current_table ( "lehrer" );
-		$_GET['year'] = get_prop("current_year")[1];
-	}
-	$return_prep = $pdo_insert->prepare ( "SELECT * FROM " . $table . " WHERE id = :id" );
-	$return = $return_prep->execute ( array (
-			'id' => $_GET ['flehr'] 
-	) );
-	if ($return == false) {
-		echo "EIn PRoblem ist aufgetreten!";
-	}
-	$lehrer = $return_prep->fetch ();
-	if ($lehrer == false) {
-		echo "EIN PROBLEM";
-	} else {
-		$lehrer = validate_input($lehrer, true);
-		if(is_string($lehrer)) {
-			echo "EIn Fehler ist passiert: $lehrer";
-		}else{
-		$_SESSION ['lehrerid'] = $_GET ['flehr'];
-		?>
+	if ($show_formular_lehrer) {
+		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
+		if (isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
+			$table = "`lehrer-" . $_GET['year'] . "`";
+		} else {
+			$table = get_current_table("lehrer");
+			$_GET['year'] = get_prop("current_year")[1];
+		}
+		$return_prep = $pdo_insert->prepare("SELECT * FROM " . $table . " WHERE id = :id");
+		$return = $return_prep->execute(array(
+				'id' => $_GET['flehr']
+		));
+		if ($return == false) {
+			echo "EIn PRoblem ist aufgetreten!";
+		}
+		$lehrer = $return_prep->fetch();
+		if ($lehrer == false) {
+			echo "EIN PROBLEM";
+		} else {
+			$lehrer = validate_input($lehrer, true);
+			if (is_string($lehrer)) {
+				echo "EIn Fehler ist passiert: $lehrer";
+			} else {
+				$_SESSION['lehrerid'] = $_GET['flehr'];
+				?>
 <div class="formular_class">
 	<form action="?change=2&year=<?php echo $_GET['year'];?>" method="POST">
 		<fieldset style="padding: 40px;">
@@ -602,14 +581,14 @@ if ($show_formular_lehrer) {
 				<br>
 				<select name="fach1">
 				<?php
-		for($i = 0; $i < count ( $faecher ); $i ++) {
-			if (strcmp ( $lehrer ['fach1'], $faecher [$i] ) == 0) {
-				echo "<option value=\"" . $faecher [$i] . "\" selected >" . $faecher_lesbar [$i] . "</option>";
-			} else {
-				echo "<option value=\"" . $faecher [$i] . "\">" . $faecher_lesbar [$i] . "</option>";
-			}
-		}
-		?>
+				for($i = 0; $i < count($faecher); $i++) {
+					if (strcmp($lehrer['fach1'], $faecher[$i]) == 0) {
+						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
+					} else {
+						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
+					}
+				}
+				?>
 				</select>
 				<br>
 				<br>
@@ -623,14 +602,14 @@ if ($show_formular_lehrer) {
 				<br>
 				<select name="fach2">
 				<?php
-		for($i = 0; $i < count ( $faecher ); $i ++) {
-			if (strcmp ( $lehrer ['fach2'], $faecher [$i] ) == 0) {
-				echo "<option value=\"" . $faecher [$i] . "\" selected >" . $faecher_lesbar [$i] . "</option>";
-			} else {
-				echo "<option value=\"" . $faecher [$i] . "\">" . $faecher_lesbar [$i] . "</option>";
-			}
-		}
-		?>
+				for($i = 0; $i < count($faecher); $i++) {
+					if (strcmp($lehrer['fach2'], $faecher[$i]) == 0) {
+						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
+					} else {
+						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
+					}
+				}
+				?>
 				</select>
 				<br>
 				<br>
@@ -644,14 +623,14 @@ if ($show_formular_lehrer) {
 				<br>
 				<select name="fach3">
 				<?php
-		for($i = 0; $i < count ( $faecher ); $i ++) {
-			if (strcmp ( $lehrer ['fach3'], $faecher [$i] ) == 0) {
-				echo "<option value=\"" . $faecher [$i] . "\" selected >" . $faecher_lesbar [$i] . "</option>";
-			} else {
-				echo "<option value=\"" . $faecher [$i] . "\">" . $faecher_lesbar [$i] . "</option>";
-			}
-		}
-		?>
+				for($i = 0; $i < count($faecher); $i++) {
+					if (strcmp($lehrer['fach3'], $faecher[$i]) == 0) {
+						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
+					} else {
+						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
+					}
+				}
+				?>
 				</select>
 				<br>
 				<br>
@@ -722,11 +701,9 @@ if ($show_formular_lehrer) {
 	</form>
 </div>
 <?php
+			}
 		}
 	}
+}else{
+	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }
-?>
-</div>
-<footer>Designed by Yannik Weber</footer>
-</body>
-</html>
