@@ -22,24 +22,9 @@
 <?php
 session_start();
 error_reporting(E_ALL);
-/*
- * if (isset($_GET['page'])) {
- * $pdo_search = new PDO('mysql:host=localhost;dbname=schuefi_login', $login_user, $login_user_passwd, array(
- * PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
- * ));
- * $return = $pdo_search->prepare("SELECT * FROM `navigation` WHERE kuerzel = :kuerzel");
- * $return = $pdo_search->exec(array(
- * 'kuerzel' => $_GET['page']
- * ));
- * } else {
- * $active = "index.php";
- * $_GET['page'] = "index.php";
- * }
- */
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
-// var_dump($_SESSION);
-$pdo_obj = new PDO('mysql:host=localhost;dbname=schuefi_login', $login_user, $login_user_passwd, array(
+$pdo_obj = new PDO('mysql:host=localhost;dbname=schuefi', $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 		PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 ));
 if (isset($_SESSION['user']) && strlen($_SESSION['user']) > 0) {
@@ -233,12 +218,6 @@ var interval = 6000;
 	<?php
 	} else {
 		?>
-
-
-
-
-
-
 <body>
 	<nav>
 		<ul class="navigation">
@@ -283,10 +262,5 @@ var interval = 6000;
 </body>
 <?php
 }
-
 ?>
-
-
-
-
 </html>

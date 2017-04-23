@@ -9,26 +9,50 @@ if (isset($user) && $user->runscript()) {
 	$person = new person();
 	if ($result !== false) {
 		while ( $result ) {
-			echo $result['vname'];
 			$person->load_person($result['id']);
-			var_dump($person);
-			$person->search_lehrer_schueler();
-			$result = $return->fetch();
-			$lehrer = new lehrer($person->id);
-			if($person->id == 1) {
-				$array = array(
-						'klassenstufe' => 8,
-						'klasse' => 'a',
-						'klassenlehrer_name' => 'Frau Bau',
-				);
-				$lehrer->add_lehrer($array) != false ?:$lehrer->load_lehrer(get_current_year(), $person->id); 
-				$lehrer->get_id();
-				$zeit = array('mi','15:00','16:00');
-				$lehrer->add_time($zeit);
-				var_dump(get_faecher_all());
-				$lehrer->add_angebot_fach(1, false);
-				var_dump($lehrer);
+			?>
+<fieldset style="padding: 40px; width: 80%;">
+	<legend><?php echo $person->vname.' '.$person->nname?></legend>
+	<div style="display: flex;">
+		<div style="width: 50%; display: inline-block;">
+						
+			<?php
+			echo "Name: " . $person->vname . " " . $person->nname . "<br>E-Mail: " . $person->email;
+			if (strlen($person->telefon) > 0) {
+				echo "<br>Telefon: " . $person->telefon;
 			}
+			if (strlen($person->geburtstag) > 0) {
+				echo "<br>Geburtstag: " . $person->geburtstag;
+			}
+			$schueler_lehrer = $person->search_lehrer_schueler();
+			if (is_array($schueler_lehrer['lehrer'])) {
+				?>
+				<div style="padding-left: 10%;">
+				<?php
+				$lehrer = new lehrer($person->id);
+				$lehrer->load_lehrer($lehrer->get_id(), get_current_year());
+				echo "<br><br>$person->vname $person->nname ist als Nachhilfelehrer tätig:";
+				echo "<br>Klasse: ".$lehrer->get_klassenstufe();
+				if(is_numeric($lehrer->get_klasse())) {
+					echo "/";
+				}
+				echo $lehrer->get_klasse();
+				echo "<br>Klassenlehrer/in: ".$lehrer->get_klassenlehrer();
+				echo "<br>Fächer, in denen er/sie Nachhilfe anbietet:";
+				$faecher = $lehrer->get_angebot_faecher();
+				for($i = 0; $i < count($faecher); $i++) {
+					echo "<br>".get_faecher_name_of_id($faecher[$i]['id'])." - Nachweis vorhanden: " .($faecher[$i]['nachweis_vorhanden'] == true ? "ja": "nein");
+				}
+				?>
+				</div>
+				<?php
+			}
+			?>
+		</div>
+	</div>
+</fieldset>
+<?php
+			$result = $return->fetch();
 		}
 	} else {
 		echo "Es wurde noch keine Person hinzugefügt";

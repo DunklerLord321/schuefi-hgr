@@ -7,8 +7,16 @@ class person {
 	public $telefon;
 	public $geburtstag;
 	
+	function __construct(){
+		$this->id = null;
+		$this->vname = '';
+		$this->nname = '';
+		$this->email = '';
+		$this->telefon = '';
+		$this->geburtstag = '';
+	}
+	
 	function load_person_name($vname, $nname) {
-		
 	}
 	
 	function load_person($pid) {
@@ -23,7 +31,10 @@ class person {
 		$this->nname = $result['nname'];
 		$this->email = $result['email'];
 		$this->telefon = $result['telefon'];
-		$this->geburtstag = $result['geburtstag'];
+		if(strlen($result['geburtstag']) > 0) {
+		$time = strtotime($result['geburtstag']);
+		$this->geburtstag = date('d.m.Y',$time);
+		}
 	}
 
 	function addperson($vname, $nname, $email, $telefon, $geburtstag) {
@@ -49,6 +60,9 @@ class person {
 		if (strlen($geburtstag) != 0) {
 			if (!strtotime($geburtstag)) {
 				$error = $error . "<br><br>Bitte gib ein gültiges Geburtsdatum an.";
+			}else{
+				$time = strtotime($geburtstag);
+				$geburtstag = date('Y-m-d',$time);
 			}
 		} else {
 			$geburtstag = NULL;
@@ -57,7 +71,7 @@ class person {
 			echo $error;
 			return false;
 		}
-		//Teste, ob Person bereits vorhanden ist
+		// Teste, ob Person bereits vorhanden ist
 		$ret_prep = $pdo->prepare("SELECT * FROM `person` WHERE vname = :vname AND nname = :nname");
 		$return = $ret_prep->execute(array(
 				'vname' => $vname,
@@ -69,7 +83,7 @@ class person {
 		if ($result !== FALSE) {
 			echo "Diese Person existiert bereits!";
 		} else {
-			//Füge Person zu DB hinzu
+			// Füge Person zu DB hinzu
 			$ret_prep = $pdo->prepare("INSERT INTO `person` (`vname`,`nname`,`email`,`telefon`,`geburtstag`) VALUES( :vname, :nname, :email, :telefon, :geburtstag)");
 			$return = $ret_prep->execute(array(
 					'vname' => $vname,
@@ -91,17 +105,27 @@ class person {
 			}
 		}
 	}
-	
+
 	function search_lehrer_schueler() {
 		global $pdo;
-		$ret_prep = $pdo->prepare("SELECT * FROM `lehrer` WHERE pid = :id AND schuljahr = :year");
-		$return = $ret_prep->execute(array(
-				'id' => '2',
-				'year' => '1617'
-		));
-		$ret_prepp = query_db("SELECT * FROM `lehrer` WHERE pid = :id AND schuljahr = :year", $this->id, '1617');
-		var_dump($ret_prepp);
-		var_dump($ret_prepp->fetch());
+		$ret_prepp = query_db("SELECT * FROM `lehrer` WHERE pid = :id AND schuljahr = :year", $this->id, get_current_year());
+		if ($ret_prepp) {
+			$lehrer = $ret_prepp->fetch();
+		}
+		$ret_prepp = query_db("SELECT * FROM `schueler` WHERE pid = :id AND schuljahr = :year", $this->id, get_current_year());
+		if ($ret_prepp) {
+			$schueler = $ret_prepp->fetch();
+		}
+		if (isset($lehrer) && isset($schueler)) {
+			return array(
+					'lehrer' => $lehrer,
+					'schueler' => $schueler
+			);
+		}else{
+			return array(
+					'lehrer'=> NULL,'schueler' => NULL
+			);
+		}
 	}
 	
 }

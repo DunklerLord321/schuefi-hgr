@@ -94,11 +94,17 @@ class user {
 		}
 	}
 	private function increase_count_login() {
+		if(!function_exists("query_db")) {
+			require 'includes/functions.inc.php';
+		}
 		query_db("UPDATE `users` SET count_login = :count WHERE email = :email", $this->count_login_trys + 1, $this->email);
 		$this->count_login_trys++;
 	}
 	
 	private function reset_count_login() {
+		if(!function_exists("query_db")) {
+			require 'includes/functions.inc.php';
+		}
 		query_db("UPDATE `users` SET count_login = :count WHERE email = :email", 0, $this->email);
 		$this->count_login_trys = 0;
 	}

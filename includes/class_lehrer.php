@@ -6,15 +6,27 @@ class lehrer {
 	private $klassenlehrer_name;
 	private $comment;
 	private $person = person::class;
-	private $faecher = array();
-	private $zeit = array();
+	public $faecher = array();
+	public $zeit = array();
+	
 	function __construct(int $pid) {
 		$this->person = new person();
 		$this->person->load_person($pid);
-		$this->faecher[0]['kuerzel'] = "test";
 	}
 	function get_id() {
 		return $this->id;
+	}
+	function get_klasse() {
+		return $this->klasse;
+	}
+	function get_klassenstufe() {
+		return $this->klassenstufe;
+	}
+	function get_klassenlehrer() {
+		return $this->klassenlehrer_name;
+	}
+	function get_comment() {
+		return $this->comment;
 	}
 	
 	/*
@@ -74,7 +86,7 @@ class lehrer {
 			}
 		}
 	}
-	function load_lehrer($schuljahr, $pid) {
+	function load_lehrer($pid, $schuljahr) {
 		$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, $schuljahr);
 		$lehrer = $return->fetch();
 		if ($lehrer) {
@@ -92,6 +104,16 @@ class lehrer {
 						'ende' => $times['ende']
 				);
 				$times = $return->fetch();
+			}
+			$return = query_db("SELECT * FROM `bietet_an` WHERE lid = :lid", $this->id);
+			$fach = $return->fetch();
+			while ( $fach ) {
+				$this->faecher[] = array(
+						'fid' => $fach['fid'],
+						'nachweis_vorhanden' => $fach['nachweis_vorhanden'],
+						'status' => $fach['status']
+				);
+				$fach = $return->fetch();
 			}
 		}
 	}
@@ -136,7 +158,10 @@ class lehrer {
 	}
 	function get_angebot_faecher() {
 		$return = query_db("SELECT * FROM `bietet_an` WHERE lid = :lid", $this->id);
-		$result = $return->fetchAll();
-		return $result;
+		if ($return) {
+			$result = $return->fetchAll();
+			return $result;
+		}
+		return false;
 	}
 }

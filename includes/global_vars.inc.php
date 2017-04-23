@@ -1,8 +1,9 @@
 <?php 
+global $GLOBAL_CONFIG;
 $GLOBAL_CONFIG = array();
 
 // 0 = nur return false, 1 = die();
-$exit_on_db_failure = 1;
+$exit_on_db_failure = 0;
 global $login_user;
 global $login_user_passwd;
 global $dbuser;

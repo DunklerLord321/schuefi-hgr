@@ -88,8 +88,8 @@ function query_db($statement, ...$params) {
 	global $pdo;
 	$stat_ex = explode(' ', $statement);
 	$i = 0;
-var_dump($params);
-var_dump($stat_ex);
+//var_dump($params);
+//var_dump($stat_ex);
 	// baue assoziativen Array für prepared-Statement
 	$parameter = array();
 	$replace = array(
@@ -99,29 +99,29 @@ var_dump($stat_ex);
 	);
 	foreach ( $stat_ex as $string ) {
 		if (strpos($string, ':') !== false) {
-			var_dump($string);
+//			var_dump($string);
 			$stringpart = explode(':', $string);
-			var_dump($stringpart);
+//			var_dump($stringpart);
 			// $parameter[$stringpart[1]] = $params[$i];
 			$parameter[strtr($stringpart[1], $replace)] = $params[$i];
-			var_dump($parameter);
+//			var_dump($parameter);
 			$i++;
 		}
 	}
-var_dump($parameter);
+//var_dump($parameter);
 	$ret_prep = $pdo->prepare($statement);
-var_dump($ret_prep);
+//var_dump($ret_prep);
 	if ($ret_prep === false) {
 		echo "Ein DB-Fehler ist aufgetreten - 1";
 		var_dump($ret_prep->errorInfo());
-		$exit_on_db_failure == 1 ?: die();
+		$exit_on_db_failure == 0 ?: die();
 		return false;
 	} else {
 		$return = $ret_prep->execute($parameter);
 		if ($return === false) {
 			echo "Ein DB-Fehler ist aufgtreten";
 			var_dump($ret_prep->errorInfo());
-			$exit_on_db_failure == 1 ?: die();
+			$exit_on_db_failure == 0 ?: die();
 			return false;
 		} else {
 			return $ret_prep;
