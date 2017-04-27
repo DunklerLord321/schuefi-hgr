@@ -6,28 +6,23 @@
 <meta name="description" content="Verwalte die Daten der Schülerfirma 'Schüler helfen Schülern' einfach und automatisiert.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="design.css" rel="stylesheet">
-<!-- included für DatePicker -->
-<!-- --
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="/resources/demos/style.css">
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>---->
-<script>
-( function() {
-	( "#datepicker" ).datepicker();
-} );
-	</script>
+<link href="includes/jquery/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet">
+<script type="text/javascript" src="includes/jquery/jquery-3.2.1.min.js"></script>
+<script src="includes/jquery/jquery-ui-1.12.1/jquery.js"></script>
+<script src="includes/jquery/jquery-ui-1.12.1/jquery-ui.js"></script>
+
 </head>
 
 <?php
 session_start();
-error_reporting(E_ALL);
+error_reporting(0);
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
 $pdo_obj = new PDO('mysql:host=localhost;dbname=schuefi', $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 		PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 ));
 if (isset($_SESSION['user']) && strlen($_SESSION['user']) > 0) {
+	echo "Session vorhanden";
 	$user = unserialize($_SESSION['user']);
 }
 if (!isset($user)) {
@@ -64,25 +59,6 @@ if (isset($_GET['page'])) {
 		$active = $_GET['page'];
 		?>
 <body>
-	<script>
-var ajax = function get_user_logged_in_ajax() {
-	if (window.XMLHttpRequest) {
-        xmlhttp = new XMLHttpRequest();
-    } else {
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("log_in").innerHTML = this.responseText;
-        }
-    };
-    xmlhttp.open("GET","logged_in.php",true);
-    xmlhttp.send();
-}
-// interval 60000 = jede Minute
-var interval = 6000;
-//setInterval(ajax,interval);
-</script>
 	<nav>
 		<ul class="navigation">
 			<li <?php if(strcmp($active, "content") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>>
@@ -91,29 +67,13 @@ var interval = 6000;
 			<li <?php if(strcmp($active, "settings") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>>
 				<a href="index.php?page=settings">Einstellungen</a>
 			</li>
-			<li class="navigation_li">
-				<a href="index.php?page=content" id="log_in">
-					<script type="text/javascript"> function get_user_logged_in_ajax() {
-				if (window.XMLHttpRequest) {
-			        xmlhttp = new XMLHttpRequest();
-			    } else {
-			        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-			    }
-			    xmlhttp.onreadystatechange = function() {
-			        if (this.readyState == 4 && this.status == 200) {
-			            document.getElementById("log_in").innerHTML = this.responseText;
-			        }
-			    };
-			    xmlhttp.open("GET","logged_in.php",true);
-			    xmlhttp.send();
-			} 
-			ajax();</script>
-				</a>
+			<li <?php if(strcmp($active, "user") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>>
+				<a href="index.php?page=user" id="log_in">Passwort ändern</a>
 			</li>
 			<li <?php if(strcmp($active, "logout") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>>
 				<a href="index.php?page=logout">Abmelden</a>
 			</li>
-			<li <?php if(strcmp($active, "user") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>>
+			<li class="navigation_li">
 				<?php
 		echo "<a href=\"index.php?page=user\">Du bist als " . $user->getemail() . " angemeldet.</a>";
 		?>
@@ -125,10 +85,10 @@ var interval = 6000;
 			<li <?php if(strcmp($active, "person") == 0 ) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=person"> Neue Person</a>
 			</li>
-			<li <?php if(strcmp($active, "input") == 0 && strcmp($_SERVER['QUERY_STRING'], "schueler=1") == 0) { echo "class=\"active\""; }?>>
+			<li <?php if(strcmp($active, "input") == 0 && strpos($_SERVER['QUERY_STRING'], "schueler=1") !== false) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=input&schueler=1"> Neuer Nachhilfeschüler</a>
 			</li>
-			<li <?php if(strcmp($active, "input") == 0 && strcmp($_SERVER['QUERY_STRING'], "lehrer=1") == 0) { echo "class=\"active\""; }?>>
+			<li <?php if(strcmp($active, "input") == 0 && strpos($_SERVER['QUERY_STRING'], "lehrer=1") !== false) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=input&lehrer=1"> Neuer Nachhilfelehrer</a>
 			</li>
 			<li <?php if(strcmp($active, "input_paar") == 0) { echo "class=\"active\""; }?>>
@@ -197,7 +157,6 @@ var interval = 6000;
 				if ($result['visible'] == 1) {
 					if (file_exists($result['path'])) {
 						$user->allowrunscript();
-						echo $result['path'];
 						require $result['path'];
 						$user->denyrunscript();
 					} else {

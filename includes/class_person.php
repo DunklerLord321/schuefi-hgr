@@ -98,7 +98,12 @@ class person {
 				$this->email = $email;
 				$this->telefon = $telefon;
 				$this->geburtstag = $geburtstag;
-				echo "Person wurde erfolgreich hinzugefügt";
+				$return = query_db("SELECT * FROM `person` WHERE vname = :vname AND nname = :nname", $this->vname, $this->nname);
+				$result = $return->fetch();
+				$this->id = $result['id'];
+				echo "Person wurde erfolgreich hinzugefügt!<br><br><br>";
+				echo "<br><a href=\"index.php?page=input&schueler=1&pid=".$this->id."\" class=\"links\">Gib der Person eine Rolle als Nachhilfeschüler</a><br><br>";
+				echo "<br><a href=\"index.php?page=input&lehrer=1&pid=".$this->id."\" class=\"links\">Gib der Person eine Rolle als Nachhilfelehrer</a><br><br>";
 			} else {
 				echo "Ein Fehler ist  aufgetreten";
 				var_dump($pdo->errorInfo());

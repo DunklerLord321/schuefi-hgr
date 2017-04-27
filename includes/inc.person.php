@@ -2,7 +2,7 @@
 if (isset($user) && $user->runscript()) {
 	echo "<h1>Neue Person</h1>";
 	if (isset($_GET['addperson']) && $_GET['addperson'] == 1) {
-		echo $_POST['geb'];
+//		echo $_POST['geb'];
 		require 'includes/class_person.php';
 		$person = new person();
 		$person->addperson($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['telefon'], $_POST['geb']);
@@ -25,6 +25,15 @@ if (isset($user) && $user->runscript()) {
 			Geburtstag
 			<br>
 			<input type="text" id="datepicker" name="geb">
+			  <script>
+  $( function() {
+    $( "#datepicker" ).datepicker({
+        changeYear: true,
+        yearRange: "c-20:c-10",
+	    });
+  } );
+  </script>
+			
 			<br>
 			<br>
 			Email:

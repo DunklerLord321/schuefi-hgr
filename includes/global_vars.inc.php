@@ -45,26 +45,6 @@ $faecher_lesbar = array(
 //		"katholische Religion",
 );
 //zum Speichern der Infos in der Datenbank
-global $faecher;
-$faecher = array(
-		"",
-		"de",
-		"ma",
-		"phy",
-		"che",
-		"bio",
-		"eng",
-		"fra",
-		"rus",
-		"spa",
-		"lat",
-		"ge",
-		"grw",
-		"mu",
-		"eth",
-//		"relev",
-//		"relkat",
-);
 
 $GLOBAL_CONFIG['klassen'] = array(
 		"a",

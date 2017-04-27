@@ -6,6 +6,7 @@ if (isset($user) && $user->runscript()) {
 	$result = $return->fetch();
 	require 'includes/class_person.php';
 	require 'includes/class_lehrer.php';
+	require 'includes/class_schueler.php';
 	$person = new person();
 	if ($result !== false) {
 		while ( $result ) {
@@ -46,6 +47,22 @@ if (isset($user) && $user->runscript()) {
 				?>
 				</div>
 				<?php
+			}
+			if(is_array($schueler_lehrer['schueler'])) {
+				$schueler = new schueler($person->id);
+				$schueler->load_schueler($schueler->get_id(), get_current_year());
+				echo "<br><br>$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet:";
+				echo "<br>Klasse: ".$schueler->get_klassenstufe();
+				if(is_numeric($schueler->get_klasse())) {
+					echo "/";
+				}
+				echo $schueler->get_klasse();
+				echo "<br>Klassenlehrer/in: ".$schueler->get_klassenlehrer();
+				echo "<br>Fächer, in denen er/sie Nachhilfe benötigt:";
+				$faecher = $schueler->get_nachfrage_faecher();
+				for($i = 0; $i < count($faecher); $i++) {
+					echo "<br>".get_faecher_name_of_id($faecher[$i]['id'])." - Langfristig: " .($faecher[$i]['langfristig'] == true ? "ja": "nein");
+				}
 			}
 			?>
 		</div>

@@ -126,6 +126,19 @@ class user {
 		}
 	}
 	
+	function neuespassword($password_neu, $password_neu2) {
+		if(strlen($password_neu) < 4) {
+			$this->error = 'Das neue Passwort muss mindestens 4 Zeichen lang sein';
+			return false;
+		}
+		if($password_neu != $password_neu2) {
+			$this->error = 'Die beiden Passwörter müssen übereinstimmen';
+			return false;
+		}
+		
+		
+	}
+	
 	private function send_mail() {
 		require 'mail/class.phpmailer.php';
 		require 'mail/class.smtp.php';

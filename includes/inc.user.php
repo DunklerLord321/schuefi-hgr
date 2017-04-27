@@ -2,6 +2,7 @@
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Profil ändern</h2>";
 	global $pdo;
+	global $user;
 	$show_formular = true;
 	if (isset($_GET['change']) && $_GET['change'] == 1) {
 		if (strlen($_POST['passwort_neu1']) == 0 || strlen($_POST['passwort_neu1']) < 4) {
@@ -24,16 +25,17 @@ if (isset($user) && $user->runscript()) {
 			} elseif ($fuser != false) {
 				$passwort_hash = password_hash($_POST['passwort_neu1'], PASSWORD_DEFAULT);
 				// echo $passwort_hash.$_POST['passwort_neu1'];
-				$statement = $pdo->prepare("UPDATE users SET passwd = :passwort_hash WHERE id = :id");
+				$statement = $pdo->prepare("UPDATE `users` SET passwd = :passwort_hash WHERE id = :id");
 				$return = $statement->execute(array(
 						'passwort_hash' => $passwort_hash,
 						'id' => $fuser['id']
 				));
 				if ($return) {
-					echo "Passwort wurde erfolgreich geändert.
-					<meta http-equiv=\"refresh\" content=\"3;url=logout.php\"
-					<br>Du wirst in 3 Sekunden auttomatisch zum Logout weitergeleitet.<br><br>
-			  		Für manuelle Weiterleitung hier klicken: <a href=\"content.php\">Hautpseite</a>";
+					unset($_SESSION['user']);
+					echo "Dein Passwort wurde erfolgreich geändert. Bitte melde dich erneut an.
+					<meta http-equiv=\"refresh\" content=\"5;url=index.php\"
+					<br>Du wirst in 5 Sekunden auttomatisch zum Logout weitergeleitet.<br><br>
+			  		Für manuelle Weiterleitung hier klicken: <a href=\"index.php\">Login</a>";
 					$show_formular = false;
 				}
 			}
@@ -45,7 +47,7 @@ if (isset($user) && $user->runscript()) {
 <form action="index.php?page=user&change=1" method="post">
 	Dein Passwort:
 	<br>
-	<input type="password" size="40" maxlength="250" name="passwort_alt" required="required" autofocus="autofocus">
+	<input type="password" size="40" maxlength="250" name="passwort_alt" required="required" autofocus="autofocus" placeholder="Passwort" value="">
 	<br>
 	<br>
 	Neues Passwort:
