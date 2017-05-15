@@ -7,13 +7,13 @@ if (isset($user) && $user->runscript()) {
 <nav>
 	<ul class="mail_steps">
 		<li>
-			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?step=1";?>" <?php if(!isset($_GET['step']) || $_GET['step'] == 1) {echo "class=\"mail_steps_active\"";}?>>1.Schritt</a>
+			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=1";?>" <?php if(!isset($_GET['step']) || $_GET['step'] == 1) {echo "class=\"mail_steps_active\"";}?>>1.Schritt</a>
 		</li>
 		<li>
-			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?step=2";?>" <?php if(!isset($_GET['step']) || $_GET['step'] == 2) {echo "class=\"mail_steps_active\"";}?>>2.Schritt</a>
+			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=2";?>" <?php if(!isset($_GET['step']) || $_GET['step'] == 2) {echo "class=\"mail_steps_active\"";}?>>2.Schritt</a>
 		</li>
 		<li>
-			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?step=3";?>" <?php if(!isset($_GET['step']) || $_GET['step'] == 3) {echo "class=\"mail_steps_active\"";}?>>3.Schritt</a>
+			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=3";?>" <?php if(!isset($_GET['step']) || $_GET['step'] == 3) {echo "class=\"mail_steps_active\"";}?>>3.Schritt</a>
 		</li>
 	</ul>
 </nav>
@@ -51,36 +51,52 @@ if (isset($user) && $user->runscript()) {
 	
 	if (!isset($_GET['step']) || ($_GET['step'] != 2 && $_GET['step'] != 3)) {
 		?>
-<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?reset=1";?>">Zurücksetzen</a>
-<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?step=2"?>" method="POST">
+<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&reset=1";?>">Zurücksetzen</a>
+<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=2"?>" method="POST">
 	<div style="display: flex;">
 		<div style="display: inline-block; width: 20%;">
 			<br>
 			<br>Nachhilfelehrer:<?php
-		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
-		if (isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
-			$table = "`lehrer-" . $_GET['year'] . "`";
-		} else {
-			$table = get_current_table("lehrer");
-			$_GET['year'] = get_prop("current_year")[1];
-		}
-		$return = $pdo_insert->query("SELECT * FROM " . $table . " WHERE 1");
-		if ($return == false) {
-			echo "EIn PRoblem ist aufgetreten!";
-		}
+		require 'includes/class_person.php';
+		require 'includes/class_lehrer.php';
+		require 'includes/class_schueler.php';
+		$return = query_db("SELECT * FROM `person`");
+		// $return = query_db("SELECT * FROM `lehrer` WHERE schuljahr = :schuljahr", get_current_year());
 		$i = 0;
-		$lehrer = $return->fetch();
-		if ($lehrer == false) {
+		$result = $return->fetch();
+		$person = new person();
+		$schueler_output = '';
+		if ($result == false) {
 			echo "EIN PROBLEM";
 		} else {
-			while ( $lehrer ) {
-				if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['dest' . $i]) && $_SESSION['mail_step1']['dest' . $i] == $lehrer['email']) {
-					echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $lehrer['email'] . "\" checked> " . $lehrer['vname'] . " " . $lehrer['nname'] . "<br>" . $lehrer['email'] . "</label><br>";
-				} else {
-					echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $lehrer['email'] . "\"> " . $lehrer['vname'] . " " . $lehrer['nname'] . "<br>" . $lehrer['email'] . "</label><br>";
+			while ( $result ) {
+				$person->load_person($result['id']);
+				$lehrerschueler = $person->search_lehrer_schueler();
+
+				if (is_array($lehrerschueler['lehrer'])) {
+
+					$lehrer = new lehrer($person->id);
+					$lehrer->load_lehrer_pid();
+					
+					if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['dest' . $i]) && $_SESSION['mail_step1']['dest' . $i] == $lehrer['email']) {
+						echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $lehrer['email'] . "\" checked> " . $lehrer['vname'] . " " . $lehrer['nname'] . "<br>" . $lehrer['email'] . "</label><br>";
+					} else {
+						echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+					}
+				}
+				if (is_array($lehrerschueler['schueler'])) {
+				
+					$schueler = new schueler($person->id);
+					$schueler->load_schueler_pid();
+						
+					if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['dest' . $i]) && $_SESSION['mail_step1']['dest' . $i] == $schueler['email']) {
+						$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $schueler['email'] . "\" checked> " . $schueler['vname'] . " " . $schueler['nname'] . "<br>" . $schueler['email'] . "</label><br>";
+					} else {
+						$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+					}
 				}
 				// var_dump($lehrer);
-				$lehrer = $return->fetch();
+				$result = $return->fetch();
 				$i++;
 			}
 		}
@@ -89,32 +105,7 @@ if (isset($user) && $user->runscript()) {
 		<div style="display: inline-block; width: 20%;">
 			<br>
 			<br>Nachhilfeschüler:<?php
-		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
-		if (isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
-			$table = "`schueler-" . $_GET['year'] . "`";
-		} else {
-			$table = get_current_table("schueler");
-			$_GET['year'] = get_prop("current_year")[1];
-		}
-		$return = $pdo_insert->query("SELECT * FROM " . $table . " WHERE 1");
-		if ($return == false) {
-			echo "EIn PRoblem ist aufgetreten!";
-		}
-		$schueler = $return->fetch();
-		if ($schueler == false) {
-			echo "EIN PROBLEM";
-		} else {
-			while ( $schueler ) {
-				if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['dest' . $i]) && $_SESSION['mail_step1']['dest' . $i] == $schueler['email']) {
-					echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $schueler['email'] . "\" checked> " . $schueler['vname'] . " " . $schueler['nname'] . "<br>" . $schueler['email'] . "</label><br>";
-				} else {
-					echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $schueler['email'] . "\"> " . $schueler['vname'] . " " . $schueler['nname'] . "<br>" . $schueler['email'] . "</label><br>";
-				}
-				// var_dump($schueler);count($_POST) == 0 ? 0 :
-				$schueler = $return->fetch();
-				$i++;
-			}
-		}
+			echo $schueler_output;
 		?></div>
 	</div>
 	<input type="submit" value="Weiter" style="float: right;">

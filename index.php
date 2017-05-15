@@ -11,18 +11,18 @@
 <script src="includes/jquery/jquery-ui-1.12.1/jquery.js"></script>
 <script src="includes/jquery/jquery-ui-1.12.1/jquery-ui.js"></script>
 
-</head>
 
+</head>
+<body>
 <?php
 session_start();
-error_reporting(0);
+error_reporting(E_ALL);
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
 $pdo_obj = new PDO('mysql:host=localhost;dbname=schuefi', $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 		PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 ));
 if (isset($_SESSION['user']) && strlen($_SESSION['user']) > 0) {
-	echo "Session vorhanden";
 	$user = unserialize($_SESSION['user']);
 }
 if (!isset($user)) {
@@ -36,7 +36,6 @@ if (isset($_GET['reset'])) {
 if (isset($_GET['page'])) {
 	if ($_GET['page'] == 'logout') {
 		?>
-		<body>
 	<nav>
 		<ul class="navigation">
 			<!-- -- <li class="navigation_li"><a href="index">Login</a></li> -->
@@ -53,12 +52,10 @@ if (isset($_GET['page'])) {
 		<br>
 		<a href="index.php?login=1">Hier geht es zum Login.</a>
 	</div>
-</body>
 		<?php
 	} else if ($user->is_valid()) {
 		$active = $_GET['page'];
 		?>
-<body>
 	<nav>
 		<ul class="navigation">
 			<li <?php if(strcmp($active, "content") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?>>
@@ -177,7 +174,6 @@ if (isset($_GET['page'])) {
 	<?php
 	} else {
 		?>
-<body>
 	<nav>
 		<ul class="navigation">
 			<!-- -- <li class="navigation_li"><a href="index">Login</a></li> -->
@@ -194,14 +190,12 @@ if (isset($_GET['page'])) {
 		<br>
 		<a href="index.php?login=1">Hier geht es zum Login.</a>
 	</div>
-</body>
 <?php
 		die();
 	}
 } else {
 	$user->logout();
 	?>
-<body>
 	<nav>
 		<ul class="navigation">
 			<!-- -- <li class="navigation_li"><a href="index.php">Login</a></li> -->
@@ -218,8 +212,8 @@ if (isset($_GET['page'])) {
 	$user->denyrunscript();
 	?>
 	</div>
-</body>
 <?php
 }
 ?>
+</body>
 </html>

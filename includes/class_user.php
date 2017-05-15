@@ -91,6 +91,10 @@ class user {
 			$pdo = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd, array(
 					PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 			));
+			return true;
+		}else{
+			$this->error = "Ein Nutzer mit dieser E-Mail-Adresse existiert leider nicht";
+			return false;
 		}
 	}
 	private function increase_count_login() {

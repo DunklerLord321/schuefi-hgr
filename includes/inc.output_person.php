@@ -31,7 +31,7 @@ if (isset($user) && $user->runscript()) {
 				<div style="padding-left: 10%;">
 				<?php
 				$lehrer = new lehrer($person->id);
-				$lehrer->load_lehrer($lehrer->get_id(), get_current_year());
+				$lehrer->load_lehrer_pid();
 				echo "<br><br>$person->vname $person->nname ist als Nachhilfelehrer tätig:";
 				echo "<br>Klasse: ".$lehrer->get_klassenstufe();
 				if(is_numeric($lehrer->get_klasse())) {
@@ -41,28 +41,47 @@ if (isset($user) && $user->runscript()) {
 				echo "<br>Klassenlehrer/in: ".$lehrer->get_klassenlehrer();
 				echo "<br>Fächer, in denen er/sie Nachhilfe anbietet:";
 				$faecher = $lehrer->get_angebot_faecher();
+				$zeit = $lehrer->get_zeit();
 				for($i = 0; $i < count($faecher); $i++) {
-					echo "<br>".get_faecher_name_of_id($faecher[$i]['id'])." - Nachweis vorhanden: " .($faecher[$i]['nachweis_vorhanden'] == true ? "ja": "nein");
+					echo "<br>".get_faecher_name_of_id($faecher[$i]['fid'])." - Nachweis vorhanden: " .($faecher[$i]['nachweis_vorhanden'] == true ? "ja": "nein");
+				}
+				for($i = 0; $i < count($zeit); $i++) {
+					echo "<br>".get_name_of_tag($zeit[$i]['tag'])." von ".$zeit[$i]['anfang']." Uhr bis ".$zeit[$i]['ende']." Uhr";
 				}
 				?>
 				</div>
 				<?php
 			}
 			if(is_array($schueler_lehrer['schueler'])) {
+				?>
+				<div style="padding-left: 10%;">
+				<?php
 				$schueler = new schueler($person->id);
-				$schueler->load_schueler($schueler->get_id(), get_current_year());
+				$schueler->load_schueler_pid();
 				echo "<br><br>$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet:";
 				echo "<br>Klasse: ".$schueler->get_klassenstufe();
 				if(is_numeric($schueler->get_klasse())) {
 					echo "/";
 				}
 				echo $schueler->get_klasse();
+				echo $schueler->get_id();
 				echo "<br>Klassenlehrer/in: ".$schueler->get_klassenlehrer();
 				echo "<br>Fächer, in denen er/sie Nachhilfe benötigt:";
 				$faecher = $schueler->get_nachfrage_faecher();
+				$zeit = $schueler->get_zeit();
 				for($i = 0; $i < count($faecher); $i++) {
-					echo "<br>".get_faecher_name_of_id($faecher[$i]['id'])." - Langfristig: " .($faecher[$i]['langfristig'] == true ? "ja": "nein");
+					echo "<br>".get_faecher_name_of_id($faecher[$i]['fid'])." - Langfristig: " .($faecher[$i]['langfristig'] == true ? "ja": "nein");
 				}
+				for($i = 0; $i < count($zeit); $i++) {
+					echo "<br>".get_name_of_tag($zeit[$i]['tag'])." von ".$zeit[$i]['anfang']." Uhr bis ".$zeit[$i]['ende']." Uhr";
+				}
+				if(strlen($schueler->get_comment()) > 0) {
+					echo "<br>Kommentar: ".$schueler->get_comment();
+				}
+				$schueler->get_lehrer($faecher[0]['id']);
+				?>
+				</div>
+				<?php
 			}
 			?>
 		</div>

@@ -2,7 +2,7 @@
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Neuer Nutzer</h2>";
 	$showFormular = true;
-	global $pdo_obj;
+	global $pdo;
 	if (isset($_GET['register'])) {
 		$error = false;
 		$email = $_POST['email'];
@@ -12,7 +12,6 @@ if (isset($user) && $user->runscript()) {
 		$passwort = $_POST['passwort'];
 		$passwort2 = $_POST['passwort2'];
 		// echo $email . "<br>" . $passwort . "<br>" . $passwort2 . "<br>Error" . $error . "<br>";
-		
 		if (strlen($vname) == 0 || strlen($vname) > 49) {
 			echo 'Bitte einen gültigen Vornamen angeben';
 			$error = true;
@@ -41,9 +40,9 @@ if (isset($user) && $user->runscript()) {
 			$result = $statement->execute(array(
 					'email' => $email
 			));
-			$user = $statement->fetch();
+			$user_db = $statement->fetch();
 			
-			if ($user !== false) {
+			if ($user_db !== false) {
 				echo 'Diese E-Mail-Adresse ist bereits vergeben<br><br>';
 				$error = true;
 			}
@@ -52,7 +51,6 @@ if (isset($user) && $user->runscript()) {
 		// Keine Fehler, wir können den Nutzer registrieren
 		if (!$error) {
 			$passwort_hash = password_hash($passwort, PASSWORD_DEFAULT);
-			echo $passwort_hash;
 			$statement = $pdo->prepare("INSERT INTO users (vname, nname, email, passwd, account) VALUES (:vname, :nname, :email, :passwd, :account)");
 			$result = $statement->execute(array(
 					'vname' => $vname,
@@ -60,11 +58,9 @@ if (isset($user) && $user->runscript()) {
 					'email' => $email,
 					'passwd' => $passwort_hash,
 					'account' => $type
-			));
-			echo "<br>RESULT:" . $result;
-			
+			));			
 			if ($result) {
-				echo 'Du wurdest erfolgreich registriert. <a href="index.php">Zum Login</a>';
+				echo 'Der neue Nutzer wurde erfolgreich registriert. <a href="index.php">Zum Login</a>';
 				$showFormular = false;
 			} else {
 				echo 'Beim Abspeichern ist leider ein Fehler aufgetreten<br>';
@@ -75,7 +71,7 @@ if (isset($user) && $user->runscript()) {
 	if ($showFormular) {
 		?>
 <div id="formular">
-	<form action="?register=1" method="post">
+	<form action="index.php?page=registrate&register=1" method="post">
 		Vorname:
 		<br>
 		<input type="text" size="40" maxlength="49" name="vname" autofocus>
@@ -93,12 +89,14 @@ if (isset($user) && $user->runscript()) {
 		<br>
 		Accounttype:
 		<br>
-		<input type="radio" name="account" value="view-only">
+		<input type="radio" name="account" value="w">
 		Nur lesend
-		<input type="radio" name="account" value="normal" checked="checked">
-		Schreibend und Lesend
-		<input type="radio" name="account" value="root">
-		Admin
+		<input type="radio" name="account" value="k" checked="checked">
+		Kundenbetreuer
+		<input type="radio" name="account" value="f">
+		Finanzler
+		<input type="radio" name="account" value="v">
+		Vorstand
 		<br>
 		<br>
 		Passwort:

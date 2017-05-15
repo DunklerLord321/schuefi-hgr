@@ -10,38 +10,160 @@ if (isset($user) && $user->runscript()) {
 		$show_formular_lehrer = false;
 		$show_formular_schueler = true;
 	}
-	if (isset($_GET['input']) && ($_GET['input'] == 1 || $_GET['input'] == 2)) {
+	if (isset($_GET['input']) && $_GET['input'] == 1) {
 		require 'includes/class_schueler.php';
 		require 'includes/class_person.php';
-		$schueler_array= array(
+		require 'includes/class_lehrer.php';
+		$schueler_array = array(
 				'klassenlehrer_name' => $_POST['klassenlehrer'],
 				'klasse' => $_POST['klasse'],
-				'klassenstufe' => $_POST['klassenstufe']
+				'klassenstufe' => $_POST['klassenstufe'],
+				'comment' => $_POST['comment']
 		);
 		$schueler = new schueler($_POST['person']);
 		$schueler->add_schueler($schueler_array);
-		$schueler->add_nachfrage_fach($_POST['fach1'], true);
+		var_dump($_POST);
+		for($i = 1; $i <= count($_POST['fach']); $i++) {
+			$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer']);
+		}
+		for($i = 1; $i <= count($_POST['zeit']); $i++) {
+			$schueler->add_time($_POST['zeit'][$i]);
+		}
 		$show_formular_schueler = false;
 	}
+	if (isset($_GET['input']) && $_GET['input'] == 2) {
+		require 'includes/class_person.php';
+		require 'includes/class_lehrer.php';
+		$lehrer_array = array(
+				'klassenlehrer_name' => $_POST['klassenlehrer'],
+				'klasse' => $_POST['klasse'],
+				'klassenstufe' => $_POST['klassenstufe'],
+				'comment' => $_POST['comment']
+		);
+		$lehrer = new lehrer($_POST['person']);
+		echo $lehrer->get_id();
+		var_dump($lehrer->person);
+		$lehrer->add_lehrer($lehrer_array);
+		var_dump($_POST);
+		for($i = 1; $i <= count($_POST['fach']); $i++) {
+			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt']);
+		}
+		for($i = 1; $i <= count($_POST['zeit']); $i++) {
+			$lehrer->add_time($_POST['zeit'][$i]);
+		}
+		$show_formular_lehrer = false;
+	}
 	
-	if ($show_formular_schueler) {
+	if ($show_formular_schueler || $show_formular_lehrer) {
 		$return = query_db("SELECT * FROM `person`");
-		if($return) {
-		?>
+		if ($return) {
+			?>
+<script src="includes/jquery/jquery-ui-timepicker/jquery.ui.timepicker.js?v=0.3.3"></script>
+<link rel="stylesheet" href="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/ui-lightness/jquery-ui-1.10.0.custom.min.css" type="text/css" />
+<link rel="stylesheet" href="includes/jquery/jquery-ui-timepicker/jquery.ui.timepicker.css?v=0.3.3" type="text/css" />
+<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.core.min.js"></script>
+<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.widget.min.js"></script>
+<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.tabs.min.js"></script>
+<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.position.min.js"></script>
+
+<script type="text/javascript">
+var fachzahl = 0;
+var zeitzahl = 0;
+
+function addfach() {
+	fachzahl++;
+	var doc = document.createDocumentFragment();
+	var element = document.createElement('div');
+	element.innerHTML = '<div style="width: 20%; display: inline-block; margin-right: 10%;padding: 10px; border: solid 1px grey;">\
+		<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
+		<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
+		</select><br><br>Fachlehrer:<br><input type="text" class="textinput" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]"><br>\
+		<?php if($show_formular_lehrer) {
+			echo "Notenschnitt:<br><input class=\"textinput\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
+		}?>
+		</div>';
+	while(element.firstChild) {
+		doc.appendChild(element.firstChild);
+	}
+	document.getElementById("insertfach").appendChild(doc);	
+}
+		
+function addtime() {
+	var doc = document.createDocumentFragment();
+	var element = document.createElement('div');
+	zeitzahl++;
+	element.innerHTML = '<select name="zeit['+ zeitzahl + '][tag]"><option value="mo">Montag</option><option value="di">Dienstag</option>\
+	<option value="mi">Mittwoch</option><option value="do">Donnerstag</option>\
+	<option value="fr">Freitag</option>\
+	</select><br>\
+	<br>Von: \
+	<input type="text" class="timepickervon" name="zeit['+zeitzahl + '][from]" value="13:00">\
+	     Bis: \
+ 	<input type="text" class="timepickerbis" name="zeit['+zeitzahl + '][until]" value="14:00">\
+	<br><br><br><br>';
+	while(element.firstChild) {
+		doc.appendChild(element.firstChild);
+	}
+	document.getElementById("insertzeit").appendChild(doc);
+}
+/*
+$("form").submit(function (event) {
+	if( typeof 
+}
+*/
+$('body').on('focus','.timepickervon', function(){
+    $(this).timepicker({
+		showPeriodLabels: false,
+		hourText: "Stunden",
+		minuteText: "Minuten",
+		hours: {
+			starts: 11,
+			ends: 17,
+		},
+		minutes: {
+			starts: 0,
+			interval: 15,
+			ends: 45
+		},
+		rows: 2,
+		defaultTime: '13:00'
+    });
+});
+
+$('body').on('focus','.timepickerbis', function(){
+    $(this).timepicker({
+		showPeriodLabels: false,
+		hourText: "Stunden",
+		minuteText: "Minuten",
+		hours: {
+			starts: 11,
+			ends: 17,
+		},
+		minutes: {
+			starts: 0,
+			interval: 15,
+			ends: 45
+		},
+		rows: 2,
+		defaultTime: '14:00'
+    });
+});
+
+</script>
 <div class="formular_class">
-	<form action="?page=input&input=1" method="POST" novalidate="novalidate">
+	<form action="?page=input&input=<?php if($show_formular_schueler){echo "1";}if($show_formular_lehrer){echo "2";}?>" method="POST">
 		<fieldset style="padding: 40px;">
 			<legend>
-				<b>Nachhilfeschüler</b>
+				<b><?php if($show_formular_schueler){echo "Nachhilfeschüler";}if($show_formular_lehrer){echo "Nachhilfelehrer";}?></b>
 			</legend>
 			<select name="person">
-			<?php 
+			<?php
 			$person_db = $return->fetch();
-			while ($person_db) {
-				if(isset($_GET['pid']) && $_GET['pid'] == $person_db['id']) {
-					echo "<option value=\"".$person_db['id']."\" selected >".$person_db['vname']." ".$person_db['nname']."</option>";
-				}else{
-					echo "<option value=\"".$person_db['id']."\" >".$person_db['vname']." ".$person_db['nname']."</option>";
+			while ( $person_db ) {
+				if (isset($_GET['pid']) && $_GET['pid'] == $person_db['id']) {
+					echo "<option value=\"" . $person_db['id'] . "\" selected >" . $person_db['vname'] . " " . $person_db['nname'] . "</option>";
+				} else {
+					echo "<option value=\"" . $person_db['id'] . "\" >" . $person_db['vname'] . " " . $person_db['nname'] . "</option>";
 				}
 				$person_db = $return->fetch();
 			}
@@ -49,11 +171,12 @@ if (isset($user) && $user->runscript()) {
 			</select>
 			<br>
 			<br>
-			Klassenstufe:
-			<span style="float: right; width: 50%;">Klasse/Kurs:</span>
+			<br>
+			Klassenstufe (5-12):
+			<span style="float: right; width: 50%;">Klasse/Kurs (a, b, c, d, L, L1, L2):</span>
 			<br>
 			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;">
-			<input type="text" pattern="([ABCDabcdl123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
+			<input type="text" pattern="([ABCDabcdlL123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
 			<br>
 			<br>
 			Klassenlehrer:
@@ -61,112 +184,13 @@ if (isset($user) && $user->runscript()) {
 			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required>
 			<br>
 			<br>
-			<div style="width: 20%; display: inline-block;">
-				<h3>1.Fach:</h3>
-				<select name="fach1" required>
-				<?php
-				$faecher = get_faecher_all();
-				var_dump($faecher);
-		for($i = 0; $i < count($faecher); $i++) {
-			echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>";
-		}
-		?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach1_lehrer">
-				<br>
-			</div>
-			<div style="width: 20%; display: inline-block; margin-left: 10%;">
-				<h3>2.Fach:</h3>
-				<select name="fach2">
-				<?php
-				$faecher = get_faecher_all();
-				var_dump($faecher);
-				for($i = 0; $i < count($faecher); $i++) {
-					echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>";
-				}
-				?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach2_lehrer">
-				<br>
-			</div>
-			<div style="width: 20%; display: inline-block; margin-left: 10%;">
-				<h3>3.Fach:</h3>
-				<select name="fach3">
-				<?php
-				$faecher = get_faecher_all();
-				var_dump($faecher);
-				for($i = 0; $i < count($faecher); $i++) {
-					echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>";
-				}
-				?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach3_lehrer">
-				<br>
-			</div>
+			<input type="button" value="Füge Fach hinzu" onclick="addfach()">
+			<div id="insertfach"><br></div>
 			<br>
 			<br>
 			<h3>Zeit:</h3>
-			<br>
-			<div style="display: flex;">
-				<div style="display: inline-block; width: 25%;">
-					Montag Anfang:
-					<br>
-					<input type="time" value="00:00" name="mo_anfang" class="input_time">
-					<br>
-					Montag Ende:
-					<br>
-					<input type="time" value="00:00" name="mo_ende" class="input_time">
-					<br>
-					Dienstag Anfang:
-					<br>
-					<input type="time" value="00:00" name="di_anfang" class="input_time">
-					<br>
-					Dienstag Ende:
-					<br>
-					<input type="time" value="00:00" name="di_ende" class="input_time">
-					<br>
-				</div>
-				<div id="zeitdiv" style="display: inline-block; width: 25%;">
-					Mitwoch Anfang:
-					<br>
-					<input type="time" value="00:00" name="mi_anfang" class="input_time">
-					<br>
-					Mitwoch Ende:
-					<br>
-					<input type="time" value="00:00" name="mi_ende" class="input_time">
-					<br>
-					Donnerstag Anfang
-					<br>
-					<input type="time" value="00:00" name="do_anfang" class="input_time">
-					<br>
-					Donnerstag Ende:
-					<br>
-					<input type="time" value="00:00" name="do_ende" class="input_time">
-					<br>
-				</div>
-				<div style="display: inline-block; width: 25%;">
-					Freitag Anfang:
-					<br>
-					<input type="time" value="00:00" name="fr_anfang" class="input_time">
-					<br>
-					Freitag Ende:
-					<br>
-					<input type="time" value="00:00" name="fr_ende" class="input_time">
-					<br>
-				</div>
-			</div>
+			<input type="button" value="Füge Zeit hinzu" onclick="addtime()"><br><br>
+			<div id="insertzeit"></div>
 			<br>
 			Kommentar:
 			<textarea rows="4" name="comment" style="width: 100%; margin-top: 10px;"></textarea>
@@ -180,160 +204,6 @@ if (isset($user) && $user->runscript()) {
 </div>
 <?php
 		}
-	}
-	if ($show_formular_lehrer) {
-		?>
-<div class="formular_class">
-	<form action="?input=2" method="POST">
-		<fieldset style="padding: 40px;">
-			<legend>
-				<b>Nachhilfelehrer</b>
-			</legend>
-			<br>
-			Vorname:
-			<span style="float: right; width: 50%;">Nachname:</span>
-			<br>
-			<input type="text" maxlength="49" name="vname" autofocus required style="width: 40%;">
-			<input type="text" maxlength="49" name="nname" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
-			<br>
-			<br>
-			Klassenstufe:
-			<span style="float: right; width: 50%;">Klasse/Kurs:</span>
-			<br>
-			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;">
-			<input type="text" pattern="[ABCDabcdl123456]" required name="klasse" style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
-			<br>
-			<br>
-			Klassenlehrer:
-			<br>
-			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required>
-			<br>
-			<br>
-			Geburtstag
-			<br>
-			<input type="text" id="datepicker">
-			<br>
-			<br>
-			Email:
-			<br>
-			<input type="email" class="textinput" maxlength="49" name="email" required>
-			<br>
-			<br>
-			Telefon
-			<br>
-			<input type="tel" name="telefon">
-			<br>
-			<div style="width: 20%; display: inline-block;">
-				<h3>1.Fach:</h3>
-				<select name="fach1" required>
-				<?php
-		for($i = 0; $i < count($faecher); $i++) {
-			echo "<option value=" . $faecher[$i] . ">" . $faecher_lesbar[$i] . "</option>";
-		}
-		?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach1_lehrer" required>
-				<br>
-			</div>
-			<div style="width: 20%; display: inline-block; margin-left: 10%;">
-				<h3>2.Fach:</h3>
-				<select name="fach2">
-				<?php
-		for($i = 0; $i < count($faecher); $i++) {
-			echo "<option value=" . $faecher[$i] . ">" . $faecher_lesbar[$i] . "</option>";
-		}
-		?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach2_lehrer">
-				<br>
-			</div>
-			<div style="width: 20%; display: inline-block; margin-left: 10%;">
-				<h3>3.Fach:</h3>
-				<select name="fach3">
-				<?php
-		for($i = 0; $i < count($faecher); $i++) {
-			echo "<option value=" . $faecher[$i] . ">" . $faecher_lesbar[$i] . "</option>";
-		}
-		?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach3_lehrer">
-				<br>
-			</div>
-			<br>
-			<br>
-			<h3>Zeit:</h3>
-			<br>
-			<div style="display: flex;">
-				<div style="display: inline-block; width: 25%;">
-					Montag Anfang:
-					<br>
-					<input type="time" value="00:00" name="mo_anfang" class="input_time">
-					<br>
-					Montag Ende:
-					<br>
-					<input type="time" value="00:00" name="mo_ende" class="input_time">
-					<br>
-					Dienstag Anfang:
-					<br>
-					<input type="time" value="00:00" name="di_anfang" class="input_time">
-					<br>
-					Dienstag Ende:
-					<br>
-					<input type="time" value="00:00" name="di_ende" class="input_time">
-					<br>
-				</div>
-				<div style="display: inline-block; width: 25%;">
-					Mitwoch Anfang:
-					<br>
-					<input type="time" value="00:00" name="mi_anfang" class="input_time">
-					<br>
-					Mitwoch Ende:
-					<br>
-					<input type="time" value="00:00" name="mi_ende" class="input_time">
-					<br>
-					Donnerstag Anfang
-					<br>
-					<input type="time" value="00:00" name="do_anfang" class="input_time">
-					<br>
-					Donnerstag Ende:
-					<br>
-					<input type="time" value="00:00" name="do_ende" class="input_time">
-					<br>
-				</div>
-				<div style="display: inline-block; width: 25%;">
-					Freitag Anfang:
-					<br>
-					<input type="time" value="00:00" name="fr_anfang" class="input_time">
-					<br>
-					Freitag Ende:
-					<br>
-					<input type="time" value="00:00" name="fr_ende" class="input_time">
-				</div>
-			</div>
-			<br>
-			Kommentar:
-			<textarea rows="4" name="comment" style="width: 100%; margin-top: 10px;"></textarea>
-			<br>
-			<br>
-			<br>
-			<br>
-			<input type="submit" value="Hinzufügen" style="float: right;">
-		</fieldset>
-	</form>
-</div>
-<?php
 	}
 } else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";

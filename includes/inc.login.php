@@ -18,7 +18,12 @@ if (isset($user) && $user->runscript()) {
 </form>
 <?php
 		} else {
-			$user->setmail($_POST['email']);
+			if(!$user->setmail($_POST['email'])) {
+				echo "Ein Fehler trat auf:<br><br>";
+				echo $user->geterror();
+				echo "<br><br><a href=\"index.php?login=1\">Erneut anmelden?</a>";
+				die();
+			}
 			$return = $user->testpassword($_POST['passwort']);
 			if (!$return) {
 				echo $user->geterror();

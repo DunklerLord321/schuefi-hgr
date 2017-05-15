@@ -80,7 +80,8 @@ CREATE TABLE `lehrer` (
   `klassenstufe` int(11) NOT NULL,
   `klasse` varchar(3) COLLATE utf8_german2_ci NOT NULL,
   `klassenlehrer_name` varchar(50) COLLATE utf8_german2_ci NOT NULL,
-  `comment` text COLLATE utf8_german2_ci
+  `comment` text COLLATE utf8_german2_ci,
+  `hinzugefuegt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP	
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `bietet_an`;
@@ -88,6 +89,8 @@ CREATE TABLE `bietet_an` (
   `id` int(11) NOT NULL,
   `lid` int(11) NOT NULL,
   `fid` int(11) NOT NULL,
+  `fachlehrer` varchar(50) COLLATE utf8_german2_ci NOT NULL,
+  `notenschnitt` varchar(50) COLLATE utf8_german2_ci NOT NULL,
   `nachweis_vorhanden` tinyint(1) DEFAULT 1,
   `status` enum('neu','ausstehend','schueler_gefunden') COLLATE utf8_german2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
@@ -100,7 +103,8 @@ CREATE TABLE `schueler` (
   `klassenstufe` int(11) NOT NULL,
   `klasse` varchar(3) COLLATE utf8_german2_ci NOT NULL,
   `klassenlehrer_name` varchar(50) COLLATE utf8_german2_ci NOT NULL,
-  `comment` text COLLATE utf8_german2_ci
+  `comment` text COLLATE utf8_german2_ci,
+  `hinzugefuegt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP	
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `fragt_nach`;
@@ -108,6 +112,7 @@ CREATE TABLE `fragt_nach` (
   `id` int(11) NOT NULL,
   `sid` int(11) NOT NULL,
   `fid` int(11) NOT NULL,
+  `fachlehrer` varchar(50) COLLATE utf8_german2_ci NOT NULL,
   `langfristig` tinyint(1) DEFAULT 1,
   `status` enum('neu','noetig','ausstehend','nicht_moeglich','lehrer_gefunden') COLLATE utf8_german2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;

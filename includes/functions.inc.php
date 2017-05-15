@@ -1,6 +1,17 @@
 <?php
 global $pdo_obj;
 
+function get_name_of_tag($kuerzel) {
+	$tage = array(
+			'mo' => 'Montag',
+			'di' => 'Dienstag',
+			'mi' => 'Mittwoch',
+			'do' => 'Donnerstag',
+			'fr' => 'Freitag'
+			);
+	return $tage[$kuerzel];
+}
+
 function get_faecher_all() {
 	$return = query_db("SELECT * FROM `faecher`");
 	$result = $return->fetchAll();
@@ -88,6 +99,7 @@ function query_db($statement, ...$params) {
 	global $pdo;
 	$stat_ex = explode(' ', $statement);
 	$i = 0;
+//	var_dump(debug_backtrace());
 //var_dump($params);
 //var_dump($stat_ex);
 	// baue assoziativen Array für prepared-Statement
@@ -176,112 +188,6 @@ function set_prop($key, $value) {
 		));
 		return true;
 	}
-}
-function return_schueler_40($schueler) {
-	$output = "<fieldset style=\"padding: 40px; width: 40%; display: inline-block;line-height: 150%;\">
-  <legend><b>Schüler: " . $schueler['vname'] . " " . $schueler['nname'] . "</b></legend>
-  Name: " . $schueler['vname'] . " " . $schueler['nname'] . "<br>Email: " . $schueler['email'] . "<br>Klassenlehrer/Tutor: " . $schueler['klassenlehrer_name'] . "<br>1.Fach: " . get_faecher_lesbar($schueler['fach1']) . " bei " . $schueler['fach1_lehrer'];
-	if (strlen($schueler['fach2']) != 0) {
-		$output = $output . "<br>2.Fach: " . get_faecher_lesbar($schueler['fach2']) . " bei " . $schueler['fach2_lehrer'];
-	}
-	if (strlen($schueler['fach3']) != 0) {
-		$output = $output . "<br>3.Fach: " . get_faecher_lesbar($schueler['fach3']) . " bei " . $schueler['fach3_lehrer'];
-	}
-	$output = $output . "<br><br>
-	<table class=\"time_output\">
-	<tr>
-	<th></th><th>Von:</th><th>Bis:</th>
-	</tr>
-	<tr>
-	<td>Montag:</td>
-	<td>" . date("H:i", strtotime($schueler['mo_anfang'])) . "</td>
-							<td>" . date("H:i", strtotime($schueler['mo_ende'])) . "</td>
-						</tr>
-						<tr>
-							<td>Dienstag:</td>
-							<td>" . date("H:i", strtotime($schueler['di_anfang'])) . "</td>
-							<td>" . date("H:i", strtotime($schueler['di_ende'])) . "</td>
-						</tr>
-						<tr>
-							<td>Mittwoch:</td>
-							<td>" . date("H:i", strtotime($schueler['mi_anfang'])) . "</td>
-							<td>" . date("H:i", strtotime($schueler['mi_ende'])) . "</td>
-						</tr>
-						<tr>
-							<td>Donnerstag:</td>
-							<td>" . date("H:i", strtotime($schueler['do_anfang'])) . "</td>
-							<td>" . date("H:i", strtotime($schueler['do_ende'])) . "</td>
-						</tr>
-						<tr>
-							<td>Freitag:</td>
-							<td>" . date("H:i", strtotime($schueler['fr_anfang'])) . "</td>
-							<td>" . date("H:i", strtotime($schueler['fr_ende'])) . "</td>
-						</tr>
-						</table>
-						</fieldset>";
-	// $output = $output . "<br>Montag von " . $schueler ['mo_anfang'] . " bis " . $schueler ['mo_ende'] . "<br>Dienstag von " . $schueler ['di_anfang'] . " bis " . $schueler ['di_ende'] . "<br>Mittwoch von " . $schueler ['mi_anfang'] . " bis " . $schueler ['mi_ende'] . "<br>Donnerstag von " . $schueler ['do_anfang'] . " bis " . $schueler ['do_ende'] . "<br>Freitag von " . $schueler ['fr_anfang'] . " bis " . $schueler ['fr_ende'] . "</fieldset>";
-	return $output;
-}
-function log_in($userid) {
-	global $pdo_obj;
-	$ret_prep = $pdo_obj->prepare("UPDATE users SET logged_in = true WHERE id = :id");
-	$return = $ret_prep->execute(array(
-			'id' => $userid
-	));
-	$pdo_obj = null;
-}
-function log_out($userid) {
-	global $pdo_obj;
-	$ret_prep = $pdo_obj->prepare("UPDATE users SET logged_in = false WHERE id = :id");
-	$return = $ret_prep->execute(array(
-			'id' => $userid
-	));
-	$pdo_obj = null;
-}
-function get_users_logged_in() {
-	if (!isset($login_user)) {
-		include "includes/global_vars.inc.php";
-	}
-	global $pdo_obj;
-	$ret_prep = $pdo_obj->query("SELECT * FROM `users`");
-	$return = $ret_prep->fetch();
-	// echo "while";
-	$i = 0;
-	$logged_user = array();
-	while ( $return != false ) {
-		// echo "test";
-		if ($return['logged_in']) {
-			$i++;
-			$logged_user[] = array(
-					"vname" => $return['vname'],
-					"nname" => $return['nname'],
-					"email" => $return['email']
-			);
-		}
-		$return = $ret_prep->fetch();
-	}
-	return array(
-			$i,
-			$logged_user
-	);
-}
-
-// nicht sinnvoll
-function if_logged_in($userid) {
-	global $pdo_obj;
-	$ret_prep = $pdo_obj->prepare("SELECT * FROM users WHERE id = :id");
-	$return = $ret_prep->execute(array(
-			'id' => $userid
-	));
-	$return = $ret_prep->fetch();
-	if ($return['logged_in'] == true) {
-		// echo "logged_in";
-		return true;
-	} else {
-		// echo "not logged in";
-		return false;
-	}
-	$pdo_obj = null;
 }
 
 // gibt bei korrektem Wert einen Array zurück mit bearbeiteten und sicherem Input, bei Fehler einen String mit errorbeschreibung

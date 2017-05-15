@@ -33,8 +33,10 @@ select option:LAST-CHILD {
 }
 
 .textinput{
-	width: 98%;
+	width: 95%;
 }
+
+
 input{
 	margin-top: 5px;
 }
@@ -211,4 +213,9 @@ input{
 #textarea1{
 	padding: 5px;
 	margin-top: 10px;
+}
+
+.box-fach{
+	border-color: grey;
+	border-style: solid;
 }

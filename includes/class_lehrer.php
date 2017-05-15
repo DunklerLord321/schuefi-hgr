@@ -5,13 +5,14 @@ class lehrer {
 	private $klassenstufe;
 	private $klassenlehrer_name;
 	private $comment;
-	private $person = person::class;
+	public $person = person::class;
 	public $faecher = array();
 	public $zeit = array();
-	
 	function __construct(int $pid) {
-		$this->person = new person();
-		$this->person->load_person($pid);
+		if (isset($pid)) {
+			$this->person = new person();
+			$this->person->load_person($pid);
+		}
 	}
 	function get_id() {
 		return $this->id;
@@ -74,6 +75,8 @@ class lehrer {
 				$this->klassenlehrer_name = $params_arr['klassenlehrer_name'];
 				$this->comment = $params_arr['comment'];
 				$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, get_current_year());
+				$return = $return->fetch();
+				var_dump($return);
 				if ($return === false) {
 					$return_prep = query_db("INSERT INTO `lehrer` (`id`,`pid`,`schuljahr`,`klassenstufe`,`klasse`,`klassenlehrer_name`, `comment`) VALUES (:id, :pid, :schuljahr, :klassenstufe, :klasse, :klassenlehrer_name, :comment );", NULL, $this->person->id, get_current_year(), $this->klassenstufe, $this->klasse, $this->klassenlehrer_name, $this->comment);
 					$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, get_current_year());
@@ -81,13 +84,17 @@ class lehrer {
 					$this->id = $lehrer['id'];
 				} else {
 					echo "Der Lehrer existiert bereits in dem Schuljahr";
+					$this->load_lehrer_pid();
 					return false;
 				}
 			}
 		}
 	}
-	function load_lehrer($pid, $schuljahr) {
-		$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, $schuljahr);
+	function load_lehrer_pid($pid = -1) {
+		if ($pid = -1) {
+			$pid = $this->person->id;
+		}
+		$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $pid, get_current_year());
 		$lehrer = $return->fetch();
 		if ($lehrer) {
 			$this->id = $lehrer['id'];
@@ -118,6 +125,7 @@ class lehrer {
 		}
 	}
 	function add_time(array $zeit) {
+		var_dump($zeit);
 		if (isset($this->id) && is_array($zeit)) {
 			$weekdays = array(
 					'mo',
@@ -126,12 +134,12 @@ class lehrer {
 					'do',
 					'fr'
 			);
-			if (array_search($zeit[0], $weekdays) !== false) {
-				if (strtotime($zeit[1]) !== false && strtotime($zeit[2]) !== false) {
-					$retun = query_db("SELECT * FROM `zeit` WHERE lid = :lid AND tag = :tag", $this->id, $zeit[0]);
+			if (array_search($zeit['tag'], $weekdays) !== false) {
+				if (strtotime($zeit['from']) !== false && strtotime($zeit['until']) !== false) {
+					$retun = query_db("SELECT * FROM `zeit` WHERE lid = :lid AND tag = :tag", $this->id, $zeit['tag']);
 					$time = $retun->fetch();
 					if ($time === false) {
-						query_db("INSERT INTO `zeit` (`lid`,`tag`,`anfang`,`ende`) VALUES (:id, :tag, :anfang, :ende);", $this->id, $zeit[0], $zeit[1], $zeit[2]);
+						query_db("INSERT INTO `zeit` (`lid`,`tag`,`anfang`,`ende`) VALUES (:id, :tag, :anfang, :ende);", $this->id, $zeit['tag'], $zeit['from'], $zeit['until']);
 					} else {
 						echo "Dem Lehrer / Der Lehrerin wurde bereits eine Zeit für diesen Tag zugeordnet";
 					}
@@ -139,9 +147,19 @@ class lehrer {
 			}
 		}
 	}
-	function add_angebot_fach($fachid, $nachweis_vorhanden) {
+	function get_zeit() {
+		$return = query_db("SELECT * FROM `zeit` WHERE lid = :lid", $this->id);
+		if ($return) {
+			$result = $return->fetchAll();
+			return $result;
+		}
+		return false;
+	}
+	
+	function add_angebot_fach($fachid, $nachweis_vorhanden, $fachlehrer, $notenschnitt) {
 		var_dump($nachweis_vorhanden);
-		if (isset($this->id) && is_bool($nachweis_vorhanden) && is_int($fachid)) {
+		var_dump($this->id);
+		if (isset($this->id) && is_bool($nachweis_vorhanden) && is_int(intval($fachid))) {
 			$return = query_db("SELECT * FROM `bietet_an` WHERE lid = :lid AND fid = :fid", $this->id, $fachid);
 			if ($return->fetch() !== false) {
 				echo "Es existiert bereits ein Angebot für diesen Lehrer und für dieses Fach!";
@@ -149,7 +167,7 @@ class lehrer {
 				if (!$nachweis_vorhanden) {
 					echo "Der Nachhilfelehrer hat noch keine Bestätigung für die Eignung zum Nachhilfeunterricht für dieses Fach!";
 				}
-				query_db("INSERT INTO `bietet_an` (`lid`,`fid`,`nachweis_vorhanden`,`status`) VALUES (:lid, :fid, :nachweis_vorhanden, :status)", $this->id, $fachid, intval($nachweis_vorhanden), 'neu');
+				query_db("INSERT INTO `bietet_an` (`lid`, `fid`, `nachweis_vorhanden`, `fachlehrer`, `notenschnitt`, `status`) VALUES (:lid, :fid, :nachweis_vorhanden, :fachlehrer, :notenschnitt, :status)", $this->id, $fachid, intval($nachweis_vorhanden),$fachlehrer, $notenschnitt,'neu');
 			}
 		} else {
 			var_dump($fachid);
