@@ -15,7 +15,7 @@ if (isset($user) && $user->runscript()) {
 <fieldset style="padding: 40px; width: 80%;">
 	<legend><?php echo $person->vname.' '.$person->nname?></legend>
 	<div style="display: flex;">
-		<div style="width: 50%; display: inline-block;">
+		<div style="width: 70%; display: inline-block;">
 						
 			<?php
 			echo "Name: " . $person->vname . " " . $person->nname . "<br>E-Mail: " . $person->email;
@@ -78,14 +78,16 @@ if (isset($user) && $user->runscript()) {
 				if(strlen($schueler->get_comment()) > 0) {
 					echo "<br>Kommentar: ".$schueler->get_comment();
 				}
-				$schueler->get_lehrer($faecher[0]['id']);
+				$schueler->get_lehrer($faecher[0]['fid']);
 				?>
 				</div>
 				<?php
 			}
 			?>
 		</div>
-	</div>
+		<div style="width: 30%;">
+			<a href="index.php?page=change&person=<?php echo $person->id;?>" class="links">Ändere die Daten</a>
+		</div>	
 </fieldset>
 <?php
 			$result = $return->fetch();

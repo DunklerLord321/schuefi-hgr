@@ -94,6 +94,15 @@ function get_current_year() {
 	$year = get_prop("current_year");
 	return $year[1];
 }
+
+function format_klassenstufe_kurs($klassenstufe, $klasse) {
+	if (is_numeric($klasse)) {
+		return $klassenstufe."/".$klasse;
+	}else{
+		return $klassenstufe.$klasse;
+	}
+}
+
 function query_db($statement, ...$params) {
 	global $exit_on_db_failure;
 	global $pdo;

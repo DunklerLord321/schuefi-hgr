@@ -78,8 +78,8 @@ if (isset($user) && $user->runscript()) {
 					$lehrer = new lehrer($person->id);
 					$lehrer->load_lehrer_pid();
 					
-					if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['dest' . $i]) && $_SESSION['mail_step1']['dest' . $i] == $lehrer['email']) {
-						echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $lehrer['email'] . "\" checked> " . $lehrer['vname'] . " " . $lehrer['nname'] . "<br>" . $lehrer['email'] . "</label><br>";
+					if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['dest-' . $i]) && $_SESSION['mail_step1']['dest-' . $i] == $person->email) {
+						echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 					} else {
 						echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 					}
@@ -89,8 +89,8 @@ if (isset($user) && $user->runscript()) {
 					$schueler = new schueler($person->id);
 					$schueler->load_schueler_pid();
 						
-					if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['dest' . $i]) && $_SESSION['mail_step1']['dest' . $i] == $schueler['email']) {
-						$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $schueler['email'] . "\" checked> " . $schueler['vname'] . " " . $schueler['nname'] . "<br>" . $schueler['email'] . "</label><br>";
+					if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['dest-' . $i]) && $_SESSION['mail_step1']['dest-' . $i] == $person->email) {
+						$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 					} else {
 						$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 					}
@@ -132,7 +132,7 @@ if (isset($user) && $user->runscript()) {
 		document.getElementById("textarea1").value = '';
 	}
 	</script>
-<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?step=3"?>" method="POST">
+<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=3"?>" method="POST">
 
 	<?php
 		if (isset($_SESSION['mail_step1']['subject'])) {
@@ -147,21 +147,11 @@ if (isset($user) && $user->runscript()) {
 		?>
 	<br>
 	<br>
-	<button type="button" onclick="add_text(' .vorname')">Vorname</button>
-	<button type="button" onclick="add_text(' .nachname')">Nachname</button>
-	<button type="button" onclick="add_text(' .email')">Email</button>
+	<button type="button" onclick="add_text(' :vorname')">Vorname</button>
+	<button type="button" onclick="add_text(' :nachname')">Nachname</button>
+	<button type="button" onclick="add_text(' :email')">Email</button>
 	<button type="button" onclick="reset_text()">Reset</button>
-	<?php
-		if (isset($_SESSION['mail_step1']['text'])) {
-			?>
-	<textarea name="text" rows="5" id="textarea1" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%;"><?php echo strip_tags($_SESSION['mail_step1']['text']);?></textarea>	
-	<?php
-		} else {
-			?>
-	<textarea name="text" rows="5" id="textarea1" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%;"></textarea>	
-			<?php
-		}
-		?>
+	<textarea name="text" rows="5" id="textarea1" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%;"><?php if (isset($_SESSION['mail_step1']['text'])) { echo strip_tags($_SESSION['mail_step1']['text']); }?></textarea>	
 	<br>
 	<br>
 	<input type="submit" value="Weiter" style="float: right;">

@@ -8,7 +8,48 @@ class lehrer {
 	public $person = person::class;
 	public $faecher = array();
 	public $zeit = array();
-	function __construct(int $pid) {
+	
+	/*
+	 * Wenn direkt Lehrer-ID übergeben wird, dann wird der Lehrer gleich komplett geladen
+	 * 
+	 * 
+	 */
+	function __construct(int $pid, int $id = -1) {
+		if($id != -1) {
+			$return = query_db("SELECT * FROM `lehrer` WHERE id = :lid AND schuljahr = :schuljahr", $id, get_current_year());
+			$lehrer = $return->fetch();
+			if ($lehrer) {
+				$this->id = $lehrer['id'];
+				$this->klasse = $lehrer['klasse'];
+				$this->klassenlehrer_name = $lehrer['klassenlehrer_name'];
+				$this->klassenstufe = $lehrer['klassenstufe'];
+				$this->comment = $lehrer['comment'];
+				$pid = $lehrer['pid'];
+				$return = query_db("SELECT * FROM `zeit` WHERE lid = :lid", $this->id);
+				$times = $return->fetch();
+				while ( $times ) {
+					$this->zeit[] = array(
+							'tag' => $times['tag'],
+							'anfang' => $times['anfang'],
+							'ende' => $times['ende']
+					);
+					$times = $return->fetch();
+				}
+				$return = query_db("SELECT * FROM `bietet_an` WHERE lid = :lid", $this->id);
+				$fach = $return->fetch();
+				while ( $fach ) {
+					$this->faecher[] = array(
+							'fid' => $fach['fid'],
+							'nachweis_vorhanden' => $fach['nachweis_vorhanden'],
+							'fachlehrer' => $fach['fachlehrer'],
+							'notenschnitt' => $fach['notenschnitt'],
+							'status' => $fach['status']
+					);
+					$fach = $return->fetch();
+				}
+			}
+				
+		}
 		if (isset($pid)) {
 			$this->person = new person();
 			$this->person->load_person($pid);
@@ -118,6 +159,8 @@ class lehrer {
 				$this->faecher[] = array(
 						'fid' => $fach['fid'],
 						'nachweis_vorhanden' => $fach['nachweis_vorhanden'],
+						'fachlehrer' => $fach['fachlehrer'],
+						'notenschnitt' => $fach['notenschnitt'],
 						'status' => $fach['status']
 				);
 				$fach = $return->fetch();
@@ -159,6 +202,7 @@ class lehrer {
 	function add_angebot_fach($fachid, $nachweis_vorhanden, $fachlehrer, $notenschnitt) {
 		var_dump($nachweis_vorhanden);
 		var_dump($this->id);
+		$nachweis_vorhanden = boolval($nachweis_vorhanden);
 		if (isset($this->id) && is_bool($nachweis_vorhanden) && is_int(intval($fachid))) {
 			$return = query_db("SELECT * FROM `bietet_an` WHERE lid = :lid AND fid = :fid", $this->id, $fachid);
 			if ($return->fetch() !== false) {

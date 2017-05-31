@@ -5,7 +5,7 @@
 <title>Verwaltung der Daten der Schülerfirma</title>
 <meta name="description" content="Verwalte die Daten der Schülerfirma 'Schüler helfen Schülern' einfach und automatisiert.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="design.css" rel="stylesheet">
+<link href="css/design.css" rel="stylesheet">
 <link href="includes/jquery/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet">
 <script type="text/javascript" src="includes/jquery/jquery-3.2.1.min.js"></script>
 <script src="includes/jquery/jquery-ui-1.12.1/jquery.js"></script>
@@ -94,6 +94,14 @@ if (isset($_GET['page'])) {
 			<li <?php if(strcmp($active, "output_person") == 0) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=output_person"> Ausgeben der Personen</a>
 			</li>
+			<?php 
+			if (strcmp($active, "change") == 0 && strpos($_SERVER['QUERY_STRING'], 'person') !== false) {
+				?>
+			<li class="active">
+				<a href="index.php?page=output_person" style="text-align: right;"> Ändern einer Person</a>
+			</li><?php
+					}
+			?>
 			<li <?php if(strcmp($active, "output") == 0 && strpos($_SERVER['QUERY_STRING'], "schueler=1") !== false) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=output&schueler=1"> Ausgeben der Schüler</a>
 			</li>
@@ -137,6 +145,9 @@ if (isset($_GET['page'])) {
 			</li>
 			<li <?php if(strcmp($active, "mail") == 0 ) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=mail&step=1"> Sende E-Mail</a>
+			</li>
+			<li <?php if(strcmp($active, "create_doc") == 0 ) { echo "class=\"active\""; }?>>
+				<a href="index.php?page=create_doc">Erstelle Dokumente</a>
 			</li>
 		</ul>
 	</nav>

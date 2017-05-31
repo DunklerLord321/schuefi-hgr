@@ -1,709 +1,294 @@
 <?php
-/*************************************************************************************************************
- * Get-Parameter: 
- * flehr = id eines Lehrer aus aktuellem Jahr; ruft Formular mit aktuellen Werten als Vorgabe auf
- * fschuel  - | | - für Schüler
- * change = 1 oder 2 Ändert Schüler/Lehrer in Datenbank mit Formulareingabefeldern als POST-Parameter
- * next_yearlehr = id Lehrer aktuelles Jahr- Übertragt Lehrer in nächsten Jahr, wenn Tabellen existieren zählt Klassenstufe automatisch hoch, Rest bleibt 
- * 
- * 
- * 
- */
 if (isset($user) && $user->runscript()) {
-	echo "<h2>Ändern der Schülerdaten</h2>";
-	$show_formular_schueler = false;
-	$show_formular_lehrer = false;
-	if (isset($_GET['flehr'])) {
-		$show_formular_lehrer = true;
-		$show_formular_schueler = false;
-	} else if (isset($_GET['fschuel'])) {
-		$show_formular_lehrer = false;
-		$show_formular_schueler = true;
+	echo "<h2>Ändern der Daten</h2>";
+	if (isset($_GET['change']) && ($_GET['change'] == 1 || $_GET['change'] == 2 || $_GET['change'] == 3)) {
+		if ($_GET['change'] == 1) {
+			require 'includes/class_person.php';
+			$person = new person();
+			$return = $person->load_person($_POST['id']);
+			if ($return == false) {
+				echo "Diese Person existiert nicht.";
+				die();
+			}
+			if ($person->change_person($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['telefon'], $_POST['geb'])) {
+				echo "Die Daten wurden erfolgreich geändert!";
+			} else {
+				echo "Es ist ein Fehler aufgetreten!";
+			}
+		}
+		if($_GET['change'] == 2 || $_GET['change'] == 3) {
+			echo "Dies funktioniert noch nicht!";
+			die();
+		}
 	}
-	if (isset($_GET['change']) && ($_GET['change'] == 1 || $_GET['change'] == 2)) {
-		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
-		$vname = $_POST['vname'];
-		$nname = $_POST['nname'];
-		$fach1 = $_POST['fach1'];
-		$fach1_lehrer = $_POST['fach1_lehrer'];
-		$fach2 = $_POST['fach2'];
-		$fach2_lehrer = $_POST['fach2_lehrer'];
-		$fach3 = $_POST['fach3'];
-		$fach3_lehrer = $_POST['fach3_lehrer'];
-		$email = $_POST['email'];
-		$klasse_kurs = $_POST['klasse_kurs'];
-		$klassenstufe = $_POST['klassenstufe'];
-		$klassenlehrer_name = $_POST['klassenlehrer'];
-		$telefon = $_POST['telefon'];
-		$mo_anfang = $_POST['mo_anfang'];
-		$mo_ende = $_POST['mo_ende'];
-		$di_anfang = $_POST['di_anfang'];
-		$di_ende = $_POST['di_ende'];
-		$mi_anfang = $_POST['mi_anfang'];
-		$mi_ende = $_POST['mi_ende'];
-		$do_anfang = $_POST['do_anfang'];
-		$do_ende = $_POST['do_ende'];
-		$fr_anfang = $_POST['fr_anfang'];
-		$fr_ende = $_POST['fr_ende'];
-		if (isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
-			$table_schueler = "`schueler-" . $_GET['year'] . "`";
-			$table_lehrer = "`lehrer-" . $_GET['year'] . "`";
-		} else {
-			$table_schueler = get_current_table("schueler");
-			$table_lehrer = get_current_table("lehrer");
-			$_GET['year'] = get_prop("current_year")[1];
+	if (isset($_GET['person'])) {
+		require 'includes/class_person.php';
+		$person = new person();
+		$return = $person->load_person($_GET['person']);
+		if (!$return) {
+			echo "Ein Fehler ist aufgetreten";
+			die();
+		}
+		?>
+<div class="formular_class">
+	<form action="index.php?page=change&change=1" method="POST" novalidate="novalidate">
+		<fieldset style="padding: 40px;">
+			<legend>
+				<b>Person</b>
+			</legend>
+			<br>
+			<input type="hidden" value="<?php echo $_GET['person'];?>" name="id">
+			Vorname:
+			<span style="float: right; width: 50%;">Nachname:</span>
+			<br>
+			<input type="text" maxlength="49" name="vname" autofocus required style="width: 40%;" value=<?php echo $person->vname;?>>
+			<input type="text" maxlength="49" name="nname" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" value=<?php echo $person->nname;?>>
+			<br>
+			<br>
+			Geburtstag
+			<br>
+			<input type="text" id="datepicker" name="geb" value=<?php echo $person->geburtstag;?>>
+			<script>
+		$( function() {
+			$( "#datepicker" ).datepicker({
+				changeYear: true,
+				yearRange: "c-20:c-10",
+			});
+		} );
+			</script>
+
+			<br>
+			<br>
+			Email:
+			<br>
+			<input type="email" class="textinput" maxlength="49" name="email" value=<?php echo $person->email;?>>
+			<br>
+			<br>
+			Telefon
+			<br>
+			<input type="tel" name="telefon" value=<?php echo $person->telefon;?>>
+			<br>
+			<br>
+			<input type="submit" value="Ändern">
+		</fieldset>
+	</form>
+</div>
+<?php
+	}
+	if (isset($_GET['schueler']) || isset($_GET['lehrer'])) {
+		require 'includes/class_person.php';
+		require 'includes/class_lehrer.php';
+		require 'includes/class_schueler.php';
+		if (isset($_GET['schueler'])) {
+			$sl = new schueler(-1, $_GET['schueler']);
+		}
+		if (isset($_GET['lehrer'])) {
+			$sl = new lehrer(-1, $_GET['lehrer']);
+		}
+		?>
+<script src="includes/jquery/jquery-ui-timepicker/jquery.ui.timepicker.js?v=0.3.3"></script>
+<link rel="stylesheet" href="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/ui-lightness/jquery-ui-1.10.0.custom.min.css" type="text/css" />
+<link rel="stylesheet" href="includes/jquery/jquery-ui-timepicker/jquery.ui.timepicker.css?v=0.3.3" type="text/css" />
+<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.core.min.js"></script>
+<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.widget.min.js"></script>
+<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.tabs.min.js"></script>
+<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.position.min.js"></script>
+<script type="text/javascript">
+		var fachzahl = <?php echo count($sl->faecher);?>;
+		var zeitzahl = <?php echo count($sl->zeit);?>;
+		
+		function addfach() {
+			fachzahl++;
+			var doc = document.createDocumentFragment();
+			var element = document.createElement('div');
+			element.innerHTML = '<div style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;">\
+		<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
+		<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
+		</select><br><br>Fachlehrer:<br><input type="text" class="textinput" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]"><br>\
+		<?php
+		if (isset($_GET['lehrer'])) {
+			echo "Notenschnitt:<br><input class=\"textinput\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
+			echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
+			echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
+			echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
+		}
+		?>
+		</div>';
+			while(element.firstChild) {
+				doc.appendChild(element.firstChild);
+			}
+			document.getElementById("insertfach").appendChild(doc);
 		}
 		
-		// echo "<br>" . $vname . " " . $nname . " " . $fach1 . " " . $email . $klasse_kurs . $klassenstufe . $klassenlehrer_name . "fachlehrer:" . $fach1_lehrer;
-		if (strlen($vname) == 0 || strlen($nname) == 0 || (strlen($email) == 0 && $telefon = 0) || !isset($fach1) || strlen($fach1_lehrer) == 0 || strlen($klassenlehrer_name) == 0 || strlen($klasse_kurs) == 0 || !isset($klassenstufe)) {
-			echo "Ein Problem ist aufgetreten. Bitte gib die Daten erneut ein";
-		} else {
-			if ($_GET['change'] == 1) {
-				if (strcmp($fach2, '') == 0) {
-					$fach2 = NULL;
-					$fach2_lehrer = NULL;
-				}
-				if (strcmp($fach3, '') == 0) {
-					$fach3 = NULL;
-					$fach3_lehrer = NULL;
-				}
-				// $return_prep = $pdo_insert->prepare ( "UPDATE schueler (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)" );
-				$return_prep = $pdo_insert->prepare("UPDATE " . $table_schueler . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id");
-				$return = $return_prep->execute(array(
-						'vname' => $vname,
-						'nname' => $nname,
-						'email' => $email,
-						'klassenstufe' => $klassenstufe,
-						'klasse' => $klasse_kurs,
-						'klassenlehrer_name' => $klassenlehrer_name,
-						'fach1' => $fach1,
-						'fach1_lehrer' => $fach1_lehrer,
-						'fach2' => $fach2,
-						'fach2_lehrer' => $fach2_lehrer,
-						'fach3' => $fach3,
-						'fach3_lehrer' => $fach3_lehrer,
-						'mo_anfang' => $mo_anfang,
-						'mo_ende' => $mo_ende,
-						'di_anfang' => $di_anfang,
-						'di_ende' => $di_ende,
-						'mi_anfang' => $mi_anfang,
-						'mi_ende' => $mi_ende,
-						'do_anfang' => $do_anfang,
-						'do_ende' => $do_ende,
-						'fr_anfang' => $fr_anfang,
-						'fr_ende' => $fr_ende,
-						'id' => $_SESSION['schuelerid']
-				));
-				if ($return) {
-					echo "<br>Die Daten des Schüler wurden erfolgreich geändert.";
-					$show_formular_schueler = false;
-					$show_formular_lehrer = false;
-					unset($_SESSION['schuelerid']);
-				}
-			} elseif ($_GET['change'] == 2) {
-				if (strcmp($fach2, '') == 0) {
-					$fach2 = NULL;
-					$fach2_lehrer = NULL;
-				}
-				if (strcmp($fach3, '') == 0) {
-					$fach3 = NULL;
-					$fach3_lehrer = NULL;
-				}
-				$return_prep = $pdo_insert->prepare("UPDATE " . $table_lehrer . " SET vname = :vname, nname = :nname, email = :email, klassenstufe = :klassenstufe, klasse = :klasse, klassenlehrer_name = :klassenlehrer_name, fach1 = :fach1, fach1_lehrer = :fach1_lehrer, fach2 = :fach2, fach2_lehrer = :fach2_lehrer, fach3 = :fach3, fach3_lehrer = :fach3_lehrer, mo_anfang = :mo_anfang, mo_ende = :mo_ende, di_anfang = :di_anfang, di_ende = :di_ende, mi_anfang = :mi_anfang, mi_ende = :mi_ende, do_anfang = :do_anfang, do_ende = :do_ende, fr_anfang = :fr_anfang, fr_ende = :fr_ende WHERE id = :id");
-				$return = $return_prep->execute(array(
-						'vname' => $vname,
-						'nname' => $nname,
-						'email' => $email,
-						'klassenstufe' => $klassenstufe,
-						'klasse' => $klasse_kurs,
-						'klassenlehrer_name' => $klassenlehrer_name,
-						'fach1' => $fach1,
-						'fach1_lehrer' => $fach1_lehrer,
-						'fach2' => $fach2,
-						'fach2_lehrer' => $fach2_lehrer,
-						'fach3' => $fach3,
-						'fach3_lehrer' => $fach3_lehrer,
-						'mo_anfang' => $mo_anfang,
-						'mo_ende' => $mo_ende,
-						'di_anfang' => $di_anfang,
-						'di_ende' => $di_ende,
-						'mi_anfang' => $mi_anfang,
-						'mi_ende' => $mi_ende,
-						'do_anfang' => $do_anfang,
-						'do_ende' => $do_ende,
-						'fr_anfang' => $fr_anfang,
-						'fr_ende' => $fr_ende,
-						'id' => $_SESSION['lehrerid']
-				));
-				if ($return) {
-					echo "Die Daten des Lehrers wurden erfolgreich geändert.";
-					$show_formular_schueler = false;
-					$show_formular_lehrer = false;
-					unset($_SESSION['lehrerid']);
-				}
+		function addtime() {
+			var doc = document.createDocumentFragment();
+			var element = document.createElement('div');
+			zeitzahl++;
+			element.innerHTML = '<select name="zeit['+ zeitzahl + '][tag]"><option value="mo">Montag</option><option value="di">Dienstag</option>\
+	<option value="mi">Mittwoch</option><option value="do">Donnerstag</option>\
+	<option value="fr">Freitag</option>\
+	</select><br>\
+	<br>Von: \
+	<input type="text" class="timepickervon" name="zeit['+zeitzahl + '][from]" value="13:00">\
+	     Bis: \
+ 	<input type="text" class="timepickerbis" name="zeit['+zeitzahl + '][until]" value="14:00">\
+	<br><br><br><br>';
+			while(element.firstChild) {
+				doc.appendChild(element.firstChild);
 			}
+			document.getElementById("insertzeit").appendChild(doc);
 		}
-	}
-	if (isset($_GET['next_yearschuel'])) {
-		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
-		$return_prep = $pdo_insert->prepare("SELECT * FROM " . get_current_table("schueler") . " WHERE id = :id");
-		$return = $return_prep->execute(array(
-				'id' => $_GET['next_yearschuel']
-		));
-		if ($return == false) {
-			echo "EIn PRoblem ist aufgetreten!";
-		}
-		$schueler = $return_prep->fetch();
-		if ($schueler == false) {
-			echo "EIN PROBLEM";
-		} else {
-			if (get_next_year() == false) {
-				echo "Das gewünschte Schuljahr existiert noch nicht. Bitte wende dich an den Admin!";
-			} else {
-				$schuelertabel = "`schueler-" . get_next_year() . "`";
-				$return_prep = $pdo_insert->prepare("SELECT * FROM " . $schuelertabel . " WHERE vname = :vname AND nname = :nname");
-				$return = $return_prep->execute(array(
-						'vname' => $schueler['vname'],
-						'nname' => $schueler['nname']
-				));
-				$testschueler = $return_prep->fetch();
-				if ($testschueler !== false) {
-					echo "Dieser Schüler existiert bereits im nächsten Jahr";
-				} else {
-					$klasse = intval($schueler['klassenstufe']);
-					$klasse += 1;
-					echo "Achtung: <br><i>Der Schüler geht automatisch in die nächste Klassenstufe. Falls er sitzengebieben ist, muss das per Hand geändert werden.<br>Alle anderen Daten, auch wann der Schüler Zeit hat, werden einfach übernommen.</i>";
-					if ($klasse > 12) {
-						echo "Der Schüler müsste die zwölfte Klassen bereits verlassen haben";
-					}
-					if ($klasse == 11) {
-						echo "Achtung: Der Schüler geht nun in die Oberstufe. Der Kurs muss bitte erneut eingegeben werden.";
-					}
-					$schueler['klassenstufe'] = $klasse;
-					$return_prep = $pdo_insert->prepare("INSERT INTO " . $schuelertabel . " (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)");
-					$return = $return_prep->execute(array(
-							'vname' => $schueler['vname'],
-							'nname' => $schueler['nname'],
-							'email' => $schueler['email'],
-							'klassenstufe' => $schueler['klassenstufe'],
-							'klasse' => $schueler['klasse'],
-							'klassenlehrer_name' => $schueler['klassenlehrer_name'],
-							'fach1' => $schueler['fach1'],
-							'fach1_lehrer' => $schueler['fach1_lehrer'],
-							'fach2' => $schueler['fach2'],
-							'fach2_lehrer' => $schueler['fach2_lehrer'],
-							'fach3' => $schueler['fach3'],
-							'fach3_lehrer' => $schueler['fach3_lehrer'],
-							'mo_anfang' => $schueler['mo_anfang'],
-							'mo_ende' => $schueler['mo_ende'],
-							'di_anfang' => $schueler['di_anfang'],
-							'di_ende' => $schueler['di_ende'],
-							'mi_anfang' => $schueler['mi_anfang'],
-							'mi_ende' => $schueler['mi_ende'],
-							'do_anfang' => $schueler['do_anfang'],
-							'do_ende' => $schueler['do_ende'],
-							'fr_anfang' => $schueler['fr_anfang'],
-							'fr_ende' => $schueler['fr_ende']
-					));
-					if ($return) {
-						$return_prep = $pdo_insert->prepare("SELECT * FROM " . $schuelertabel . " WHERE vname = :vname AND nname = :nname");
-						$return = $return_prep->execute(array(
-								'vname' => $schueler['vname'],
-								'nname' => $schueler['nname']
-						));
-						if ($return == false) {
-							echo "EIn PRoblem ist aufgetreten!";
-						}
-						$testschueler = $return_prep->fetch();
-						if ($testschueler === false) {
-							echo "EIn Problem liegt vor!";
-						} else {
-							echo "<br>Schüler erfolgreich übernommen";
-							echo "<br><br><a href=\"" . htmlspecialchars($_SERVER['PHP_SELF']) . "?fschuel=" . $testschueler['id'] . "&year=" . get_next_year() . "\" class=\"links\">Bearbeite den Schüler</a><br><br>";
-						}
-					}
-				}
-			}
-		}
-	}
-	if (isset($_GET['next_yearlehr'])) {
-		var_dump(get_current_table("lehrer"));
-		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
-		$return_prep = $pdo_insert->prepare("SELECT * FROM " . get_current_table("lehrer") . " WHERE id = :id");
-		$return = $return_prep->execute(array(
-				'id' => $_GET['next_yearlehr']
-		));
-		if ($return == false) {
-			echo "EIn PRoblem ist aufgetreten!";
-		}
-		$lehrer = $return_prep->fetch();
-		if ($lehrer == false) {
-			echo "EIN PROBLEM";
-		} else {
-			if (get_next_year() == false) {
-				echo "Das gewünschte Schuljahr existiert noch nicht. Bitte wende dich an den Admin!";
-			} else {
-				$lehrertabel = "`lehrer-" . get_next_year() . "`";
-				$return_prep = $pdo_insert->prepare("SELECT * FROM " . $lehrertabel . " WHERE vname = :vname AND nname = :nname");
-				$return = $return_prep->execute(array(
-						'vname' => $lehrer['vname'],
-						'nname' => $lehrer['nname']
-				));
-				if ($return == false) {
-					echo "EIn PRoblem ist aufgetreten!";
-				}
-				$testlehrer = $return_prep->fetch();
-				if ($testlehrer !== false) {
-					echo "Dieser Lehrer existiert bereits im nächsten Jahr";
-				} else {
-					$klasse = intval($lehrer['klassenstufe']);
-					$klasse += 1;
-					echo "Achtung: <br><i>Der Lehrer geht automatisch in die nächste Klassenstufe. Falls er sitzengebieben ist, muss das per Hand geändert werden.<br></i>";
-					if ($klasse > 12) {
-						echo "<br><b>Der Lehrer müsste die zwölfte Klassen bereits verlassen haben</b>";
-					}
-					if ($klasse == 11) {
-						echo "<br>Achtung: Der Lehrer geht nun in die Oberstufe. Der Kurs muss bitte erneut eingegeben werden.";
-					}
-					$lehrer['klassenstufe'] = $klasse;
-					$return_prep = $pdo_insert->prepare("INSERT INTO " . $lehrertabel . " (vname, nname, email, klassenstufe, klasse, klassenlehrer_name, fach1, fach1_lehrer, fach2, fach2_lehrer, fach3, fach3_lehrer, mo_anfang, mo_ende, di_anfang, di_ende, mi_anfang, mi_ende, do_anfang, do_ende, fr_anfang, fr_ende) VALUES (:vname, :nname, :email, :klassenstufe, :klasse, :klassenlehrer_name, :fach1, :fach1_lehrer, :fach2, :fach2_lehrer, :fach3, :fach3_lehrer, :mo_anfang, :mo_ende, :di_anfang, :di_ende, :mi_anfang, :mi_ende, :do_anfang, :do_ende, :fr_anfang, :fr_ende)");
-					$return = $return_prep->execute(array(
-							'vname' => $lehrer['vname'],
-							'nname' => $lehrer['nname'],
-							'email' => $lehrer['email'],
-							'klassenstufe' => $lehrer['klassenstufe'],
-							'klasse' => $lehrer['klasse'],
-							'klassenlehrer_name' => $lehrer['klassenlehrer_name'],
-							'fach1' => $lehrer['fach1'],
-							'fach1_lehrer' => $lehrer['fach1_lehrer'],
-							'fach2' => $lehrer['fach2'],
-							'fach2_lehrer' => $lehrer['fach2_lehrer'],
-							'fach3' => $lehrer['fach3'],
-							'fach3_lehrer' => $lehrer['fach3_lehrer'],
-							'mo_anfang' => $lehrer['mo_anfang'],
-							'mo_ende' => $lehrer['mo_ende'],
-							'di_anfang' => $lehrer['di_anfang'],
-							'di_ende' => $lehrer['di_ende'],
-							'mi_anfang' => $lehrer['mi_anfang'],
-							'mi_ende' => $lehrer['mi_ende'],
-							'do_anfang' => $lehrer['do_anfang'],
-							'do_ende' => $lehrer['do_ende'],
-							'fr_anfang' => $lehrer['fr_anfang'],
-							'fr_ende' => $lehrer['fr_ende']
-					));
-					if ($return) {
-						$return_prep = $pdo_insert->prepare("SELECT * FROM " . $lehrertabel . " WHERE vname = :vname AND nname = :nname");
-						$return = $return_prep->execute(array(
-								'vname' => $lehrer['vname'],
-								'nname' => $lehrer['nname']
-						));
-						if ($return == false) {
-							echo "EIn PRoblem ist aufgetreten!";
-						}
-						$testlehrer = $return_prep->fetch();
-						if ($testlehrer === false) {
-							echo "EIn Problem liegt vor!";
-						} else {
-							echo "<br>Lehrer erfolgreich übernommen";
-							echo "<br><br><a href=\"" . htmlspecialchars($_SERVER['PHP_SELF']) . "?flehr=" . $testlehrer['id'] . "&year=" . get_next_year() . "\" class=\"links\">Bearbeite den Lehrer</a><br><br>";
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	if ($show_formular_schueler) {
-		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
-		if (isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
-			$table = "`schueler-" . $_GET['year'] . "`";
-		} else {
-			$table = get_current_table("schueler");
-			$_GET['year'] = get_prop("current_year")[1];
-		}
-		$return_prep = $pdo_insert->prepare("SELECT * FROM " . $table . " WHERE id = :id");
-		$return = $return_prep->execute(array(
-				'id' => $_GET['fschuel']
-		));
-		if ($return == false) {
-			echo "EIn PRoblem ist aufgetreten!";
-		}
-		$schueler = $return_prep->fetch();
-		if ($schueler == false) {
-			echo "EIN PROBLEM";
-		} else {
-			$schueler = validate_input($schueler, true);
-			if (is_string($schueler)) {
-				echo "EIn Fehler ist passiert: $schueler";
-			} else {
-				$_SESSION['schuelerid'] = $_GET['fschuel'];
-				?>
+		/*
+		 $("form").submit(function (event) {
+		 if( typeof
+		 }
+		 */
+		$('body').on('focus','.timepickervon', function(){
+			$(this).timepicker({
+				showPeriodLabels: false,
+				hourText: "Stunden",
+				minuteText: "Minuten",
+				hours: {
+					starts: 11,
+					ends: 17,
+				},
+				minutes: {
+					starts: 0,
+					interval: 15,
+					ends: 45
+				},
+				rows: 2,
+				defaultTime: '13:00'
+			});
+		});
+		
+			$('body').on('focus','.timepickerbis', function(){
+				$(this).timepicker({
+					showPeriodLabels: false,
+					hourText: "Stunden",
+					minuteText: "Minuten",
+					hours: {
+						starts: 11,
+						ends: 17,
+					},
+					minutes: {
+						starts: 0,
+						interval: 15,
+						ends: 45
+					},
+					rows: 2,
+					defaultTime: '14:00'
+				});
+			});
+		
+				</script>
 <div class="formular_class">
-	<form action="?change=1&year=<?php echo $_GET['year'];?>" method="POST">
+	<form action="?page=input&input=<?php if(isset($_GET['schueler'])){echo "1";}if(isset($_GET['lehrer'])){echo "2";}?>" method="POST">
 		<fieldset style="padding: 40px;">
 			<legend>
-				<b>Nachhilfeschüler</b>
+				<b><?php if(isset($_GET['schueler'])){echo "Nachhilfeschüler";}if(isset($_GET['lehrer'])){echo "Nachhilfelehrer";}?></b>
 			</legend>
-			<p>Im Schuljahr <?php echo $_GET['year'];?></p>
+			<p>
+				Ändere Daten von:
+				<b><?php echo $sl->person->vname.' '.$sl->person->nname;?></b>
+			</p>
+			Klassenstufe (5-12):
+			<span style="float: right; width: 50%;">Klasse/Kurs (a, b, c, d, L, L1, L2):</span>
 			<br>
-			Vorname:
-			<span style="float: right; width: 50%;">Nachname:</span>
-			<br>
-			<input type="text" maxlength="49" name="vname" autofocus required="required" value="<?php echo $schueler['vname'];?>" style="width: 40%;">
-			<input type="text" maxlength="49" name="nname" required="required" value="<?php echo $schueler['nname'];?>" style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
-			<br>
-			<br>
-			Klassenstufe:
-			<span style="float: right; width: 50%;">Klasse/Kurs:</span>
-			<br>
-			<input type="number" name="klassenstufe" min="5" max="12" required="required" value="<?php echo $schueler['klassenstufe'];?>" style="width: 40%;">
-			<input type="text" pattern="([ABCDabcdl123456]|[lL][12])" name="klasse_kurs" required="required" value="<?php echo $schueler['klasse'];?>"
-				style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
+			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;" value="<?php echo $sl->get_klassenstufe();?>">
+			<input type="text" pattern="([ABCDabcdlL123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" value="<?php echo $sl->get_klasse();?>">
 			<br>
 			<br>
 			Klassenlehrer:
 			<br>
-			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required="required" value="<?php echo $schueler['klassenlehrer_name'];?>">
+			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required value="<?php echo $sl->get_klassenlehrer();?>">
 			<br>
 			<br>
-			Geburtstag
-			<br>
-			<input type="date" value="<?php echo $schueler['geburtstag'];?>">
-			<br>
-			<br>
-			Email:
-			<br>
-			<input type="email" class="textinput" maxlength="49" name="email" value="<?php echo $schueler['email'];?>">
-			<br>
-			<br>
-			<br>
-			Telefon
-			<br>
-			<input type="tel" name="telefon" value="<?php echo $schueler['telefon'];?>">
-			<br>
-			<div style="width: 20%; display: inline-block;">
-				<h3>1.Fach:</h3>
+			<input type="button" value="Füge Fach hinzu" onclick="addfach()">
+			<div id="insertfach">
 				<br>
-				<select name="fach1">
-				<?php
-				for($i = 0; $i < count($faecher); $i++) {
-					if (strcmp($schueler['fach1'], $faecher[$i]) == 0) {
-						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
-					} else {
-						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
-					}
+			<?php
+			var_dump($sl);
+		for($i = 0; $i < count($sl->faecher); $i++) {
+			echo "<div style=\"width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;\">
+			<h3>" . ($i + 1) . ".Fach:</h3><select name=\"fach[" . ($i + 1) . "][id]\" required>";
+			$faecher = get_faecher_all();
+			for($ii = 0; $ii < count($faecher); $ii++) {
+				if ($faecher[$ii]['id'] == intval($sl->faecher[$i]['fid'])) {
+					echo "<option value=\"" . $faecher[$ii]['id'] . "\" selected> " . $faecher[$ii]['name'] . "</option>";
+				} else {
+					echo "<option value=\"" . $faecher[$ii]['id'] . "\"> " . $faecher[$ii]['name'] . "</option>";
 				}
-				?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach1_lehrer" value="<?php echo $schueler['fach1_lehrer'];?>">
-				<br>
-			</div>
-			<div style="width: 20%; display: inline-block; margin-left: 10%;">
-				<h3>2.Fach:</h3>
-				<br>
-				<select name="fach2">
-				<?php
-				for($i = 0; $i < count($faecher); $i++) {
-					if (strcmp($schueler['fach2'], $faecher[$i]) == 0) {
-						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
-					} else {
-						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
-					}
+			}
+			echo "</select><br><br>Fachlehrer:<br><input type=\"text\" class=\"textinput\" maxlength=\"49\" name=\"fach[". $i ."][fachlehrer]\" value=\"" . $sl->faecher[$i]['fachlehrer'] . "\"><br>";
+			if (isset($_GET['lehrer'])) {
+				echo "Notenschnitt:<br><input class=\"textinput\" type=\"text\" name=\"fach['+ $i +'][notenschnitt]\" value=\"" . $sl->faecher[$i]['notenschnitt'] . "\">";
+				echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
+				if ($sl->faecher[$i]['nachweis_vorhanden']) {
+					echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" checked value=\"true\">Ja";
+					echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
+				} else {
+					echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
+					echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" checked style=\"margin-left: 20%;\">Nein";
 				}
-				?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach2_lehrer" value="<?php echo $schueler['fach2_lehrer'];?>">
-				<br>
-			</div>
-			<div style="width: 20%; display: inline-block; margin-left: 10%;">
-				<h3>3.Fach:</h3>
-				<br>
-				<select name="fach3">
-				<?php
-				for($i = 0; $i < count($faecher); $i++) {
-					if (strcmp($schueler['fach3'], $faecher[$i]) == 0) {
-						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
-					} else {
-						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
-					}
-				}
-				?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach3_lehrer" value="<?php echo $schueler['fach3_lehrer'];?>">
-				<br>
+			}
+			echo "</div>";
+		}
+		?>
 			</div>
 			<br>
 			<br>
 			<h3>Zeit:</h3>
+			<input type="button" value="Füge Zeit hinzu" onclick="addtime()">
 			<br>
-			<div style="display: flex;">
-				<div style="display: inline-block; width: 25%;">
-					Montag Anfang:
-					<br>
-					<input type="time" name="mo_anfang" class="input_time" value="<?php echo date("H:i", strtotime($schueler['mo_anfang']));?>">
-					<br>
-					Montag Ende:
-					<br>
-					<input type="time" name="mo_ende" class="input_time" value="<?php echo date("H:i", strtotime($schueler['mo_ende']));?>">
-					<br>
-					Dienstag Anfang:
-					<br>
-					<input type="time" name="di_anfang" class="input_time" value="<?php echo date("H:i", strtotime($schueler['di_anfang']));?>">
-					<br>
-					Dienstag Ende:
-					<br>
-					<input type="time" name="di_ende" class="input_time" value="<?php echo date("H:i", strtotime($schueler['di_ende']));?>">
-					<br>
-				</div>
-				<div id="zeitdiv" style="display: inline-block; width: 25%;">
-					Mttwoch Anfang:
-					<br>
-					<input type="time" name="mi_anfang" class="input_time" value="<?php echo date("H:i", strtotime($schueler['mi_anfang']));?>">
-					<br>
-					Mitwoch Ende:
-					<br>
-					<input type="time" name="mi_ende" class="input_time" value="<?php echo date("H:i", strtotime($schueler['mi_ende']));?>">
-					<br>
-					Donnerstag Anfang
-					<br>
-					<input type="time" name="do_anfang" class="input_time" value="<?php echo date("H:i", strtotime($schueler['do_anfang']));?>">
-					<br>
-					Donnerstag Ende:
-					<br>
-					<input type="time" name="do_ende" class="input_time" value="<?php echo date("H:i", strtotime($schueler['do_ende']));?>">
-					<br>
-				</div>
-				<div style="display: inline-block; width: 25%; height: zeitdiv.height;">
-					Freitag Anfang:
-					<br>
-					<input type="time" name="fr_anfang" class="input_time" value="<?php echo date("H:i", strtotime($schueler['fr_anfang']));?>">
-					<br>
-					Freitag Ende:
-					<br>
-					<input type="time" name="fr_ende" class="input_time" value="<?php echo date("H:i", strtotime($schueler['fr_ende']));?>">
-				</div>
+			<br>
+			<div id="insertzeit">
+			<?php
+		for($i = 0; $i < count($sl->zeit); $i++) {
+			echo "<select name=\"zeit[' + $i + '][tag]\">";
+			$tagekuerzel = array(
+					"mo",
+					"di",
+					"mi",
+					"do",
+					"fr"
+			);
+			$tage = array(
+					"Montag",
+					"Dienstag",
+					"Mittwoch",
+					"Donnerstag",
+					"Freitag"
+			);
+			for($j = 0; $j < count($tagekuerzel); $j++) {
+				if ($sl->zeit[$i]['tag'] == $tagekuerzel[$j]) {
+					echo "<option value=\"" . $tagekuerzel[$j] . "\" selected >" . $tage[$j] . "</option>";
+				} else {
+					echo "<option value=\"" . $tagekuerzel[$j] . "\">" . $tage[$j] . "</option>";
+				}
+			}
+			echo "</select><br>
+			<br>Von: 
+			<input type=\"text\" class=\"timepickervon\" name=\"zeit[". $i . "][from]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['anfang'])) . "\">
+	    	 Bis: 
+		 	<input type=\"text\" class=\"timepickerbis\" name=\"zeit[". $i ."][until]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['ende'])) . "\">
+			<br><br><br><br>";
+		}
+		?>
 			</div>
 			<br>
+			Kommentar:
+			<textarea rows="4" name="comment" style="width: 100%; margin-top: 10px;"><?php echo $sl->get_comment();?></textarea>
 			<br>
 			<br>
 			<br>
-			<input type="reset" value="Reset">
-			<input type="submit" value="Ändern" style="float: right;">
+			<br>
+			<input type="submit" value="Hinzufügen" style="float: right;">
 		</fieldset>
 	</form>
 </div>
 <?php
-			}
-		}
 	}
-	if ($show_formular_lehrer) {
-		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
-		if (isset($_GET['year']) && array_search($_GET['year'], get_all_years()) !== false) {
-			$table = "`lehrer-" . $_GET['year'] . "`";
-		} else {
-			$table = get_current_table("lehrer");
-			$_GET['year'] = get_prop("current_year")[1];
-		}
-		$return_prep = $pdo_insert->prepare("SELECT * FROM " . $table . " WHERE id = :id");
-		$return = $return_prep->execute(array(
-				'id' => $_GET['flehr']
-		));
-		if ($return == false) {
-			echo "EIn PRoblem ist aufgetreten!";
-		}
-		$lehrer = $return_prep->fetch();
-		if ($lehrer == false) {
-			echo "EIN PROBLEM";
-		} else {
-			$lehrer = validate_input($lehrer, true);
-			if (is_string($lehrer)) {
-				echo "EIn Fehler ist passiert: $lehrer";
-			} else {
-				$_SESSION['lehrerid'] = $_GET['flehr'];
-				?>
-<div class="formular_class">
-	<form action="?change=2&year=<?php echo $_GET['year'];?>" method="POST">
-		<fieldset style="padding: 40px;">
-			<legend>
-				<b>Nachhilfeschüler</b>
-			</legend>
-			<p>Im Schuljahr <?php echo $_GET['year'];?></p>
-			<br>
-			Vorname:
-			<span style="float: right; width: 50%;">Nachname:</span>
-			<br>
-			<input type="text" maxlength="49" name="vname" autofocus required="required" value="<?php echo $lehrer['vname'];?>" style="width: 40%;">
-			<input type="text" maxlength="49" name="nname" required="required" value="<?php echo $lehrer['nname'];?>" style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
-			<br>
-			<br>
-			Klassenstufe:
-			<span style="float: right; width: 50%;">Klasse/Kurs:</span>
-			<br>
-			<input type="number" name="klassenstufe" min="5" max="12" required="required" value="<?php echo $lehrer['klassenstufe'];?>" style="width: 40%;">
-			<input type="text" pattern="([ABCDabcdl123456]|[lL][12])" name="klasse_kurs" required="required" value="<?php echo $lehrer['klasse'];?>"
-				style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
-			<br>
-			<br>
-			Klassenlehrer:
-			<br>
-			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required="required" value="<?php echo $lehrer['klassenlehrer_name'];?>">
-			<br>
-			<br>
-			Geburtstag
-			<br>
-			<input type="date" value="<?php echo $lehrer['geburtstag'];?>">
-			<br>
-			<br>
-			Email:
-			<br>
-			<input type="email" class="textinput" maxlength="49" name="email" value="<?php echo $lehrer['email'];?>">
-			<br>
-			<br>
-			<br>
-			Telefon
-			<br>
-			<input type="tel" name="telefon" value="<?php echo $lehrer['telefon'];?>">
-			<br>
-			<div style="width: 20%; display: inline-block;">
-				<h3>1.Fach:</h3>
-				<br>
-				<select name="fach1">
-				<?php
-				for($i = 0; $i < count($faecher); $i++) {
-					if (strcmp($lehrer['fach1'], $faecher[$i]) == 0) {
-						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
-					} else {
-						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
-					}
-				}
-				?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach1_lehrer" value="<?php echo $lehrer['fach1_lehrer'];?>">
-				<br>
-			</div>
-			<div style="width: 20%; display: inline-block; margin-left: 10%;">
-				<h3>2.Fach:</h3>
-				<br>
-				<select name="fach2">
-				<?php
-				for($i = 0; $i < count($faecher); $i++) {
-					if (strcmp($lehrer['fach2'], $faecher[$i]) == 0) {
-						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
-					} else {
-						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
-					}
-				}
-				?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach2_lehrer" value="<?php echo $lehrer['fach2_lehrer'];?>">
-				<br>
-			</div>
-			<div style="width: 20%; display: inline-block; margin-left: 10%;">
-				<h3>3.Fach:</h3>
-				<br>
-				<select name="fach3">
-				<?php
-				for($i = 0; $i < count($faecher); $i++) {
-					if (strcmp($lehrer['fach3'], $faecher[$i]) == 0) {
-						echo "<option value=\"" . $faecher[$i] . "\" selected >" . $faecher_lesbar[$i] . "</option>";
-					} else {
-						echo "<option value=\"" . $faecher[$i] . "\">" . $faecher_lesbar[$i] . "</option>";
-					}
-				}
-				?>
-				</select>
-				<br>
-				<br>
-				Fachlehrer
-				<br>
-				<input type="text" class="textinput" maxlength="49" name="fach3_lehrer" value="<?php echo $lehrer['fach3_lehrer'];?>">
-				<br>
-			</div>
-			<br>
-			<br>
-			<h3>Zeit:</h3>
-			<br>
-			<div style="display: flex;">
-				<div style="display: inline-block; width: 25%;">
-					Montag Anfang:
-					<br>
-					<input type="time" name="mo_anfang" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['mo_anfang']));?>">
-					<br>
-					Montag Ende:
-					<br>
-					<input type="time" name="mo_ende" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['mo_ende']));?>">
-					<br>
-					Dienstag Anfang:
-					<br>
-					<input type="time" name="di_anfang" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['di_anfang']));?>">
-					<br>
-					Dienstag Ende:
-					<br>
-					<input type="time" name="di_ende" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['di_ende']));?>">
-					<br>
-				</div>
-				<div id="zeitdiv" style="display: inline-block; width: 25%;">
-					Mttwoch Anfang:
-					<br>
-					<input type="time" name="mi_anfang" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['mi_anfang']));?>">
-					<br>
-					Mitwoch Ende:
-					<br>
-					<input type="time" name="mi_ende" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['mi_ende']));?>">
-					<br>
-					Donnerstag Anfang
-					<br>
-					<input type="time" name="do_anfang" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['do_anfang']));?>">
-					<br>
-					Donnerstag Ende:
-					<br>
-					<input type="time" name="do_ende" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['do_ende']));?>">
-					<br>
-				</div>
-				<div style="display: inline-block; width: 25%; height: zeitdiv.height;">
-					Freitag Anfang:
-					<br>
-					<input type="time" name="fr_anfang" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['fr_anfang']));?>">
-					<br>
-					Freitag Ende:
-					<br>
-					<input type="time" name="fr_ende" class="input_time" value="<?php echo date("H:i", strtotime($lehrer['fr_ende']));?>">
-					<br>
-				</div>
-			</div>
-			<br>
-			<br>
-			<br>
-			<br>
-			<input type="reset" value="Reset">
-			<input type="submit" value="Ändern" style="float: right;">
-		</fieldset>
-	</form>
-</div>
-<?php
-			}
-		}
-	}
-}else{
+} else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }

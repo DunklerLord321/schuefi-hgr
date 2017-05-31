@@ -5,10 +5,46 @@ class schueler {
 	private $klassenstufe;
 	private $klassenlehrer_name;
 	private $comment;
-	private $person = person::class;
+	public $person = person::class;
 	public $faecher = array();
 	public $zeit = array();
-	function __construct(int $pid) {
+	function __construct(int $pid, int $id = -1) {
+		if ($id != -1) {
+			$return = query_db("SELECT * FROM `schueler` WHERE id = :sid AND schuljahr = :schuljahr", $id, get_current_year());
+			$schueler = $return->fetch();
+			if ($schueler) {
+				$this->id = $schueler['id'];
+				$this->klasse = $schueler['klasse'];
+				$this->klassenlehrer_name = $schueler['klassenlehrer_name'];
+				$this->klassenstufe = $schueler['klassenstufe'];
+				$this->comment = $schueler['comment'];
+				$pid = $schueler['pid'];
+				$return = query_db("SELECT * FROM `zeit` WHERE sid = :sid", $this->id);
+				$times = $return->fetch();
+				while ( $times ) {
+					$this->zeit[] = array(
+							'tag' => $times['tag'],
+							'anfang' => $times['anfang'],
+							'ende' => $times['ende']
+					);
+					$times = $return->fetch();
+				}
+				$return = query_db("SELECT * FROM `fragt_nach` WHERE sid = :sid", $this->id);
+				$fach = $return->fetch();
+				while ( $fach ) {
+					$this->faecher[] = array(
+							'fid' => $fach['fid'],
+							'langfristig' => $fach['langfristig'],
+							'fachlehrer' => $fach['fachlehrer'],
+							'status' => $fach['status']
+					);
+					$fach = $return->fetch();
+				}
+			}
+		}
+		if(!class_exists("person")) {
+			require 'includes/class_person.php';
+		}
 		$this->person = new person();
 		$this->person->load_person($pid);
 	}
@@ -39,19 +75,20 @@ class schueler {
 	 */
 	/*
 	 * Funktion fügt neuen Schüler hinzu, wenn vorhanden wird Schüler geladen
-	 * 
-	 * 
-	 * 
+	 *
+	 *
+	 *
 	 */
 	function add_schueler(array $params_arr) {
 		if (isset($this->person) && is_array($params_arr)) {
 			global $GLOBAL_CONFIG;
 			global $pdo;
-			//Überprüfe Werte, ob valide
+			// Überprüfe Werte, ob valide
 			isset($params_arr['comment']) ?: $params_arr['comment'] = '';
 			$params_arr['klassenlehrer_name'] = strip_tags($params_arr['klassenlehrer_name']);
 			$params_arr['klasse'] = strip_tags($params_arr['klasse']);
 			$params_arr['comment'] = strip_tags($params_arr['comment']);
+			
 			$params_arr['klassenlehrer_name'] = htmlspecialchars($params_arr['klassenlehrer_name'], ENT_QUOTES, 'UTF-8');
 			$params_arr['klasse'] = htmlspecialchars($params_arr['klasse'], ENT_QUOTES, 'UTF-8');
 			$params_arr['comment'] = htmlspecialchars($params_arr['comment'], ENT_QUOTES, 'UTF-8');
@@ -96,7 +133,7 @@ class schueler {
 		}
 		$return = query_db("SELECT * FROM `schueler` WHERE pid = :pid AND schuljahr = :schuljahr", $pid, get_current_year());
 		$schueler = $return->fetch();
-//		var_dump($schueler);
+		// var_dump($schueler);
 		if ($schueler) {
 			$this->id = $schueler['id'];
 			$this->klasse = $schueler['klasse'];
@@ -108,8 +145,8 @@ class schueler {
 			while ( $times ) {
 				$this->zeit[] = array(
 						'tag' => $times['tag'],
-						'from' => $times['anfang'],
-						'until' => $times['ende']
+						'anfang' => $times['anfang'],
+						'ende' => $times['ende']
 				);
 				$times = $return->fetch();
 			}
@@ -119,6 +156,7 @@ class schueler {
 				$this->faecher[] = array(
 						'fid' => $fach['fid'],
 						'langfristig' => $fach['langfristig'],
+						'fachlehrer' => $fach['fachlehrer'],
 						'status' => $fach['status']
 				);
 				$fach = $return->fetch();
@@ -126,7 +164,7 @@ class schueler {
 		}
 	}
 	function add_time(array $zeit) {
-//		var_dump($zeit);
+		// var_dump($zeit);
 		if (isset($this->id) && is_array($zeit)) {
 			$weekdays = array(
 					'mo',
@@ -135,7 +173,7 @@ class schueler {
 					'do',
 					'fr'
 			);
-//			var_dump($zeit);
+			// var_dump($zeit);
 			if (array_search($zeit['tag'], $weekdays) !== false) {
 				if (strtotime($zeit['from']) !== false && strtotime($zeit['until']) !== false) {
 					$retun = query_db("SELECT * FROM `zeit` WHERE sid = :sid AND tag = :tag", $this->id, $zeit['tag']);
@@ -157,7 +195,7 @@ class schueler {
 			if ($return->fetch() !== false) {
 				echo "Es existiert bereits ein Angebot für diesen Schüler und für dieses Fach!";
 			} else {
-				query_db("INSERT INTO `fragt_nach` (`sid`,`fid`,`langfristig`,`fachlehrer`, `status`) VALUES (:sid, :fid, :langfristig, :fachlehrer, :status)", $this->id, $fachid, intval($langfristig), $fachlehrer,  'neu');
+				query_db("INSERT INTO `fragt_nach` (`sid`,`fid`,`langfristig`,`fachlehrer`, `status`) VALUES (:sid, :fid, :langfristig, :fachlehrer, :status)", $this->id, $fachid, intval($langfristig), $fachlehrer, 'neu');
 			}
 		} else {
 			var_dump($this);
@@ -166,14 +204,12 @@ class schueler {
 			echo "Ein Fehler ist aufgetreten";
 		}
 	}
-	
 	function delete() {
 		/*
 		 * In Planung
-		 * 
+		 *
 		 */
 	}
-	
 	function get_nachfrage_faecher() {
 		$return = query_db("SELECT * FROM `fragt_nach` WHERE sid = :sid", $this->id);
 		if ($return) {
@@ -182,7 +218,6 @@ class schueler {
 		}
 		return false;
 	}
-	
 	function get_zeit() {
 		$return = query_db("SELECT * FROM `zeit` WHERE sid = :sid", $this->id);
 		if ($return) {
@@ -191,75 +226,150 @@ class schueler {
 		}
 		return false;
 	}
-	
 	function get_lehrer($fid) {
-		var_dump($this->zeit);
+		// var_dump($this->zeit);
+		// echo "Fachid:".$fid."<br>";
 		$return = query_db("SELECT * FROM `bietet_an` WHERE fid = :fid", $fid);
 		$matching_lehrer = array();
 		if ($return) {
 			$angebot = $return->fetchAll();
 			// durchlaufe die schleife für jeden Lehrer, der Fach anbietet
 			for($i = 0; $i < count($angebot); $i++) {
-				//hole Informationen über Lehrer
+				// hole Informationen über Lehrer
 				$return = query_db("SELECT * FROM `lehrer` WHERE id = :lid and schuljahr = :schuljahr", $angebot[$i]['lid'], get_current_year());
 				if ($return) {
 					$lehrer = $return->fetch();
-					echo $lehrer['pid'];
+					// echo "PID des Lehrers:".$lehrer['pid'];
 					if ($lehrer['klassenstufe'] > $this->klassenstufe) {
-						//hole Sprechzeiten des Lehrers
+						// hole Sprechzeiten des Lehrers
 						$return = query_db("SELECT * FROM `zeit` WHERE lid = :lid", $lehrer['id']);
 						if ($return) {
 							$gesamte_zeit = array();
 							$zeit = $return->fetch();
-							while($zeit) {
-								$gesamte_zeit[] = array('tag' => $zeit['tag'],'anfang' => $zeit['anfang'],'ende' => $zeit['ende']);
+							while ( $zeit ) {
+								$gesamte_zeit[] = array(
+										'tag' => $zeit['tag'],
+										'anfang' => $zeit['anfang'],
+										'ende' => $zeit['ende']
+								);
 								
 								$zeit = $return->fetch();
 							}
-							//teste, ob schüler und Lehrer am gleichen Tag zu gleicher Zeit zeit haben
-							foreach ($this->zeit as $schuelerzeit) {
-								echo "<hr>";
-								foreach ($gesamte_zeit as $lehrerzeit) {
-									if($schuelerzeit['tag'] == $lehrerzeit['tag']) {
-										echo "Tag stimmt<br>";
+							// teste, ob schüler und Lehrer am gleichen Tag zu gleicher Zeit zeit haben
+							// durchlaufe schleife für jeden Tag, an dem Schüler Zeit hat
+							foreach ( $this->zeit as $schuelerzeit ) {
+								// echo "<hr>";
+								// pro Tag, an dem Lehrer Zeit hat ein Schleifendurchlauf
+								foreach ( $gesamte_zeit as $lehrerzeit ) {
+									if ($schuelerzeit['tag'] == $lehrerzeit['tag']) {
+										//echo "Tag stimmt<br>";
 										// zeiten Vergleichen!
-										$schueler_from = new DateTime($schuelerzeit['from']);
-										$schueler_until = new DateTime($schuelerzeit['until']);
+										$untericht_possible = false;
+										$schueler_until = new DateTime($schuelerzeit['ende']);
 										$lehrer_from = new DateTime($lehrerzeit['anfang']);
 										$lehrer_until = new DateTime($lehrerzeit['ende']);
 										
-										$interval = $schueler_from->diff($schueler_until);
-										var_dump($lehrer_from);
-										var_dump($schueler_from);
-										$inter_lehrer_schuel_from = $lehrer_from->diff($schueler_from);
-										var_dump($inter_lehrer_schuel_from);
-										var_dump($schueler_from->diff($lehrer_from));
-										if($interval->format("%h") >= 1) {
-											echo "Schüler hat min 60min Zeit";
+										$unterricht_from = new DateTime($schuelerzeit['anfang']);
+										//Unterichtsende ist genau eine Stunde später als Anfang
+										$unterricht_until = new DateTime($schuelerzeit['anfang']);
+										$unterricht_until->add(new DateInterval("PT1H"));
+										// $interval = $schueler_from->diff($schueler_until);
+										$max_unterricht_until = $unterricht_until->diff($schueler_until);
+										$interval_from = $unterricht_from->diff($lehrer_from);
+										$interval_until = $unterricht_until->diff($lehrer_until);
+										while ( $max_unterricht_until->format("%h") != 0 || $max_unterricht_until->format("%i") != 0 ) {
+											// Teste, ob Anfangszeiten übereinstimmen
+											/*
+											 * wenn Lehrer eher, oder zeigleich zu Unterichtsanfang
+											 */
+											if (($interval_from->format("%h") > 0 && $interval_from->invert == 1) || ($interval_from->format("%i") > 0 && $interval_from->invert == 1) || ($interval_from->format("%i") == 0 && $interval_from->format("%h") == 0 && $interval_from->invert == 0)) {
+												// Wenn Lehrer später als bis zum Unterrichtsende
+												if (($interval_until->format("%h") >= 0 && $interval_until->invert == 0) || ($interval_until->format("%i") >= 0 && $interval_until->invert == 0)) {
+													$untericht_possible = true;
+													break;
+													// Oder wenn Lehrer und Unterichtsende zeitgleichh
+												} elseif ($interval_until->format("%h") == 0 && $interval_until->format("%i") == 0 && $interval_until->invert == 0) {
+													$untericht_possible = true;
+													break;
+												}
+											}
+											// Füge zu Unterichtszeiten 5Minuten hinzu
+											$unterricht_from->add(new DateInterval("PT5M"));
+											$unterricht_until->add(new DateInterval("PT5M"));
+											$max_unterricht_until = $unterricht_until->diff($schueler_until);
+											$interval_from = $unterricht_from->diff($lehrer_from);
+											$interval_until = $unterricht_until->diff($lehrer_until);
 										}
-										if($interval->format("%i") >= 90) {
-											echo "Schüler hat min 90min Zeit";
+										if (!$untericht_possible) {
+											if (($interval_from->format("%h") > 0 && $interval_from->invert == 1) || ($interval_from->format("%i") > 0 && $interval_from->invert == 1) || ($interval_from->format("%i") == 0 && $interval_from->format("%h") == 0 && $interval_from->invert == 0)) {
+												// echo "Passt";
+												if (($interval_until->format("%h") >= 0 && $interval_until->invert == 0) || ($interval_until->format("%i") >= 0 && $interval_until->invert == 0)) {
+													$untericht_possible = true;
+												} elseif ($interval_until->format("%h") == 0 && $interval_until->format("%i") == 0 && $interval_until->invert == 0) {
+													$untericht_possible = true;
+												}
+											}
 										}
-										var_dump($interval);
-										var_dump($schueler_from);
-										var_dump(strtotime($schuelerzeit['from']));
-										var_dump(strtotime($schuelerzeit['until']));
-										var_dump(strtotime("60min"));
-										if ((strtotime($schuelerzeit['until']) - strtotime($schuelerzeit['from'])) > 3600) {
-											echo "test";
+										/*
+										 * echo "Unterricht von:";
+										 * var_dump($unterricht_from);
+										 * echo "Unterricht bis:";
+										 * var_dump($unterricht_until);
+										 * echo "Lehrer:";
+										 * var_dump($lehrer_from);
+										 * echo "Lehrer bis:";
+										 * var_dump($lehrer_until);
+										 * $inter_lehrer_schuel_from = $unterricht_from->diff($lehrer_from);
+										 * echo "unterricht_from->diff lehrer_from:";
+										 * var_dump($inter_lehrer_schuel_from);
+										 * echo "unterricht_until->diff lehrer_until:";
+										 * var_dump($unterricht_until->diff($lehrer_until));
+										 */
+										if ($untericht_possible) {
+											$lehrer['unterricht'] = array(
+													'tag' => $schuelerzeit['tag'],
+													'anfang' => $unterricht_from,
+													'ende' => $unterricht_until
+											);
+											$matching_lehrer[] = $lehrer;
 										}
 									}
 								}
-								var_dump($schuelerzeit);
+								/*
+								 * Known Issue:
+								 * es wird nur der letzte Tag als mögliche Zeit genannt
+								 *
+								 */
+								// var_dump($schuelerzeit);
 							}
-							$lehrer[] = $gesamte_zeit;
-							var_dump($lehrer);
-							$matching_lehrer[] = $lehrer;
-							var_dump($matching_lehrer);
+							// echo "<hr>";
+							// var_dump($matching_lehrer);
 						}
 					}
 				}
 			}
+			var_dump($matching_lehrer);
+			for($i = 0; $i < count($matching_lehrer); $i++) {
+				echo "<br>Folgende Lehrer kämen in Frage:<br>";
+				$return = query_db("SELECT * FROM `person` WHERE id = :pid", $matching_lehrer[$i]['pid']);
+				if ($return) {
+					$return = $return->fetch();
+					echo $return['vname'] . " " . $return['nname'] . ", Klasse: " . format_klassenstufe_kurs($matching_lehrer[$i]['klassenstufe'], $matching_lehrer[$i]['klasse']);
+					echo "<br>Der Unterricht würde immer " . get_name_of_tag($matching_lehrer[$i]['unterricht']['tag']);
+					echo " von " . $matching_lehrer[$i]['unterricht']['anfang']->format("H:i");
+					echo " Uhr bis " . $matching_lehrer[$i]['unterricht']['ende']->format("H:i") . " Uhr stattfinden";
+					$ret = query_db("SELECT * FROM `unterricht` WHERE lid = :lid", $matching_lehrer[$i]['id']);
+					if ($ret) {
+						$unterricht = $ret->fetchAll();
+						$anzahl = count($unterricht);
+						if ($anzahl > 0) {
+							echo "Der Lehrer hat schon $anzahl Nachhilfeschüler";
+						}
+					}
+				}
+			}
+		} else {
+			echo "Ein Fehler ist aufgetreten";
 		}
 	}
 }

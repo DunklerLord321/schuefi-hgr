@@ -46,7 +46,7 @@ if (isset($user) && $user->runscript()) {
 		$lehrer->add_lehrer($lehrer_array);
 		var_dump($_POST);
 		for($i = 1; $i <= count($_POST['fach']); $i++) {
-			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt']);
+			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], $_POST['fach'][$i]['nachweis'], $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt']);
 		}
 		for($i = 1; $i <= count($_POST['zeit']); $i++) {
 			$lehrer->add_time($_POST['zeit'][$i]);
@@ -74,12 +74,15 @@ function addfach() {
 	fachzahl++;
 	var doc = document.createDocumentFragment();
 	var element = document.createElement('div');
-	element.innerHTML = '<div style="width: 20%; display: inline-block; margin-right: 10%;padding: 10px; border: solid 1px grey;">\
+	element.innerHTML = '<div style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;">\
 		<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
 		<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
 		</select><br><br>Fachlehrer:<br><input type="text" class="textinput" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]"><br>\
 		<?php if($show_formular_lehrer) {
 			echo "Notenschnitt:<br><input class=\"textinput\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
+			echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
+			echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
+			echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
 		}?>
 		</div>';
 	while(element.firstChild) {

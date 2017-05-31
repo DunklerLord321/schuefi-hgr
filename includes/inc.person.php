@@ -5,7 +5,11 @@ if (isset($user) && $user->runscript()) {
 //		echo $_POST['geb'];
 		require 'includes/class_person.php';
 		$person = new person();
-		$person->addperson($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['telefon'], $_POST['geb']);
+		if($person->addperson($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['telefon'], $_POST['geb'])) {
+			echo "Person wurde erfolgreich hinzugefügt!<br><br><br>";
+			echo "<br><a href=\"index.php?page=input&schueler=1&pid=" . $this->id . "\" class=\"links\">Gib der Person eine Rolle als Nachhilfeschüler</a><br><br>";
+			echo "<br><a href=\"index.php?page=input&lehrer=1&pid=" . $this->id . "\" class=\"links\">Gib der Person eine Rolle als Nachhilfelehrer</a><br><br>";
+		}
 	} else {
 		?>
 <div class="formular_class">
