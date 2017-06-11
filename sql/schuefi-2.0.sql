@@ -201,7 +201,7 @@ ALTER TABLE `fragt_nach` ADD FOREIGN KEY (`fid`) REFERENCES `faecher`(`id`) ON D
 
 INSERT INTO `faecher` (`kuerzel`,`name`) VALUE ('eng','Englisch'),('ma','Mathematik'),('de','Deutsch'),('frz','Französisch'),('phy','Physik'),('ch','Chemie'),('bio','Biologie'),('geo','Geographie');
 
-INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwd`, `account`, `createt_time`, `update_time`, `last_login`, `count_login`, `logged_in`, `last_active`) VALUES
+INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwort`, `account`, `createt_time`, `update_time`, `last_login`, `count_login`, `logged_in`, `last_active`) VALUES
 (1, 'Karla', 'Großer', 'karla.grosser@mail.com', 'test', 'k', '2017-02-08 08:32:30', '2017-02-08 08:32:30', '2017-02-17 17:17:08', 0, 0, '2017-02-17 17:39:17'),
 (6, 'Yannik', 'Weber', 'yajo10@yahoo.de', '$2y$10$rs27PVrKUl5I8hVP0V/U5eAjLoHHw5llQCZGbICaEb2R2J5TuypSC', 'v', '2017-02-13 10:42:52', '2017-02-13 10:42:52', '2017-02-17 17:17:08', 1, 4, '2017-03-09 16:12:27'),
 (7, 'Christopher', 'Stäglich', 'joyajo108@gmail.com', '$2y$10$.3nbeE6OajtDUiFqj0wD0ePAn/3.rF0W0XueUzvh7xMTGuJT8JlWO', 'v', '2017-02-14 09:37:42', '2017-02-14 09:37:42', '2017-02-17 17:17:08', 0, 3, '2017-03-09 15:13:29'),
