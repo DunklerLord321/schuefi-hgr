@@ -32,8 +32,10 @@ if (isset($user) && $user->runscript()) {
 				echo "<br><br><b>Fächer:</b>";
 				for($i = 0; $i < count($faecher); $i++) {
 					echo "<div style=\"padding-left: 5%;\">";
+					echo "<br><b>" . get_faecher_name_of_id($faecher[$i]['fid']) ."</b>";
 					echo "<br>Fachlehrer: ".$faecher[$i]['fachlehrer'];
-					echo "<br>" . get_faecher_name_of_id($faecher[$i]['fid']) . " <br> Nachweis vorhanden: " . ($faecher[$i]['nachweis_vorhanden'] == true ? "ja" : "nein");
+					echo "<br>Notenschnitt: ".$faecher[$i]['notenschnitt'];
+					echo " <br> Nachweis vorhanden: " . ($faecher[$i]['nachweis_vorhanden'] == true ? "ja" : "nein");
 					echo "<br><b>Vermittlungsstatus: ".$faecher[$i]['status']."</b>";
 					echo "</div>";
 				}
@@ -83,11 +85,14 @@ if (isset($user) && $user->runscript()) {
 				$zeit = $schueler->get_zeit();
 				echo "<br><br><b>Fächer:</b>";
 				for($i = 0; $i < count($faecher); $i++) {
-					echo "<div style=\"padding-left: 5%;\">";
-					echo "<br>" . get_faecher_name_of_id($faecher[$i]['fid']) . " <br> Langfristig: " . ($faecher[$i]['langfristig'] == true ? "ja" : "nein");
-					echo "<br>Fachlehrer: ".$faecher[$i]['fachlehrer'];
-					echo "<br><b>Vermittlungsstatus: ".$faecher[$i]['status']."</b>";
-					echo "</div>";
+					if(isset($faecher[$i])) {
+						echo "<div style=\"padding-left: 5%;\">";
+						echo "<br>" . get_faecher_name_of_id($faecher[$i]['fid']) . " <br> Langfristig: " . ($faecher[$i]['langfristig'] == true ? "ja" : "nein");
+						echo "<br>Fachlehrer: ".$faecher[$i]['fachlehrer'];
+						echo "<br><b>Vermittlungsstatus: ".$faecher[$i]['status']."</b><br><br>";
+						echo "<a href=\"index.php?page=input_paar&schueler=".$schueler->get_id()."&fid=".$faecher[$i]['fid']."\" class=\"links\">Suche nach Lehrer</a>";
+						echo "</div>";
+					}
 				}
 				echo "<br><b>Zeiten:</b>";
 				echo "<div style=\"padding-left: 5%;\">";
@@ -108,6 +113,9 @@ if (isset($user) && $user->runscript()) {
 		} else {
 			echo "Es wurde noch kein Schüler hinzugefügt";
 		}
+	}
+	if(isset($_GET['paare']) && $_GET['paare'] == 1) {
+		//Ausgabe der Paare
 	}
 } else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";

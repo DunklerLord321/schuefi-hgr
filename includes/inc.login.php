@@ -6,15 +6,15 @@ if (isset($user) && $user->runscript()) {
 <form action="?loginreal=1" method="post">
 	E-Mail:
 	<br>
-	<input type="email" size="40" maxlength="250" name="email" autofocus>
+	<input type="email" size="40" maxlength="250" name="email" autofocus class="input_text">
 	<br>
 	<br>
 	Dein Passwort:
 	<br>
-	<input type="password" size="40" maxlength="250" name="passwort">
+	<input type="password" size="40" maxlength="250" name="passwort" class="input_text">
 	<br>
 	<br>
-	<input type="submit" value="Anmelden">
+	<input type="submit" value="Anmelden" class="mybuttons">
 </form>
 <?php
 		} else {

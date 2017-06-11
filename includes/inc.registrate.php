@@ -4,67 +4,11 @@ if (isset($user) && $user->runscript()) {
 	$showFormular = true;
 	global $pdo;
 	if (isset($_GET['register'])) {
-		$error = false;
-		$email = $_POST['email'];
-		$vname = $_POST['vname'];
-		$nname = $_POST['nname'];
-		$type = $_POST['account'];
-		$passwort = $_POST['passwort'];
-		$passwort2 = $_POST['passwort2'];
-		// echo $email . "<br>" . $passwort . "<br>" . $passwort2 . "<br>Error" . $error . "<br>";
-		if (strlen($vname) == 0 || strlen($vname) > 49) {
-			echo 'Bitte einen gültigen Vornamen angeben';
-			$error = true;
-		}
-		if (strlen($nname) == 0) {
-			echo 'Bitte einen gültigen Nachnamen angeben';
-			$error = true;
-		}
-		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-			echo 'Bitte eine gültige E-Mail-Adresse eingeben<br>';
-			$error = true;
-		}
-		if (strlen($passwort) == 0 || strlen($passwort) < 4) {
-			echo 'Bitte ein Passwort angeben mit mindestens 4 Zeichen.<br>';
-			$error = true;
-		}
-		if ($passwort != $passwort2) {
-			echo 'Die Passwörter müssen übereinstimmen<br>';
-			$error = true;
-		}
-		
-		// Überprüfe, dass die E-Mail-Adresse noch nicht registriert wurde
-		// echo "testerror" . $error . "<br>";
-		if (!$error) {
-			$statement = $pdo->prepare("SELECT * FROM users WHERE email = :email");
-			$result = $statement->execute(array(
-					'email' => $email
-			));
-			$user_db = $statement->fetch();
-			
-			if ($user_db !== false) {
-				echo 'Diese E-Mail-Adresse ist bereits vergeben<br><br>';
-				$error = true;
-			}
-		}
-		
-		// Keine Fehler, wir können den Nutzer registrieren
-		if (!$error) {
-			$passwort_hash = password_hash($passwort, PASSWORD_DEFAULT);
-			$statement = $pdo->prepare("INSERT INTO users (vname, nname, email, passwd, account) VALUES (:vname, :nname, :email, :passwd, :account)");
-			$result = $statement->execute(array(
-					'vname' => $vname,
-					'nname' => $nname,
-					'email' => $email,
-					'passwd' => $passwort_hash,
-					'account' => $type
-			));			
-			if ($result) {
-				echo 'Der neue Nutzer wurde erfolgreich registriert. <a href="index.php">Zum Login</a>';
-				$showFormular = false;
-			} else {
-				echo 'Beim Abspeichern ist leider ein Fehler aufgetreten<br>';
-			}
+		$return = $user->adduser($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['passwort'], $_POST['passwort2'], $_POST['account']);
+		if($return !== false) {
+			echo $return;
+		}else {
+			$user->geterror();
 		}
 	}
 	

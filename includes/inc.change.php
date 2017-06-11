@@ -16,9 +16,119 @@ if (isset($user) && $user->runscript()) {
 				echo "Es ist ein Fehler aufgetreten!";
 			}
 		}
-		if($_GET['change'] == 2 || $_GET['change'] == 3) {
-			echo "Dies funktioniert noch nicht!";
-			die();
+		if($_GET['change'] == 2) {
+			require 'includes/class_schueler.php';
+			$schueler = new schueler(-1, $_POST['id']);
+			$params = array(
+					'klasse' => $_POST['klasse'],
+					'klassenstufe' => $_POST['klassenstufe'],
+					'klassenlehrer_name' => $_POST['klassenlehrer'],
+					'comment' => $_POST['comment']
+			);
+			$schueler->change_schueler($params);
+			var_dump($schueler);
+			if(!isset($_POST['zeit']) && count($schueler->zeit) != 0) {
+				for ($i = 0; $i < count($schueler->zeit); $i++) {
+					$schueler->remove_time($schueler->zeit[$i]['id']);
+				}
+			}
+			if(isset($_POST['zeit']) && count($schueler->zeit) != 0) {
+				for ($i = 0; $i < count($schueler->zeit); $i++) {
+					$schueler->remove_time($schueler->zeit[$i]['id']);
+				}
+				$schueler->load_schueler_pid(-1);
+			}
+			if(isset($_POST['zeit']) && count($schueler->zeit) == 0) {
+				for ($i = 0; $i <= count($_POST['zeit']); $i++) {
+					if(isset($_POST['zeit'][$i])) {
+						$schueler->add_time(array('tag' => $_POST['zeit'][$i]['tag'], 'from' => $_POST['zeit'][$i]['from'], 'until' => $_POST['zeit'][$i]['until']));
+					}
+				}
+			}
+			
+			//Ändere Fächer
+			if(!isset($_POST['fach']) && count($schueler->faecher) != 0) {
+				for ($i = 0; $i < count($schueler->faecher); $i++) {
+					echo "ttztztztztz".$schueler->faecher[$i]['fachlehrer'];
+					var_dump($schueler->remove_nachfrage_fach($schueler->faecher[$i]['fid']));
+				}
+			}
+			if(isset($_POST['fach']) && count($schueler->faecher) != 0) {
+				for ($i = 0; $i < count($schueler->faecher); $i++) {
+					echo "ttztztztztz".$schueler->faecher[$i]['fachlehrer'];
+					var_dump($schueler->remove_nachfrage_fach($schueler->faecher[$i]['fid']));
+				}
+				$schueler->load_schueler_pid(-1);
+			}
+			var_dump($schueler);
+			if(isset($_POST['fach']) && count($schueler->faecher) == 0) {
+				echo "ld";
+				for ($i = 0; $i <= count($_POST['fach']); $i++) {
+					if(isset($_POST['fach'][$i])) {
+						echo "test";
+						$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer']);
+					}
+				}
+			}
+			var_dump($schueler);
+			var_dump($_POST);
+		}
+		if($_GET['change'] == 3) {
+			require 'includes/class_lehrer.php';
+			$lehrer = new lehrer(-1, $_POST['id']);
+			$params = array(
+					'klasse' => $_POST['klasse'],
+					'klassenstufe' => $_POST['klassenstufe'],
+					'klassenlehrer_name' => $_POST['klassenlehrer'],
+					'comment' => $_POST['comment']
+			);
+			$lehrer->change_lehrer($params);
+			var_dump($lehrer);
+			if(!isset($_POST['zeit']) && count($lehrer->zeit) != 0) {
+				for ($i = 0; $i < count($lehrer->zeit); $i++) {
+					$lehrer->remove_time($lehrer->zeit[$i]['id']);
+				}
+			}
+			if(isset($_POST['zeit']) && count($lehrer->zeit) != 0) {
+				for ($i = 0; $i < count($lehrer->zeit); $i++) {
+					$lehrer->remove_time($lehrer->zeit[$i]['id']);
+				}
+				$lehrer->load_lehrer_pid(-1);
+			}
+			if(isset($_POST['zeit']) && count($lehrer->zeit) == 0) {
+				for ($i = 0; $i <= count($_POST['zeit']); $i++) {
+					if(isset($_POST['zeit'][$i])) {
+						$lehrer->add_time(array('tag' => $_POST['zeit'][$i]['tag'], 'from' => $_POST['zeit'][$i]['from'], 'until' => $_POST['zeit'][$i]['until']));
+					}
+				}
+			}
+				
+			//Ändere Fächer
+			if(!isset($_POST['fach']) && count($lehrer->faecher) != 0) {
+				for ($i = 0; $i < count($lehrer->faecher); $i++) {
+					echo "ttztztztztz".$lehrer->faecher[$i]['fachlehrer'];
+					var_dump($lehrer->remove_angebot_fach($lehrer->faecher[$i]['fid']));
+				}
+			}
+			if(isset($_POST['fach']) && count($lehrer->faecher) != 0) {
+				for ($i = 0; $i < count($lehrer->faecher); $i++) {
+					echo "ttztztztztz".$lehrer->faecher[$i]['fachlehrer'];
+					var_dump($lehrer->remove_angebot_fach($lehrer->faecher[$i]['fid']));
+				}
+				$lehrer->load_lehrer_pid(-1);
+			}
+			var_dump($lehrer);
+			if(isset($_POST['fach']) && count($lehrer->faecher) == 0) {
+				echo "ld";
+				for ($i = 0; $i <= count($_POST['fach']); $i++) {
+					if(isset($_POST['fach'][$i])) {
+						echo "test";
+						$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt']);
+					}
+				}
+			}
+			var_dump($lehrer);
+			var_dump($_POST);
 		}
 	}
 	if (isset($_GET['person'])) {
@@ -41,13 +151,13 @@ if (isset($user) && $user->runscript()) {
 			Vorname:
 			<span style="float: right; width: 50%;">Nachname:</span>
 			<br>
-			<input type="text" maxlength="49" name="vname" autofocus required style="width: 40%;" value=<?php echo $person->vname;?>>
-			<input type="text" maxlength="49" name="nname" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" value=<?php echo $person->nname;?>>
+			<input type="text" maxlength="49" name="vname" autofocus required style="width: 40%;" value="<?php echo $person->vname;?>" class="input_text">
+			<input type="text" maxlength="49" name="nname" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" value="<?php echo $person->nname;?>" class="input_text">
 			<br>
 			<br>
 			Geburtstag
 			<br>
-			<input type="text" id="datepicker" name="geb" value=<?php echo $person->geburtstag;?>>
+			<input type="text" id="datepicker" name="geb" value="<?php echo $person->geburtstag;?>" class="input_text">
 			<script>
 		$( function() {
 			$( "#datepicker" ).datepicker({
@@ -61,15 +171,15 @@ if (isset($user) && $user->runscript()) {
 			<br>
 			Email:
 			<br>
-			<input type="email" class="textinput" maxlength="49" name="email" value=<?php echo $person->email;?>>
+			<input type="email" maxlength="49" name="email" value="<?php echo $person->email;?>" class="input_text" style="width: 40%;">
 			<br>
 			<br>
 			Telefon
 			<br>
-			<input type="tel" name="telefon" value=<?php echo $person->telefon;?>>
+			<input type="tel" name="telefon" value="<?php echo $person->telefon;?>" class="input_text">
 			<br>
 			<br>
-			<input type="submit" value="Ändern">
+			<input type="submit" value="Ändern" class="mybuttons">
 		</fieldset>
 	</form>
 </div>
@@ -101,23 +211,29 @@ if (isset($user) && $user->runscript()) {
 			fachzahl++;
 			var doc = document.createDocumentFragment();
 			var element = document.createElement('div');
-			element.innerHTML = '<div style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;">\
+			element.innerHTML = '<div id="faecherdiv-'+ fachzahl+'" style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;">\
 		<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
 		<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
-		</select><br><br>Fachlehrer:<br><input type="text" class="textinput" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]"><br>\
+		</select><br><br>Fachlehrer:<br><input type="text" class="input_text" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]" style="width: 98%;"><br>\
 		<?php
 		if (isset($_GET['lehrer'])) {
-			echo "Notenschnitt:<br><input class=\"textinput\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
+			echo "Notenschnitt:<br><input class=\"input_text\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
 			echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
 			echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
 			echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
 		}
+		echo "<br><br><a class=\"mybuttons\" onClick=\"deletefach(\'faecherdiv-'+ fachzahl +'\')\">Fach löschen</a><br><br>";
 		?>
 		</div>';
 			while(element.firstChild) {
 				doc.appendChild(element.firstChild);
 			}
 			document.getElementById("insertfach").appendChild(doc);
+		}
+
+		function deletefach(id) {
+			document.getElementById(id).parentNode.removeChild(document.getElementById(id));
+			fachzahl--;
 		}
 		
 		function addtime() {
@@ -129,9 +245,9 @@ if (isset($user) && $user->runscript()) {
 	<option value="fr">Freitag</option>\
 	</select><br>\
 	<br>Von: \
-	<input type="text" class="timepickervon" name="zeit['+zeitzahl + '][from]" value="13:00">\
+	<input type="text" class="timepickervon input_text" name="zeit['+zeitzahl + '][from]" value="13:00">\
 	     Bis: \
- 	<input type="text" class="timepickerbis" name="zeit['+zeitzahl + '][until]" value="14:00">\
+ 	<input type="text" class="timepickerbis input_text" name="zeit['+zeitzahl + '][until]" value="14:00">\
 	<br><br><br><br>';
 			while(element.firstChild) {
 				doc.appendChild(element.firstChild);
@@ -183,7 +299,7 @@ if (isset($user) && $user->runscript()) {
 		
 				</script>
 <div class="formular_class">
-	<form action="?page=input&input=<?php if(isset($_GET['schueler'])){echo "1";}if(isset($_GET['lehrer'])){echo "2";}?>" method="POST">
+	<form action="?page=change&change=<?php if(isset($_GET['schueler'])){echo "2";}if(isset($_GET['lehrer'])){echo "3";}?>" method="POST">
 		<fieldset style="padding: 40px;">
 			<legend>
 				<b><?php if(isset($_GET['schueler'])){echo "Nachhilfeschüler";}if(isset($_GET['lehrer'])){echo "Nachhilfelehrer";}?></b>
@@ -192,25 +308,26 @@ if (isset($user) && $user->runscript()) {
 				Ändere Daten von:
 				<b><?php echo $sl->person->vname.' '.$sl->person->nname;?></b>
 			</p>
+			<input type="hidden" value="<?php if(isset($_GET['schueler'])){echo $_GET['schueler'];}if(isset($_GET['lehrer'])){echo $_GET['lehrer'];}?>" name="id">
 			Klassenstufe (5-12):
 			<span style="float: right; width: 50%;">Klasse/Kurs (a, b, c, d, L, L1, L2):</span>
 			<br>
-			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;" value="<?php echo $sl->get_klassenstufe();?>">
-			<input type="text" pattern="([ABCDabcdlL123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" value="<?php echo $sl->get_klasse();?>">
+			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;" value="<?php echo $sl->get_klassenstufe();?>" class="input_text">
+			<input type="text" pattern="([ABCDabcdlL123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" value="<?php echo $sl->get_klasse();?>" class="input_text">
 			<br>
 			<br>
 			Klassenlehrer:
 			<br>
-			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required value="<?php echo $sl->get_klassenlehrer();?>">
+			<input type="text" class="input_text" maxlength="49" name="klassenlehrer" required value="<?php echo $sl->get_klassenlehrer();?>" style="width: 40%;">
 			<br>
 			<br>
-			<input type="button" value="Füge Fach hinzu" onclick="addfach()">
+			<input type="button" value="Füge Fach hinzu" onclick="addfach()" class="mybuttons">
 			<div id="insertfach">
 				<br>
 			<?php
-			var_dump($sl);
+//			var_dump($sl);
 		for($i = 0; $i < count($sl->faecher); $i++) {
-			echo "<div style=\"width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;\">
+			echo "<div id=\"faecherdiv-".($i + 1)."\" style=\"width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;\">
 			<h3>" . ($i + 1) . ".Fach:</h3><select name=\"fach[" . ($i + 1) . "][id]\" required>";
 			$faecher = get_faecher_all();
 			for($ii = 0; $ii < count($faecher); $ii++) {
@@ -220,18 +337,19 @@ if (isset($user) && $user->runscript()) {
 					echo "<option value=\"" . $faecher[$ii]['id'] . "\"> " . $faecher[$ii]['name'] . "</option>";
 				}
 			}
-			echo "</select><br><br>Fachlehrer:<br><input type=\"text\" class=\"textinput\" maxlength=\"49\" name=\"fach[". $i ."][fachlehrer]\" value=\"" . $sl->faecher[$i]['fachlehrer'] . "\"><br>";
+			echo "</select><br><br>Fachlehrer:<br><input type=\"text\" class=\"input_text\" maxlength=\"49\" name=\"fach[". ($i+1) ."][fachlehrer]\" value=\"" . $sl->faecher[$i]['fachlehrer'] . "\"><br>";
 			if (isset($_GET['lehrer'])) {
-				echo "Notenschnitt:<br><input class=\"textinput\" type=\"text\" name=\"fach['+ $i +'][notenschnitt]\" value=\"" . $sl->faecher[$i]['notenschnitt'] . "\">";
+				echo "Notenschnitt:<br><input class=\"input_text\" type=\"text\" name=\"fach[".($i+1)."][notenschnitt]\" value=\"" . $sl->faecher[$i]['notenschnitt'] . "\">";
 				echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
 				if ($sl->faecher[$i]['nachweis_vorhanden']) {
-					echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" checked value=\"true\">Ja";
-					echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
+					echo "<br><input type=\"radio\" name=\"fach[".($i+1)."][nachweis]\" checked value=\"true\">Ja";
+					echo "<input type=\"radio\" name=\"fach[".($i+1)."][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
 				} else {
-					echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
-					echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" checked style=\"margin-left: 20%;\">Nein";
+					echo "<br><input type=\"radio\" name=\"fach[".($i+1)."][nachweis]\" value=\"true\">Ja";
+					echo "<input type=\"radio\" name=\"fach[".($i+1)."][nachweis]\" value=\"false\" checked style=\"margin-left: 20%;\">Nein";
 				}
 			}
+			echo "<br><br><a class=\"mybuttons\" onClick=\"document.getElementById('faecherdiv-".($i + 1)."').parentNode.removeChild(document.getElementById('faecherdiv-".($i + 1)."'))\">Fach löschen</a><br><br>";
 			echo "</div>";
 		}
 		?>
@@ -239,13 +357,13 @@ if (isset($user) && $user->runscript()) {
 			<br>
 			<br>
 			<h3>Zeit:</h3>
-			<input type="button" value="Füge Zeit hinzu" onclick="addtime()">
+			<input type="button" value="Füge Zeit hinzu" onclick="addtime()" class="mybuttons">
 			<br>
 			<br>
 			<div id="insertzeit">
 			<?php
 		for($i = 0; $i < count($sl->zeit); $i++) {
-			echo "<select name=\"zeit[' + $i + '][tag]\">";
+			echo "<select name=\"zeit[$i][tag]\">";
 			$tagekuerzel = array(
 					"mo",
 					"di",
@@ -269,9 +387,9 @@ if (isset($user) && $user->runscript()) {
 			}
 			echo "</select><br>
 			<br>Von: 
-			<input type=\"text\" class=\"timepickervon\" name=\"zeit[". $i . "][from]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['anfang'])) . "\">
+			<input type=\"text\" class=\"timepickervon input_text\" name=\"zeit[". $i . "][from]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['anfang'])) . "\">
 	    	 Bis: 
-		 	<input type=\"text\" class=\"timepickerbis\" name=\"zeit[". $i ."][until]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['ende'])) . "\">
+		 	<input type=\"text\" class=\"timepickerbis input_text\" name=\"zeit[". $i ."][until]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['ende'])) . "\">
 			<br><br><br><br>";
 		}
 		?>
@@ -283,7 +401,7 @@ if (isset($user) && $user->runscript()) {
 			<br>
 			<br>
 			<br>
-			<input type="submit" value="Hinzufügen" style="float: right;">
+			<input type="submit" value="Ändern" style="float: right;">
 		</fieldset>
 	</form>
 </div>

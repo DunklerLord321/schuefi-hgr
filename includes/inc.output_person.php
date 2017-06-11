@@ -85,9 +85,13 @@ if (isset($user) && $user->runscript()) {
 			}
 			?>
 		</div>
+		<?php 
+		if($user->isuserallowed('k')) {?>
 		<div style="width: 30%;">
 			<a href="index.php?page=change&person=<?php echo $person->id;?>" class="links">Ändere die Daten</a>
 		</div>	
+		<?php }?>
+		</div>
 </fieldset>
 <?php
 			$result = $return->fetch();

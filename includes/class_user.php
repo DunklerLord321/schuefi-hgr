@@ -94,7 +94,7 @@ class user {
 		}
 		return false;
 	}
-	function adduser($vorname, $nachname, $mail, $password, $password2, $type = 'k') {
+	function adduser($vname, $nname, $email, $passwort, $passwort2, $type = 'k') {
 		$error = '';
 		if (strlen($vname) == 0 || strlen($vname) > 49) {
 			$error .= 'Bitte einen gültigen Vornamen angeben';
@@ -116,22 +116,25 @@ class user {
 			$error .= "Bitte gib einen korrekten Accounttyp an.<br>";
 		}
 		if (strlen($error) > 0) {
-			return $error;
+			$this->error = $error;
+			return false;
 		}
-		$return = query_db("SELECT * FROM `user` WHERE email = :email", $mail);
+		$return = query_db("SELECT * FROM `users` WHERE email = :email", $email);
 		if (!$return) {
-			return "Datenbankfehler!";
+			$this->error = "Datenbankfehler!";
+			return false;
 		}
 		$return = $return->fetch();
 		if ($return !== false) {
-			return "Es existiert bereit ein Nutzer mit dieser E-Mail-Adresse";
+			$this->error = "Es existiert bereit ein Nutzer mit dieser E-Mail-Adresse";
+			return false;
 		}
-		$return = query_db("INSERT INTO `user` (vname, nname, email, passwd, account) VALUES (:vname, :nname, :email, :passwd, :account", $vorname, $nachname, $mail, password_hash($password, PASSWORD_DEFAULT), $type);
+		$return = query_db("INSERT INTO `users` (vname, nname, email, passwort, account) VALUES (:vname, :nname, :email, :passwort, :account)", $vname, $nname, $email, password_hash($passwort, PASSWORD_DEFAULT), $type);
 		if ($return) {
-			echo 'Der neue Nutzer wurde erfolgreich registriert. <a href="index.php">Zum Login</a>';
-			$showFormular = false;
+			return 'Der neue Nutzer wurde erfolgreich registriert. <a href="index.php">Zum Login</a>';
 		} else {
-			echo 'Beim Abspeichern ist leider ein Fehler aufgetreten<br>';
+			$this->error = 'Beim Abspeichern ist leider ein Fehler aufgetreten<br>';
+			return false;
 		}
 	}
 
@@ -150,11 +153,11 @@ class user {
 			$this->vname = $user['vname'];
 			$this->nname = $user['nname'];
 			$this->account = $user['account'];
-			$this->hash_password = $user['passwd'];
+			$this->hash_password = $user['passwort'];
 			$this->id = $user['id'];
 			$this->count_login_trys = intval($user['count_login']);
 			require 'includes/global_vars.inc.php';
-			$pdo = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd, array(
+			$pdo = new PDO("mysql:host=localhost;dbname=schuefi", $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 					PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 			));
 			return true;

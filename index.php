@@ -154,7 +154,7 @@ if (isset($_GET['page'])) {
 	<!-- - div endet in letzter Zeile   -->
 	<div class="content">
 	<?php
-		$pdo = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd, array(
+		$pdo = new PDO("mysql:host=localhost;dbname=schuefi", $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 				PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 		));
 		require 'includes/functions.inc.php';

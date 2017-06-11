@@ -23,6 +23,7 @@ class schueler {
 				$times = $return->fetch();
 				while ( $times ) {
 					$this->zeit[] = array(
+							'id' => $times['id'],
 							'tag' => $times['tag'],
 							'anfang' => $times['anfang'],
 							'ende' => $times['ende']
@@ -127,6 +128,53 @@ class schueler {
 			}
 		}
 	}
+	function change_schueler(array $params_arr) {
+		if (isset($this->person) && is_array($params_arr)) {
+			global $GLOBAL_CONFIG;
+			global $pdo;
+			// Überprüfe Werte, ob valide
+			isset($params_arr['comment']) ?: $params_arr['comment'] = '';
+			$params_arr['klassenlehrer_name'] = strip_tags($params_arr['klassenlehrer_name']);
+			$params_arr['klasse'] = strip_tags($params_arr['klasse']);
+			$params_arr['comment'] = strip_tags($params_arr['comment']);
+				
+			$params_arr['klassenlehrer_name'] = htmlspecialchars($params_arr['klassenlehrer_name'], ENT_QUOTES, 'UTF-8');
+			$params_arr['klasse'] = htmlspecialchars($params_arr['klasse'], ENT_QUOTES, 'UTF-8');
+			$params_arr['comment'] = htmlspecialchars($params_arr['comment'], ENT_QUOTES, 'UTF-8');
+			echo $params_arr['klassenlehrer_name'];
+			$error = '';
+			if (!isset($params_arr['klassenlehrer_name']) || strlen($params_arr['klassenlehrer_name']) < 3 || strlen($params_arr['klassenlehrer_name']) > 49 || !preg_match("/^(Herr|Frau|herr|frau|Hr.|Fr.|hr.|fr.|Dr.|Doktor|DR.|Dr) [A-Za-z]*/", $params_arr['klassenlehrer_name'])) {
+				$error = $error . "<br><br>Bitte gib einen korrekten Namen des Klassenlehrers an, der zwischen 3 und 49 Zeichen lang ist.";
+			}
+			if (!isset($params_arr['klassenstufe']) || $params_arr['klassenstufe'] < 5 || $params_arr['klassenstufe'] > 12 || strlen($params_arr['klassenstufe']) == 0) {
+				$error = $error . "<br><br>Bitte gib eine korrekte Klassenstufe an.";
+			}
+			if (!isset($params_arr['klasse']) || strlen($params_arr['klasse']) < 1 || strlen($params_arr['klasse']) > 2 || array_search($params_arr['klasse'], $GLOBAL_CONFIG['klassen']) === false) {
+				$error = $error . "<br><br>Bitte gib eine korrekte Klasse/Kurs an.";
+			}
+			if (strlen($error) != 0) {
+				echo $error;
+				return false;
+			} else {
+				$return = query_db("SELECT * FROM `schueler` WHERE id = :sid", $this->id);
+				$return = $return->fetch();
+				if ($return !== false) {
+					$this->klasse = $params_arr['klasse'];
+					$this->klassenstufe = $params_arr['klassenstufe'];
+					$this->klassenlehrer_name = $params_arr['klassenlehrer_name'];
+					$this->comment = $params_arr['comment'];
+					echo $params_arr['klassenlehrer_name'];
+					$return_prep = query_db("UPDATE `schueler` SET `klassenstufe` = :klassenstufe, `klasse` = :klasse, `klassenlehrer_name` = :klassenelehrer_name, `comment` = :comment WHERE id = :id;", $this->klassenstufe, $this->klasse, $this->klassenlehrer_name, $this->comment, $this->id);
+					echo "Die Daten des Schülers wurden erfolgreich geändert";
+					return true;
+				} else {
+					echo "Der Schüler existiert noch nicht in dem Schuljahr";
+					$this->load_schueler_pid();
+					return false;
+				}
+			}
+		}
+	}
 	function load_schueler_pid($pid = -1) {
 		if ($pid = -1) {
 			$pid = $this->person->id;
@@ -142,8 +190,10 @@ class schueler {
 			$this->comment = $schueler['comment'];
 			$return = query_db("SELECT * FROM `zeit` WHERE sid = :sid", $this->id);
 			$times = $return->fetch();
+			$this->zeit = array();
 			while ( $times ) {
 				$this->zeit[] = array(
+						'id' => $times['id'],
 						'tag' => $times['tag'],
 						'anfang' => $times['anfang'],
 						'ende' => $times['ende']
@@ -152,6 +202,7 @@ class schueler {
 			}
 			$return = query_db("SELECT * FROM `fragt_nach` WHERE sid = :sid", $this->id);
 			$fach = $return->fetch();
+			$this->faecher = array();
 			while ( $fach ) {
 				$this->faecher[] = array(
 						'fid' => $fach['fid'],
@@ -187,21 +238,40 @@ class schueler {
 			}
 		}
 	}
+	function remove_time(int $tid) {
+		$return = query_db("DELETE FROM `zeit` WHERE id = :id", $tid);
+		if ($return) {
+			return true;
+		}else{
+			echo "Eine Zeit konnte nicht gelöscht werden";
+			return false;
+		}
+	}
 	function add_nachfrage_fach($fachid, bool $langfristig, $fachlehrer) {
 		$fachid = intval($fachid);
-		echo $fachid;
+//		echo $fachid;
 		if (isset($this->id) && is_bool($langfristig) && is_int($fachid)) {
 			$return = query_db("SELECT * FROM `fragt_nach` WHERE sid = :sid AND fid = :fid", $this->id, $fachid);
 			if ($return->fetch() !== false) {
 				echo "Es existiert bereits ein Angebot für diesen Schüler und für dieses Fach!";
 			} else {
 				query_db("INSERT INTO `fragt_nach` (`sid`,`fid`,`langfristig`,`fachlehrer`, `status`) VALUES (:sid, :fid, :langfristig, :fachlehrer, :status)", $this->id, $fachid, intval($langfristig), $fachlehrer, 'neu');
+				$this->load_schueler_pid($this->person->id);
 			}
 		} else {
 			var_dump($this);
 			var_dump($langfristig);
 			var_dump($fachid);
 			echo "Ein Fehler ist aufgetreten";
+		}
+	}
+	function remove_nachfrage_fach(int $fid) {
+		$return = query_db("DELETE FROM `fragt_nach` WHERE fid = :fid AND sid = :sid", $fid, $this->id);
+		if ($return) {
+			return true;
+		}else{
+			echo "Ein Fach konnte nicht gelöscht werden";
+			return false;
 		}
 	}
 	function delete() {
@@ -338,6 +408,7 @@ class schueler {
 								/*
 								 * Known Issue:
 								 * es wird nur der letzte Tag als mögliche Zeit genannt
+								 * Lehrer kann anderen Unterricht schon zur möglichen Zeit geben
 								 *
 								 */
 								// var_dump($schuelerzeit);
@@ -349,6 +420,9 @@ class schueler {
 				}
 			}
 			var_dump($matching_lehrer);
+			if(count($matching_lehrer) == 0) {
+				echo "<br>Es wurde leider kein passender Lehrer gefunden<br>";
+			}
 			for($i = 0; $i < count($matching_lehrer); $i++) {
 				echo "<br>Folgende Lehrer kämen in Frage:<br>";
 				$return = query_db("SELECT * FROM `person` WHERE id = :pid", $matching_lehrer[$i]['pid']);

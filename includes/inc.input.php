@@ -77,9 +77,9 @@ function addfach() {
 	element.innerHTML = '<div style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;">\
 		<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
 		<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
-		</select><br><br>Fachlehrer:<br><input type="text" class="textinput" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]"><br>\
+		</select><br><br>Fachlehrer:<br><input type="text" class="input_text" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]" style="width: 95%;"><br>\
 		<?php if($show_formular_lehrer) {
-			echo "Notenschnitt:<br><input class=\"textinput\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
+			echo "Notenschnitt:<br><input class=\"textinput input_text\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
 			echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
 			echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
 			echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
@@ -100,9 +100,9 @@ function addtime() {
 	<option value="fr">Freitag</option>\
 	</select><br>\
 	<br>Von: \
-	<input type="text" class="timepickervon" name="zeit['+zeitzahl + '][from]" value="13:00">\
+	<input type="text" class="timepickervon input_text" name="zeit['+zeitzahl + '][from]" value="13:00">\
 	     Bis: \
- 	<input type="text" class="timepickerbis" name="zeit['+zeitzahl + '][until]" value="14:00">\
+ 	<input type="text" class="timepickerbis input_text" name="zeit['+zeitzahl + '][until]" value="14:00">\
 	<br><br><br><br>';
 	while(element.firstChild) {
 		doc.appendChild(element.firstChild);
@@ -178,21 +178,21 @@ $('body').on('focus','.timepickerbis', function(){
 			Klassenstufe (5-12):
 			<span style="float: right; width: 50%;">Klasse/Kurs (a, b, c, d, L, L1, L2):</span>
 			<br>
-			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;">
-			<input type="text" pattern="([ABCDabcdlL123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
+			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;" class="input_text">
+			<input type="text" pattern="([ABCDabcdlL123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" class="input_text">
 			<br>
 			<br>
 			Klassenlehrer:
 			<br>
-			<input type="text" class="textinput" maxlength="49" name="klassenlehrer" required>
+			<input type="text" maxlength="49" name="klassenlehrer" required class="input_text" style="width: 40%;">
 			<br>
 			<br>
-			<input type="button" value="Füge Fach hinzu" onclick="addfach()">
+			<input type="button" value="Füge Fach hinzu" onclick="addfach()" class="mybuttons">
 			<div id="insertfach"><br></div>
 			<br>
 			<br>
 			<h3>Zeit:</h3>
-			<input type="button" value="Füge Zeit hinzu" onclick="addtime()"><br><br>
+			<input type="button" value="Füge Zeit hinzu" onclick="addtime()" class="mybuttons"><br><br>
 			<div id="insertzeit"></div>
 			<br>
 			Kommentar:

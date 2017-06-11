@@ -13,7 +13,8 @@ if (isset($user) && $user->runscript()) {
 	} else {
 		?>
 <div class="formular_class">
-	<form action="index.php?page=person&addperson=1" method="POST" novalidate="novalidate">
+	<script type="text/javascript" src="includes/javascript/javascript.js"></script>
+	<form action="index.php?page=person&addperson=1" method="POST" onsubmit="return person_check()">
 		<fieldset style="padding: 40px;">
 			<legend>
 				<b>Person</b>
@@ -22,13 +23,13 @@ if (isset($user) && $user->runscript()) {
 			Vorname:
 			<span style="float: right; width: 50%;">Nachname:</span>
 			<br>
-			<input type="text" maxlength="49" name="vname" autofocus required style="width: 40%;">
-			<input type="text" maxlength="49" name="nname" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;">
+			<input type="text" maxlength="49" id="vname" name="vname" autofocus required style="width: 40%;" class="input_text">
+			<input type="text" maxlength="49" name="nname" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" class="input_text">
 			<br>
 			<br>
-			Geburtstag
+			Geburtstag:
 			<br>
-			<input type="text" id="datepicker" name="geb">
+			<input type="text" id="datepicker" name="geb" class="input_text">
 			  <script>
   $( function() {
     $( "#datepicker" ).datepicker({
@@ -42,15 +43,15 @@ if (isset($user) && $user->runscript()) {
 			<br>
 			Email:
 			<br>
-			<input type="email" class="textinput" maxlength="49" name="email">
+			<input type="email" maxlength="49" name="email" class="input_text" style="width: 40%">
 			<br>
 			<br>
-			Telefon
+			Telefon:
 			<br>
-			<input type="tel" name="telefon">
+			<input type="tel" name="telefon" class="input_text">
 			<br>
 			<br>
-			<input type="submit" value="Füge hinzu">
+			<input type="submit" value="Füge hinzu" class="mybuttons">
 		</fieldset>
 	</form>
 </div>

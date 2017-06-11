@@ -18,15 +18,19 @@ body{
 	padding-left: 3%;
 	padding-right: 3%;
 	margin-right: 5%;
+	border-radius: 5px;
 }
 
 select {
 	width: 100%;
 	padding: 5px;
 	margin-top: 5px;
+	border: 1px solid #ccc;
+	background-color: #f7f7f7;
 }
 select option{
 	padding-left: 10px;
+	padding-top: 2px;
 }
 select option:LAST-CHILD {
 	padding-bottom: 10px;
@@ -42,15 +46,20 @@ input{
 	margin-bottom: 5px;
 }
 
+button {
+	border-radius: 15px;
+}
+
 .navigation{
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
 	position: fixed;
-	width: 100%;
+	width: 99%;
 	top: 0;
 	background-color: #36B8FF;
+	border-radius: 15px;
 }
 .nav_seite{
 	list-style-type: none;
@@ -61,12 +70,13 @@ input{
 	width: 20%;
 	top: 100px;
 	background-color: #36B8FF;
-}
-.nav_seite li {
-	border-bottom: 1px solid #bbb;
+	border-radius: 15px;
 }
 .nav_seite li:HOVER{
 	background-color: #0E87FF;
+}
+.nav_seite li {
+	transition-duration: 0.5s;
 }
 .nav_seite a {
 	display: block;
@@ -76,9 +86,8 @@ input{
 	padding: 20px 20px;
 }
 .navigation_li{
+	transition-duration: 0.5s;
 	float: left;
-	border-right: 1px solid #bbb;
-	border-left: 1px solid #bbb;
 }
 .navigation_li:NTH-LAST-CHILD(2) {
 	float: right;
@@ -93,7 +102,7 @@ input{
 	color: white;
 	text-decoration: none;
 }
-.navigation_li a:HOVER {
+.navigation_li:HOVER {
 	background-color: #0E87FF;
 }
 .active{
@@ -129,13 +138,13 @@ input{
 }
 
 .mybuttons{
-	background-color: #36B8FF;
+	background-color: #e7e7e7;
 	text-align: center;
-	color: white;
+	color: black;
 	text-decoration: none;
-	padding: 5px;
+	padding: 10px;
 	margin: 5px;
-	border: none;
+	border: solid #e7e7e7 2px;
 	font-size: 15px;
 	border-radius: 5px;
 	-webkit-transition-duration: 0.3s;
@@ -143,8 +152,10 @@ input{
 }
 
 .mybuttons:hover{
-	background-color: #EAF50B;
+	background-color: white;
 	color: black;
+	cursor: pointer;
+	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
 .links{
@@ -219,4 +230,10 @@ input{
 .box-fach{
 	border-color: grey;
 	border-style: solid;
+}
+
+.input_text{
+	border-radius: 2px;
+	border: 1px solid #ccc;
+	padding: 5px;
 }

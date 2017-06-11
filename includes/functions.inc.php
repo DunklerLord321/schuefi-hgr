@@ -109,7 +109,7 @@ function query_db($statement, ...$params) {
 	$stat_ex = explode(' ', $statement);
 	$i = 0;
 //	var_dump(debug_backtrace());
-//var_dump($params);
+// var_dump($params);
 //var_dump($stat_ex);
 	// baue assoziativen Array für prepared-Statement
 	$parameter = array();
@@ -135,6 +135,7 @@ function query_db($statement, ...$params) {
 	if ($ret_prep === false) {
 		echo "Ein DB-Fehler ist aufgetreten - 1";
 		var_dump($ret_prep->errorInfo());
+		var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 		$exit_on_db_failure == 0 ?: die();
 		return false;
 	} else {
@@ -201,7 +202,7 @@ function set_prop($key, $value) {
 
 // gibt bei korrektem Wert einen Array zurück mit bearbeiteten und sicherem Input, bei Fehler einen String mit errorbeschreibung
 function validate_input($sl, $is_output = FALSE) {
-	if (!isset($login_user)) {
+	if (!isset($GLOBAL_CONFIG)) {
 		include "includes/global_vars.inc.php";
 	}
 	$sl['vname'] = strip_tags($sl['vname']);

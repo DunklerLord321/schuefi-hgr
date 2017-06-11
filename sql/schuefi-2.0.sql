@@ -34,7 +34,7 @@ CREATE TABLE `users` (
   `vname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `nname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `passwd` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `passwort` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `account` enum('k','f','v','w') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'w',
   `createt_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -124,6 +124,7 @@ CREATE TABLE `unterricht` (
   `sid` int(11) NOT NULL,
   `fid` int(11) NOT NULL,
   `erstellungs_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `tag` enum('mo','di','mi','do','fr') COLLATE utf8_german2_ci NOT NULL,
   `treff_zeit` time DEFAULT NULL,
   `treff_raum` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
@@ -152,6 +153,9 @@ ALTER TABLE `fragt_nach`
 ALTER TABLE `bietet_an`
   ADD PRIMARY KEY (`id`);
   
+ ALTER TABLE `unterricht`
+ 	ADD PRIMARY KEY (`id`);
+  
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
@@ -164,6 +168,7 @@ ALTER TABLE `faecher` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `zeit` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `bietet_an` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `fragt_nach` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `unterricht` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `users`  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --

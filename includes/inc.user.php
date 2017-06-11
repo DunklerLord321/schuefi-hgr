@@ -20,12 +20,12 @@ if (isset($user) && $user->runscript()) {
 			$fuser = $statement->fetch();
 			// echo "USER:" . $user['id'];
 			
-			if (!password_verify($_POST['passwort_alt'], $fuser['passwd'])) {
+			if (!password_verify($_POST['passwort_alt'], $fuser['passwort'])) {
 				echo "Das alte Passwort stimmt nicht!";
 			} elseif ($fuser != false) {
 				$passwort_hash = password_hash($_POST['passwort_neu1'], PASSWORD_DEFAULT);
 				// echo $passwort_hash.$_POST['passwort_neu1'];
-				$statement = $pdo->prepare("UPDATE `users` SET passwd = :passwort_hash WHERE id = :id");
+				$statement = $pdo->prepare("UPDATE `users` SET passwort = :passwort_hash WHERE id = :id");
 				$return = $statement->execute(array(
 						'passwort_hash' => $passwort_hash,
 						'id' => $fuser['id']
