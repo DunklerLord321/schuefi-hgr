@@ -60,6 +60,7 @@ if (isset($user) && $user->runscript()) {
 		require 'includes/class_person.php';
 		require 'includes/class_lehrer.php';
 		require 'includes/class_schueler.php';
+		require 'includes/class_paar.php';
 		$return = query_db("SELECT * FROM `person`");
 		// $return = query_db("SELECT * FROM `lehrer` WHERE schuljahr = :schuljahr", get_current_year());
 		$i = 0;
@@ -99,6 +100,14 @@ if (isset($user) && $user->runscript()) {
 				$result = $return->fetch();
 				$i++;
 			}
+		}
+		$return = query_db("SELECT * FROM `unterricht`");
+		$result = $return->fetch();
+		if($result == false) {
+			echo "Fehler";
+		}else{
+			$paar = new paar($result['id']);
+			
 		}
 		?></div>
 
@@ -147,10 +156,10 @@ if (isset($user) && $user->runscript()) {
 		?>
 	<br>
 	<br>
-	<button type="button" onclick="add_text(' :vorname')">Vorname</button>
-	<button type="button" onclick="add_text(' :nachname')">Nachname</button>
-	<button type="button" onclick="add_text(' :email')">Email</button>
-	<button type="button" onclick="reset_text()">Reset</button>
+	<button type="button" onclick="add_text(' :vorname')" class="mybuttons">Vorname</button>
+	<button type="button" onclick="add_text(' :nachname')" class="mybuttons">Nachname</button>
+	<button type="button" onclick="add_text(' :email')" class="mybuttons">Email</button>
+	<button type="button" onclick="reset_text()" class="mybuttons">Reset</button>
 	<textarea name="text" rows="5" id="textarea1" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%;"><?php if (isset($_SESSION['mail_step1']['text'])) { echo strip_tags($_SESSION['mail_step1']['text']); }?></textarea>	
 	<br>
 	<br>
@@ -168,65 +177,6 @@ if (isset($user) && $user->runscript()) {
 		}
 		var_dump($_SESSION);
 		echo "Schritt 3";
-		$pdo_insert = new PDO("mysql:host=localhost;dbname=schuefi", $dbuser, $dbuser_passwd);
-		$return_query = $pdo_insert->query("SELECT * FROM " . get_current_table("lehrer"));
-		if ($return_query == false) {
-			echo "EIN PROBLEM";
-		} else {
-			$count_lehrer = $return_query->rowCount();
-		}
-		$return_query = $pdo_insert->query("SELECT * FROM " . get_current_table("schueler"));
-		if ($return_query == false) {
-			echo "EIN PROBLEM";
-		} else {
-			$count_schueler = $return_query->rowCount();
-		}
-		$count = $count_lehrer * $count_schueler - 1;
-		$return_query = $pdo_insert->query("SELECT * FROM " . get_current_table("lehrer") . " WHERE 1");
-		$return_query2 = $pdo_insert->query("SELECT * FROM " . get_current_table("schueler") . " WHERE 1");
-		if ($return_query == false || $return_query2 == false) {
-			echo "EIN PROBLEM";
-		} else {
-			$destination = array();
-			$person = $return_query->fetch();
-			while ( $person != false ) {
-				$person = validate_input($person, true);
-				if (!is_array($person)) {
-					echo "Ein Fehler trat auf $person<br><br>";
-				} else {
-					for($i = 0; $i < $count; $i++) {
-						if (isset($_SESSION['mail_step1']['dest-' . $i]) && strcmp($person['email'], $_SESSION['mail_step1']['dest-' . $i]) == 0) {
-							$destination[] = $person;
-						}
-					}
-				}
-				$person = $return_query->fetch();
-			}
-			$person2 = $return_query2->fetch();
-			while ( $person2 != false ) {
-				$person2 = validate_input($person2, true);
-				if (!is_array($person2)) {
-					echo "Ein Fehler trat auf $person2<br><br>";
-				} else {
-					for($i = 0; $i < $count; $i++) {
-						if (isset($_SESSION['mail_step1']['dest-' . $i]) && strcmp($person2['email'], $_SESSION['mail_step1']['dest-' . $i]) == 0) {
-							$destination[] = $person2;
-						}
-					}
-				}
-				$person2 = $return_query2->fetch();
-			}
-			var_dump($destination);
-			foreach ( $destination as $person ) {
-				$_SESSION['mail_step1']['text'] = strip_tags($_SESSION['mail_step1']['text']);
-				$_SESSION['mail_step1']['subject'] = strip_tags($_SESSION['mail_step1']['subject']);
-				var_dump($_SESSION);
-				$person['text'] = $_SESSION['mail_step1']['text'];
-				$person['text'] = str_replace(".vorname", $person['vname'], $person['text']);
-				$person['text'] = str_replace(".nachname", $person['nname'], $person['text']);
-				var_dump($person);
-			}
-		}
 		?>
 <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?step=3"?>" method="POST">
 	<input type="submit" value="Weiter" style="float: right;">

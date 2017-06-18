@@ -83,7 +83,6 @@ class schueler {
 	function add_schueler(array $params_arr) {
 		if (isset($this->person) && is_array($params_arr)) {
 			global $GLOBAL_CONFIG;
-			global $pdo;
 			// Überprüfe Werte, ob valide
 			isset($params_arr['comment']) ?: $params_arr['comment'] = '';
 			$params_arr['klassenlehrer_name'] = strip_tags($params_arr['klassenlehrer_name']);
@@ -131,7 +130,6 @@ class schueler {
 	function change_schueler(array $params_arr) {
 		if (isset($this->person) && is_array($params_arr)) {
 			global $GLOBAL_CONFIG;
-			global $pdo;
 			// Überprüfe Werte, ob valide
 			isset($params_arr['comment']) ?: $params_arr['comment'] = '';
 			$params_arr['klassenlehrer_name'] = strip_tags($params_arr['klassenlehrer_name']);
@@ -440,6 +438,7 @@ class schueler {
 							echo "Der Lehrer hat schon $anzahl Nachhilfeschüler";
 						}
 					}
+					echo "<a href=\"index.php?page=input_paar&control_paar=1&sid=$this->id&lid=".$matching_lehrer[$i]['id']."&fid=$fid&tag=".$matching_lehrer[$i]['unterricht']['tag']."&anfang=".$matching_lehrer[$i]['unterricht']['anfang']->format("H:i")."&ende=".$matching_lehrer[$i]['unterricht']['ende']->format("H:i")."\" class=\"links\">Weiter</a>";
 				}
 			}
 		} else {

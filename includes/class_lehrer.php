@@ -93,7 +93,6 @@ class lehrer {
 	function add_lehrer(array $params_arr) {
 		if (isset($this->person) && is_array($params_arr)) {
 			global $GLOBAL_CONFIG;
-			global $pdo;
 			isset($params_arr['comment']) ?: $params_arr['comment'] = '';
 			$params_arr['klassenlehrer_name'] = strip_tags($params_arr['klassenlehrer_name']);
 			$params_arr['klasse'] = strip_tags($params_arr['klasse']);
@@ -138,7 +137,6 @@ class lehrer {
 	function change_lehrer(array $params_arr) {
 		if (isset($this->person) && is_array($params_arr)) {
 			global $GLOBAL_CONFIG;
-			global $pdo;
 			isset($params_arr['comment']) ?: $params_arr['comment'] = '';
 			$params_arr['klassenlehrer_name'] = strip_tags($params_arr['klassenlehrer_name']);
 			$params_arr['klasse'] = strip_tags($params_arr['klasse']);

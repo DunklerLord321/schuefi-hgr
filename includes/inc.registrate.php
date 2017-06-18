@@ -2,7 +2,6 @@
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Neuer Nutzer</h2>";
 	$showFormular = true;
-	global $pdo;
 	if (isset($_GET['register'])) {
 		$return = $user->adduser($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['passwort'], $_POST['passwort2'], $_POST['account']);
 		if($return !== false) {

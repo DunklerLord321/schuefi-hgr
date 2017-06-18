@@ -1,6 +1,5 @@
 <?php
 if (isset($user) && $user->runscript()) {
-	global $pdo;
 	echo "<h2>Ausgabe</h2>";
 	require 'includes/class_person.php';
 	require 'includes/class_lehrer.php';
@@ -21,11 +20,7 @@ if (isset($user) && $user->runscript()) {
 	<div style="display: flex;">
 		<div style="width: 70%; display: inline-block;">
 					<?php
-				echo "<br>Klasse: " . $lehrer->get_klassenstufe();
-				if (is_numeric($lehrer->get_klasse())) {
-					echo "/";
-				}
-				echo $lehrer->get_klasse();
+				echo "<br>Klasse: " . format_klassenstufe_kurs($lehrer->get_klassenstufe(), $lehrer->get_klasse());
 				echo "<br>Klassenlehrer/in: " . $lehrer->get_klassenlehrer();
 				$faecher = $lehrer->get_angebot_faecher();
 				$zeit = $lehrer->get_zeit();
@@ -75,11 +70,7 @@ if (isset($user) && $user->runscript()) {
 	<div style="display: flex;">
 		<div style="width: 70%; display: inline-block;">
 							<?php
-				echo "<br>Klasse: " . $schueler->get_klassenstufe();
-				if (is_numeric($schueler->get_klasse())) {
-					echo "/";
-				}
-				echo $schueler->get_klasse();
+				echo "<br>Klasse: " . format_klassenstufe_kurs($schueler->get_klassenstufe(), $schueler->get_klasse());
 				echo "<br>Klassenlehrer/in: " . $schueler->get_klassenlehrer();
 				$faecher = $schueler->get_nachfrage_faecher();
 				$zeit = $schueler->get_zeit();
@@ -115,6 +106,42 @@ if (isset($user) && $user->runscript()) {
 		}
 	}
 	if(isset($_GET['paare']) && $_GET['paare'] == 1) {
+		require 'includes/class_paar.php';
+		$return = query_db("SELECT * FROM `unterricht`;");
+		$i = 0;
+		if($return) {
+			$paar = $return->fetch();
+			while ($paar) {
+				$npaar = new paar($paar['id']);
+				echo "<fieldset>";
+				echo "<legend>Nachhilfepaar</legend>";
+				echo "<p>Im Fach ".get_faecher_name_of_id($npaar->fid)."</p><details class=\"detail\"><summary>Lehrer: ".$npaar->lehrer->person->vname." ".$npaar->lehrer->person->nname."</summary><p>";
+				echo "Klasse: " . format_klassenstufe_kurs($npaar->lehrer->get_klassenstufe(), $npaar->lehrer->get_klasse());
+				echo "<br>Klassenlehrer/in: " . $npaar->lehrer->get_klassenlehrer();
+				echo "</p></details><br>";
+				echo "<details class=\"detail\"><summary>Schüler: ".$npaar->schueler->person->vname." ".$npaar->schueler->person->nname."</summary><p>";
+				echo "Klasse: " . format_klassenstufe_kurs($npaar->schueler->get_klassenstufe(), $npaar->schueler->get_klasse());
+				echo "<br>Klassenlehrer/in: " . $npaar->schueler->get_klassenlehrer();
+				echo "</p></details>";
+				echo "<br>Zeitpunkt: ".get_name_of_tag($npaar->tag)." von ".$npaar->anfang." Uhr bis ".$npaar->ende." Uhr";
+				echo "<br><br>Im Zimmer: ".$npaar->raum."<br><br>";
+				if(strlen($npaar->lehrer_dokument) > 0) {
+					echo "<a href=\"docs/unterricht/".$npaar->lehrer_dokument."\" class=\"links\">Vermittlungsdokument für Lehrer ist vorhanden</a><br><br>";
+				}else{
+					echo "Vermittlungsdokument für Lehrer ist noch nicht vorhanden";
+					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a><br><br><br>";
+				}
+				if(strlen($npaar->schueler_dokument) > 0) {
+					echo "<a href=\"docs/unterricht/".$npaar->schueler_dokument."\" class=\"links\">Vermittlungsdokument für Schüler ist vorhanden</a>";
+				}else{
+					echo "Vermittlungsdokument für Schüler ist noch nicht vorhanden";
+					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a>";
+				}
+				echo "</fieldset>";
+				$paar = $return->fetch();
+				$i++;
+			}
+		}
 		//Ausgabe der Paare
 	}
 } else {

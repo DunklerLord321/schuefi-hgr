@@ -1,8 +1,7 @@
 <?php
 if (isset($user) && $user->runscript()) {
-	global $pdo;
 	echo "<h2>Ausgabe</h2>";
-	$return = $pdo->query("SELECT * FROM `person`");
+	$return = query_db("SELECT * FROM `person`");
 	$result = $return->fetch();
 	require 'includes/class_person.php';
 	require 'includes/class_lehrer.php';

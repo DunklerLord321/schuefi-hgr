@@ -203,13 +203,29 @@ class user {
 		}
 	}
 	//noch nicht funktionstüchtig!!!
-	function neuespassword($password_neu, $password_neu2) {
+	function neuespassword($passwortaktuell, $password_neu, $password_neu2) {
 		if (strlen($password_neu) < 4) {
 			$this->error = 'Das neue Passwort muss mindestens 4 Zeichen lang sein';
 			return false;
 		}
 		if ($password_neu != $password_neu2) {
 			$this->error = 'Die beiden Passwörter müssen übereinstimmen';
+			return false;
+		}
+		if ($password_neu == $passwortaktuell) {
+			$this->error = 'Das neue Passwort darf nicht mit dem alten Passwort übereinstimmen';
+			return false;
+		}
+		if (!$this->testpassword($passwortaktuell) ) {
+			$this->error = 'Das alte Passwort war leider falsch';
+			return  false;
+		}
+		$passwort_hash = password_hash($password_neu, PASSWORD_DEFAULT);
+		$return = query_db("UPDATE `users` SET passwort = :passwort_hash WHERE id = :id", $passwort_hash, $this->id);
+		if($return) {
+			return true;
+		}else{
+			$this->error = 'Ein Datenbankfehler ist aufgetreten';
 			return false;
 		}
 	}

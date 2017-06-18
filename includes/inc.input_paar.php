@@ -16,9 +16,13 @@ if (isset($user) && $user->runscript()) {
 		var_dump($lehrer_ex);
 		$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, treff_zeit, treff_raum) VALUES (:lid, :sid, :fid, :treff_zeit, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['from'], $_POST['raum']);
 	}
-	if (!isset($_GET['schueler']) && !isset($_GET['fid'])) {
-		echo "<p>Wenn du den passenden Lehrer automatisch finden willst, dann gehe bitte über die Seite <i>Ausgeben der Schüler</i> und wähle dann den Schüler an.</p>";
-		echo "<p>Hier kannst du Schüler und Lehrer per Hand zusammenfügen</p>";
+	if (!isset($_GET['schueler']) && !isset($_GET['manuell'])) {
+		if(!isset($_GET['control_paar'])) {
+			echo "<p>Wenn du den passenden Lehrer automatisch finden willst, dann gehe bitte über die Seite <i>Ausgeben der Schüler</i> und wähle dann den Schüler an.</p>";
+			echo "<p>Hier kannst du Schüler und Lehrer per Hand zusammenfügen</p>";
+		}else{
+			echo "<p>Bitte überprüfe nochmal die Angaben. Wenn es mehrer mögliche Lehrer für den Schüler gab, dann kann es sein, dass das Programm nicht die beste Möglichkeit findet. Da es immer nur für einen Schüler den Lehrer sucht und nicht die beste Möglichkeit für alle Schüler findet.</p>";
+		}
 		$return = query_db("SELECT * FROM `schueler` WHERE schuljahr = :schuljahr", get_current_year());
 		if ($return !== false) {
 			$schueler = $return->fetch();
@@ -70,7 +74,7 @@ $('body').on('focus','.timepickerbis', function(){
 });
 </script>
 <form action="index.php?page=input_paar&manuell=1" method="post">
-	<p>Nachhilfeschüler:</p>
+	<label>Nachhilfeschüler:</label>
 	<select name="schueler">
 		<?php
 			require 'includes/class_schueler.php';
@@ -78,13 +82,17 @@ $('body').on('focus','.timepickerbis', function(){
 				$schueler = new schueler(-1, $schueler['id']);
 				$faecher = $schueler->get_nachfrage_faecher();
 				for($i = 0; $i < count($faecher); $i++) {
-					echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+					if(isset($_GET['control_paar']) && isset($_GET['sid']) && $_GET['sid'] == $schueler->get_id()) {
+						echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\" selected>" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+					}else{
+						echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+					}
 				}
 				$schueler = $return->fetch();
 			}
 			?>
-		</select>
-	<p>Nachhilfelehrer:</p>
+		</select><br><br>
+	<label>Nachhilfelehrer:</label>
 	<select name="lehrer">
 		<?php
 			$return = query_db("SELECT * FROM `lehrer` WHERE schuljahr = :schuljahr", get_current_year());
@@ -96,33 +104,53 @@ $('body').on('focus','.timepickerbis', function(){
 					$faecher = $lehrer->get_angebot_faecher();
 					var_dump($lehrer);
 					for($i = 0; $i < count($faecher); $i++) {
-						echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+						if(isset($_GET['control_paar']) && isset($_GET['lid']) && $_GET['lid'] == $lehrer->get_id()) {
+							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\" selected >" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+						}else{
+							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+						}
 					}
 					$lehrer = $return->fetch();
 				}
 			}
 			?>
-		</select>
-	<p>Zeitpunkt:</p>
+		</select><br><br>
+	<label>Zeitpunkt:</label>
 	<select name="zeit[tag]">
-		<option value="mo">Montag</option>
-		<option value="di">Dienstag</option>
-		<option value="mi">Mittwoch</option>
-		<option value="do">Donnerstag</option>
-		<option value="fr">Freitag</option>
+	<?php 
+	$tagekuerzel = array(
+			"mo",
+			"di",
+			"mi",
+			"do",
+			"fr"
+	);
+	$tage = array(
+			"Montag",
+			"Dienstag",
+			"Mittwoch",
+			"Donnerstag",
+			"Freitag"
+	);
+	for($j = 0; $j < count($tagekuerzel); $j++) {
+		if (isset($_GET['tag']) && $_GET['tag'] == $tagekuerzel[$j]) {
+			echo "<option value=\"" . $tagekuerzel[$j] . "\" selected >" . $tage[$j] . "</option>";
+		} else {
+			echo "<option value=\"" . $tagekuerzel[$j] . "\">" . $tage[$j] . "</option>";
+		}
+	}
+	?>
 	</select>
 	<br>
 	<br>
 	Von:
-	<input type="text" class="timepickervon" name="zeit[from]" value="13:00">
+	<input type="text" class="timepickervon input_text" name="zeit[from]" value="<?php if(isset($_GET['anfang'])){echo $_GET['anfang'];}else{echo "13:00";}?>">
 	Bis:
-	<input type="text" class="timepickerbis" name="zeit[until]" value="14:00">
+	<input type="text" class="timepickerbis input_text" name="zeit[until]" value="<?php if(isset($_GET['ende'])){echo $_GET['ende'];}else{echo "14:00";}?>">
 	<br>
 	<br>
-	<br>
-	<br>
-	<p>Raum:</p>
-	<input type="text" name="raum">
+	<label>Raum:</label><br>
+	<input type="text" name="raum" class="input_text">
 	<p></p>
 	<input type="submit" value="Erstellen" style="float: right;">
 	<br>

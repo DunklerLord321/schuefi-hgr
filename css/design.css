@@ -191,6 +191,7 @@ button {
 }
 
 .mail_steps {
+	display: inline-block;
 	background-color: #848484;
 	list-style-type: none;
 	margin: 0;
@@ -205,6 +206,7 @@ button {
 }
 
 .mail_steps li a{
+	transition: background-color 0.3s;
 	display: block;
 	text-decoration: none;
 	text-align: center;
@@ -214,7 +216,7 @@ button {
 .mail_steps_active {
 	background-color: #585858;
 }
-.mail_steps li a:HOVER {
+.mail_steps li a:HOVER:NOT(.mail_steps_active) {
 	background-color: #424242;
 }
 .mail_steps li a:VISITED {
@@ -236,4 +238,12 @@ button {
 	border-radius: 2px;
 	border: 1px solid #ccc;
 	padding: 5px;
+}
+
+.detail{
+	cursor: pointer;
+	transition-duration: 0.5s;
+}
+.detail p {
+	cursor: auto;
 }

@@ -401,7 +401,7 @@ if (isset($user) && $user->runscript()) {
 			<br>
 			<br>
 			<br>
-			<input type="submit" value="Ändern" style="float: right;">
+			<input type="submit" value="Ändern" style="float: right;" class="mybuttons">
 		</fieldset>
 	</form>
 </div>

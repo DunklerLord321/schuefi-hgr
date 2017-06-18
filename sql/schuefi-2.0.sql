@@ -126,7 +126,10 @@ CREATE TABLE `unterricht` (
   `erstellungs_date` datetime DEFAULT CURRENT_TIMESTAMP,
   `tag` enum('mo','di','mi','do','fr') COLLATE utf8_german2_ci NOT NULL,
   `treff_zeit` time DEFAULT NULL,
-  `treff_raum` int(11) DEFAULT NULL
+  `treff_zeit_ende` time DEFAULT NULL,
+  `treff_raum` int(11) DEFAULT NULL,
+  `lehrer_dokument` varchar(50) DEFAULT NULL,
+  `schueler_dokument` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 --
@@ -198,8 +201,6 @@ ALTER TABLE `bietet_an` ADD FOREIGN KEY (`fid`) REFERENCES `faecher`(`id`) ON DE
 ALTER TABLE `fragt_nach` ADD FOREIGN KEY (`sid`) REFERENCES `schueler`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `fragt_nach` ADD FOREIGN KEY (`fid`) REFERENCES `faecher`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
 
-
-INSERT INTO `faecher` (`kuerzel`,`name`) VALUE ('eng','Englisch'),('ma','Mathematik'),('de','Deutsch'),('frz','Französisch'),('phy','Physik'),('ch','Chemie'),('bio','Biologie'),('geo','Geographie');
 
 INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwort`, `account`, `createt_time`, `update_time`, `last_login`, `count_login`, `logged_in`, `last_active`) VALUES
 (1, 'Karla', 'Großer', 'karla.grosser@mail.com', 'test', 'k', '2017-02-08 08:32:30', '2017-02-08 08:32:30', '2017-02-17 17:17:08', 0, 0, '2017-02-17 17:39:17'),
