@@ -51,15 +51,19 @@ button {
 }
 
 .navigation{
-	list-style-type: none;
 	margin: 0;
+	margin-top: 5px;
 	padding: 0;
 	overflow: hidden;
-	position: fixed;
-	width: 99%;
 	top: 0;
-	background-color: #36B8FF;
+	background-color: rgba(27,37,135,1);
 	border-radius: 15px;
+}
+.nav{
+	margin: 0px;
+	padding: 0px;
+	top: 0;
+	width: 99%;
 }
 .nav_seite{
 	list-style-type: none;
@@ -69,11 +73,12 @@ button {
 	position: fixed;
 	width: 20%;
 	top: 100px;
-	background-color: #36B8FF;
+	background-color: rgba(27,37,135,1);
 	border-radius: 15px;
+	z-index:  1;
 }
 .nav_seite li:HOVER{
-	background-color: #0E87FF;
+	background-color: #0b1162;
 }
 .nav_seite li {
 	transition-duration: 0.5s;
@@ -85,9 +90,14 @@ button {
 	color: white;
 	padding: 20px 20px;
 }
+
 .navigation_li{
 	transition-duration: 0.5s;
 	float: left;
+	text-align: center;
+	padding: 20px 50px;
+	color: white;
+	text-decoration: none;
 }
 .navigation_li:NTH-LAST-CHILD(2) {
 	float: right;
@@ -95,24 +105,22 @@ button {
 .navigation_li:LAST-CHILD {
 	float: right;
 }
-.navigation_li a{
-	display: block;
+.navigation_li:HOVER {
+	background-color: #0b1162;
+}
+.active{
+	background-color: #e91e63;;
+}
+.active a{
+	color: white;
+}
+.navigation_active{
+	transition-duration: 0.5s;
 	text-align: center;
 	padding: 20px 40px;
 	color: white;
 	text-decoration: none;
-}
-.navigation_li:HOVER {
-	background-color: #0E87FF;
-}
-.active{
-	background-color: #EAF50B;
-}
-.active a{
-	color: black;
-}
-.navigation_active{
-	background-color: #EAF50B;
+	background-color: #e91e63;;
 	float: left;
 	border-right: 1px solid #bbb;
 	border-left: 1px solid #bbb;
@@ -122,13 +130,6 @@ button {
 	width: 50%;
 	margin-bottom: 4%;
 	margin-top: 4%;	
-}
-.navigation_active a{
-	display: block;
-	text-align: center;
-	padding: 20px 40px;
-	color: black;
-	text-decoration: none;
 }
 .navigation_active:NTH-LAST-CHILD(2) {
 	float: right;
@@ -159,7 +160,7 @@ button {
 }
 
 .links{
-	background-color: #36B8FF;
+	background-color: rgba(27,37,135,1);
 	padding: 10px;
 	margin: 10px;
 	border-radius: 5px;
@@ -171,12 +172,12 @@ button {
 }
 
 .links:visited{
-	background-color: #36B8FF;
+	background-color: rgba(27,37,135,1);
 	text-decoration-line: none;
 }
 .links:hover{
-	color: black;
-	background-color: #EAF50B;
+	color: white;
+	background-color: #e91e63;;
 }
 
 .time_output{
@@ -192,7 +193,7 @@ button {
 
 .mail_steps {
 	display: inline-block;
-	background-color: #848484;
+	background-color: white;
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
@@ -201,8 +202,9 @@ button {
 }
 .mail_steps li{
 	float: left;
-	width: 33.2%;
+	width: 24%;
 	border-left: 1px solid white;
+	cursor: inherit;
 }
 
 .mail_steps li a{
@@ -214,10 +216,10 @@ button {
 }
 
 .mail_steps_active {
-	background-color: #585858;
+	background-color: #848484;;
 }
 .mail_steps li a:HOVER:NOT(.mail_steps_active) {
-	background-color: #424242;
+	background-color: #858585;
 }
 .mail_steps li a:VISITED {
 	text-decoration: none;
@@ -246,4 +248,119 @@ button {
 }
 .detail p {
 	cursor: auto;
+}
+.mail_steps a:LINK {
+	text-decoration: none;
+	color: black;
+}
+.links2 {
+	padding: 2px;
+}
+.links2:LINK {
+	font-style: italic;
+	text-decoration: underline;
+	color: black;
+}
+.links2:HOVER {
+	box-shadow: 0px 4px 16px 0px rgba(0,0,0,0.2);
+	border-radius: 5px;
+	transition-duration: 0.5s;
+}
+.links2:VISITED {
+	text-decoration: none;
+	color: black;
+}
+
+.dropdown-content {
+	display: none;
+	position: absolute;
+	min-width: 15%;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	background-color: white;
+	z-index: 10;
+	top: 65px;
+}
+
+.dropdown-content a{
+	float: none;
+	color: rgba(27,37,135,1);
+	text-decoration: none;
+	text-align: left;
+	padding: 12px 16px;
+	display: block;
+}
+
+.dropdown-content a:hover{
+	color: #e91e63;
+}
+
+.dropdown {
+	font-size: 16px;
+	outline: none;
+	float: left;
+	text-align: center;
+	padding: 20px 40px;
+	color: white;
+	background-color: inherit;
+	border-radius: 0px;
+	border: none;
+	cursor: pointer;
+	display: inline-block;
+}
+
+.dropdiv {
+	float: left;
+	overflow: hidden;
+	display: inline-block;
+}
+
+.dropdiv_active {
+	background-color: #e91e63;
+}
+
+.dropdiv:hover {
+	background-color: #0b1162;
+}
+
+.dropdiv:HOVER .dropdown-content {
+	display: block;
+}
+
+.tooltip {
+	position: relative;
+	display: inline-block;
+}
+
+.tooltip .tooltext {
+	visibility: hidden;
+	background-color: #0b1162;
+	color: white;
+	text-align: center;
+	padding: 5px 2px;
+	border-radius: 5px;
+	position: absolute;
+	z-index: 1;
+	width: 200px;
+	top: 0px;
+	left: 105%;
+	opacity: 0;
+	transition: opacity 1.5s;
+}
+
+.tooltip:hover .tooltext{
+	visibility: visible;
+	opacity: 1;
+}
+
+
+/* Für Pfeile am Hinweis */
+.tooltip .tooltext::after {
+    content: " ";
+    position: absolute;
+    top: 30%;
+    right: 100%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent black transparent transparent;
 }

@@ -21,7 +21,9 @@ if (isset($user) && $user->runscript()) {
 				'comment' => $_POST['comment']
 		);
 		$schueler = new schueler($_POST['person']);
-		$schueler->add_schueler($schueler_array);
+		if(!$schueler->add_schueler($schueler_array)) {
+			die();
+		}
 		var_dump($_POST);
 		for($i = 1; $i <= count($_POST['fach']); $i++) {
 			$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer']);
@@ -43,7 +45,9 @@ if (isset($user) && $user->runscript()) {
 		$lehrer = new lehrer($_POST['person']);
 		echo $lehrer->get_id();
 		var_dump($lehrer->person);
-		$lehrer->add_lehrer($lehrer_array);
+		if(!$lehrer->add_lehrer($lehrer_array)) {
+			die();
+		}
 		var_dump($_POST);
 		for($i = 1; $i <= count($_POST['fach']); $i++) {
 			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], $_POST['fach'][$i]['nachweis'], $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt']);
@@ -201,7 +205,7 @@ $('body').on('focus','.timepickerbis', function(){
 			<br>
 			<br>
 			<br>
-			<input type="submit" value="Hinzufügen" style="float: right;">
+			<input type="submit" value="Hinzufügen" style="float: right;" class="mybuttons">
 		</fieldset>
 	</form>
 </div>

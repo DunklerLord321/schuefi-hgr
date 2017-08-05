@@ -417,7 +417,6 @@ class schueler {
 					}
 				}
 			}
-			var_dump($matching_lehrer);
 			if(count($matching_lehrer) == 0) {
 				echo "<br>Es wurde leider kein passender Lehrer gefunden<br>";
 			}

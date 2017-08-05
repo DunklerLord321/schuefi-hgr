@@ -13,12 +13,20 @@ if (isset($user) && $user->runscript()) {
 		if ($lehrer_ex[1] != $schueler_ex[1]) {
 			echo "Unterschiedliche Fächer wurden gewählt!";
 		}
-		var_dump($lehrer_ex);
-		$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, treff_zeit, treff_raum) VALUES (:lid, :sid, :fid, :treff_zeit, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['from'], $_POST['raum']);
+		$return = query_db("SELECT * FROM `unterricht` WHERE `lid` = :lid AND `sid` = :sid AND `fid` = :fid", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1]);
+		$result = $return->fetch();
+		if($result !== false) {
+			echo "Das Paar existiert schon!";
+		}else{
+			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, treff_zeit, treff_zeit_ende, treff_raum) VALUES (:lid, :sid, :fid, :treff_zeit, :treff_zeit_ende, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum']);
+			if($return !== false) {
+				echo "Das Paar wurde erfolgreich hinzugefügt";
+			}
+		}
 	}
 	if (!isset($_GET['schueler']) && !isset($_GET['manuell'])) {
 		if(!isset($_GET['control_paar'])) {
-			echo "<p>Wenn du den passenden Lehrer automatisch finden willst, dann gehe bitte über die Seite <i>Ausgeben der Schüler</i> und wähle dann den Schüler an.</p>";
+			echo "<p>Wenn du den passenden Lehrer automatisch finden willst, dann gehe bitte über die Seite <a href=\"index.php?page=output&schueler=1\" class=\"links2\">Ausgeben der Schüler</a> und wähle dann den Schüler an.</p>";
 			echo "<p>Hier kannst du Schüler und Lehrer per Hand zusammenfügen</p>";
 		}else{
 			echo "<p>Bitte überprüfe nochmal die Angaben. Wenn es mehrer mögliche Lehrer für den Schüler gab, dann kann es sein, dass das Programm nicht die beste Möglichkeit findet. Da es immer nur für einen Schüler den Lehrer sucht und nicht die beste Möglichkeit für alle Schüler findet.</p>";
@@ -152,7 +160,7 @@ $('body').on('focus','.timepickerbis', function(){
 	<label>Raum:</label><br>
 	<input type="text" name="raum" class="input_text">
 	<p></p>
-	<input type="submit" value="Erstellen" style="float: right;">
+	<input type="submit" value="Erstellen" style="float: right;" class="mybuttons">
 	<br>
 	<br>
 </form>

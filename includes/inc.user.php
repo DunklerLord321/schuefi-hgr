@@ -20,20 +20,20 @@ if (isset($user) && $user->runscript()) {
 <form action="index.php?page=user&change=1" method="post">
 	Dein Passwort:
 	<br>
-	<input type="password" size="40" maxlength="250" name="passwort_alt" required="required" autofocus="autofocus" placeholder="Passwort" value="">
+	<input type="password" size="40" maxlength="250" name="passwort_alt" required="required" autofocus="autofocus" placeholder="Passwort" value="" class="input_text">
 	<br>
 	<br>
 	Neues Passwort:
 	<br>
-	<input type="password" size="40" maxlength="250" name="passwort_neu1" required="required">
+	<input type="password" size="40" maxlength="250" name="passwort_neu1" required="required" class="input_text">
 	<br>
 	<br>
 	Neues Passwort bestätigen:
 	<br>
-	<input type="password" size="40" maxlength="250" name="passwort_neu2" required="required">
+	<input type="password" size="40" maxlength="250" name="passwort_neu2" required="required" class="input_text">
 	<br>
 	<br>
-	<input type="submit" value="Ändern">
+	<input type="submit" value="Ändern" class="mybuttons">
 </form>
 
 <?php

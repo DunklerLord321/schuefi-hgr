@@ -64,6 +64,7 @@ function get_faecher_id_of_name($fachname) {
 	}
 }
 function get_current_year() {
+	return "1617";
 	$year = intval(date('y'));
 	// echo date('y');
 	$comp_date = intval(date('md'));
@@ -77,8 +78,6 @@ function get_current_year() {
 	}
 	// echo "<br><br>".$year;
 	return $year;
-	$year = get_prop("current_year");
-	return $year[1];
 }
 
 function format_klassenstufe_kurs($klassenstufe, $klasse) {

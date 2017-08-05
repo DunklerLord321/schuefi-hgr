@@ -33,7 +33,7 @@ if (isset($user) && $user->runscript()) {
 				echo "Hallo " . $user->vname . " " . $user->nname . "!<br><br>Du wurdest erfolgreich angemeldet.<br><br>
 		<meta http-equiv=\"refresh\" content=\"3;url=index.php?page=content\"
 		<br>Du wirst in 3 Sekunden auttomatisch auf die Hauptseite weitergeleitet.<br><br>
- 		Für manuelle Weiterleitung hier klicken: <a href=\"index.php?page=content\">Hautpseite</a>";
+ 		Für manuelle Weiterleitung hier klicken: <a href=\"index.php?page=content\" class=\"links2\" >Hautpseite</a>";
 			}
 		}
 	}

@@ -4,12 +4,10 @@ $GLOBAL_CONFIG = array();
 
 // 0 = nur return false, 1 = die();
 $GLOBAL_CONFIG['$exit_on_db_failure'] = 0;
-$GLOBAL_CONFIG['login_user'] = 'sec_login';
 $GLOBAL_CONFIG['dbuser'] = 'schuefi';
-$GLOBAL_CONFIG['mail_address'] = 'schuelerfirma.hgr@gmx.de';
+$GLOBAL_CONFIG['mail_address'] = 'schuelerfirma.sender.hgr@gmx.de';
 
 //passwörter werden in includes/db_data.php gesetzt
-$GLOBAL_CONFIG['login_user_passwd'] = '';
 $GLOBAL_CONFIG['dbuser_passwd'] = '';
 $GLOBAL_CONFIG['mail_passwd'] = '';
 require 'includes/db_data.php';
@@ -24,7 +22,7 @@ $GLOBAL_CONFIG['klassen'] = array(
 		"B",
 		"C",
 		"D",
-		"l",
+		"L",
 		"l1",
 		"l2",
 		"L1",
@@ -34,6 +32,8 @@ $GLOBAL_CONFIG['klassen'] = array(
 		"3",
 		"4",
 		"5",
-		"6"
+		"6",
+		"7"
 );
+$GLOBAL_CONFIG['backup_dir'] = 'docs/backup/';
 ?>

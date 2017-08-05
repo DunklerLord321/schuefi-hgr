@@ -70,11 +70,11 @@ class paar {
 	function adddokument(string $lehrer_dokument = "", string $schueler_dokument = "") {
 		if(strlen($lehrer_dokument) > 0) {
 			$this->lehrer_dokument = $lehrer_dokument;
-			query_db("UPDATE `unterricht` SET `lehrer_dokument` = :lehrer_dokument;", $lehrer_dokument);
+			query_db("UPDATE `unterricht` SET `lehrer_dokument` = :lehrer_dokument WHERE id = :id;", $lehrer_dokument, $this->paarid);
 		}
 		if(strlen($schueler_dokument) > 0) {
 			$this->lehrer_dokument = $schueler_dokument;
-			query_db("UPDATE `unterricht` SET `schueler_dokument` = :schueler_dokument;", $schueler_dokument);
+			query_db("UPDATE `unterricht` SET `schueler_dokument` = :schueler_dokument WHERE id = :id;", $schueler_dokument, $this->paarid);
 		}
 	}
 }

@@ -4,13 +4,14 @@ if(isset($user) && $user->runscript()){
 		require 'includes/class_paar.php';
 		$paar = new paar($_GET['createdoc_paar']);
 		require 'extensions/tcpdf/TCPDF-master/tcpdf.php';
-		echo "<h2>Erstelle Word-Dokumente</h2>";
+		echo "<h2>Erstelle Vermittlungsdokumente</h2>";
 		class MYPDF extends TCPDF {
 		
 			public function Header() {
 				$image_file = 'img/logo.jpg';
-				$this->Image($image_file, 10, 10, 15, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+				$this->Image($image_file, 10, 5, 25, '', 'JPG', 'www.hgr-web.de/schuelerfirma', 'T', false, 300, '', false, false, 0, false, false, false);
 				$this->SetFont('helvetica', 'B', 20);
+				$this->Ln(10);
 				$this->Cell(0, 15, 'Vermittlungsdokument', 0, false, 'C', 0, '', 0, false, 'M', 'M');
 				$this->Ln(10);
 				$this->SetFont('helvetica', '', 15);
@@ -19,9 +20,9 @@ if(isset($user) && $user->runscript()){
 				public function Footer() {
 					$this->SetY(-15);
 					$this->SetFont('helvetica', '', 8);
-					$this->Cell(0, 0, 'Website: www.hgr-web.de/schuelerfirma', 0, false, 'C', 0, '', 0, false, 'T', 'M');
+					$this->addHtmlLink('www.hgr-web.de/schuelerfirma', "Website: www.hgr-web.de/schuelerfirma", false, true, array(0,0,0),'',false);
 					$this->Ln(5);
-					$this->Cell(0, 0, 'E-Mail-Adresse: schuelerfirma.hgr@gmx.de', 0, false, 'C', 0, '', 0, false, 'T', 'M');
+					$this->addHtmlLink("mailto:schuelerfirma.hgr@gmx.de", "E-Mail-Adresse: schuelerfirma.hgr@gmx.de" ,false, true, array(0,0,0),'',false);
 					$this->Cell(0, 0, 'Seite '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');
 				}
 		}
@@ -69,13 +70,14 @@ if(isset($user) && $user->runscript()){
 			if($i == 0) {
 				$pdf->Output(__DIR__ . '/../docs/unterricht/lehrer-' . $paar->lehrer->get_id() . 'paar-' . $paar->paarid . '.pdf', 'F');
 				$paar->adddokument('lehrer-' . $paar->lehrer->get_id() . 'paar-' . $paar->paarid . '.pdf');
-				echo "Dokument 1 erfolgreich erstellt";
+				echo "Dokument 1 erfolgreich erstellt<br><br>";
 			}else{
 				$pdf->Output(__DIR__ . '/../docs/unterricht/schueler-' . $paar->schueler->get_id() . 'paar-' . $paar->paarid . '.pdf', 'F');
 				$paar->adddokument("",'schueler-' . $paar->schueler->get_id() . 'paar-' . $paar->paarid . '.pdf');
-				echo "Dokument 2 erfolgreich erstellt";
+				echo "Dokument 2 erfolgreich erstellt<br><br>";
 			}
 		}
+		echo "<a href=\"index.php?page=output&paare=1&filter=".$paar->paarid."\" class=\"links2\">Zurück zum Paar</a>";
 	}
 }else{
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";

@@ -1,7 +1,11 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Ausgabe</h2>";
-	$return = query_db("SELECT * FROM `person`");
+	if(isset($_GET['filter'])) {
+		$return = query_db("Select * FROM `person` WHERE id = :id", $_GET['filter']);
+	}else{
+		$return = query_db("SELECT * FROM `person`");
+	}
 	$result = $return->fetch();
 	require 'includes/class_person.php';
 	require 'includes/class_lehrer.php';
@@ -29,24 +33,7 @@ if (isset($user) && $user->runscript()) {
 				?>
 				<div style="padding-left: 10%;">
 				<?php
-				$lehrer = new lehrer($person->id);
-				$lehrer->load_lehrer_pid();
-				echo "<br><br>$person->vname $person->nname ist als Nachhilfelehrer tätig:";
-				echo "<br>Klasse: ".$lehrer->get_klassenstufe();
-				if(is_numeric($lehrer->get_klasse())) {
-					echo "/";
-				}
-				echo $lehrer->get_klasse();
-				echo "<br>Klassenlehrer/in: ".$lehrer->get_klassenlehrer();
-				echo "<br>Fächer, in denen er/sie Nachhilfe anbietet:";
-				$faecher = $lehrer->get_angebot_faecher();
-				$zeit = $lehrer->get_zeit();
-				for($i = 0; $i < count($faecher); $i++) {
-					echo "<br>".get_faecher_name_of_id($faecher[$i]['fid'])." - Nachweis vorhanden: " .($faecher[$i]['nachweis_vorhanden'] == true ? "ja": "nein");
-				}
-				for($i = 0; $i < count($zeit); $i++) {
-					echo "<br>".get_name_of_tag($zeit[$i]['tag'])." von ".$zeit[$i]['anfang']." Uhr bis ".$zeit[$i]['ende']." Uhr";
-				}
+				echo "<br><br><a href=\"index.php?page=output&lehrer=1&filter=".$person->id."\" class=\"links2\">$person->vname $person->nname ist als Nachhilfelehrer tätig</a>";
 				?>
 				</div>
 				<?php
@@ -55,29 +42,7 @@ if (isset($user) && $user->runscript()) {
 				?>
 				<div style="padding-left: 10%;">
 				<?php
-				$schueler = new schueler($person->id);
-				$schueler->load_schueler_pid();
-				echo "<br><br>$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet:";
-				echo "<br>Klasse: ".$schueler->get_klassenstufe();
-				if(is_numeric($schueler->get_klasse())) {
-					echo "/";
-				}
-				echo $schueler->get_klasse();
-				echo $schueler->get_id();
-				echo "<br>Klassenlehrer/in: ".$schueler->get_klassenlehrer();
-				echo "<br>Fächer, in denen er/sie Nachhilfe benötigt:";
-				$faecher = $schueler->get_nachfrage_faecher();
-				$zeit = $schueler->get_zeit();
-				for($i = 0; $i < count($faecher); $i++) {
-					echo "<br>".get_faecher_name_of_id($faecher[$i]['fid'])." - Langfristig: " .($faecher[$i]['langfristig'] == true ? "ja": "nein");
-				}
-				for($i = 0; $i < count($zeit); $i++) {
-					echo "<br>".get_name_of_tag($zeit[$i]['tag'])." von ".$zeit[$i]['anfang']." Uhr bis ".$zeit[$i]['ende']." Uhr";
-				}
-				if(strlen($schueler->get_comment()) > 0) {
-					echo "<br>Kommentar: ".$schueler->get_comment();
-				}
-				$schueler->get_lehrer($faecher[0]['fid']);
+				echo "<br><br><a href=\"index.php?page=output&schueler=1&filter=".$person->id."\" class=\"links2\">$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet</a>";
 				?>
 				</div>
 				<?php

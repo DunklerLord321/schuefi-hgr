@@ -126,6 +126,7 @@ class lehrer {
 					$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, get_current_year());
 					$lehrer = $return->fetch();
 					$this->id = $lehrer['id'];
+					return true;
 				} else {
 					echo "Der Lehrer existiert bereits in dem Schuljahr";
 					$this->load_lehrer_pid();

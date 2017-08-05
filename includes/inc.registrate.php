@@ -17,17 +17,17 @@ if (isset($user) && $user->runscript()) {
 	<form action="index.php?page=registrate&register=1" method="post">
 		Vorname:
 		<br>
-		<input type="text" size="40" maxlength="49" name="vname" autofocus>
+		<input type="text" size="40" maxlength="49" name="vname" autofocus class="input_text">
 		<br>
 		<br>
 		Nachname:
 		<br>
-		<input type="text" size="40" maxlength="49" name="nname">
+		<input type="text" size="40" maxlength="49" name="nname" class="input_text">
 		<br>
 		<br>
 		E-Mail:
 		<br>
-		<input type="email" size="40" maxlength="250" name="email">
+		<input type="email" size="40" maxlength="250" name="email" class="input_text">
 		<br>
 		<br>
 		Accounttype:
@@ -44,15 +44,15 @@ if (isset($user) && $user->runscript()) {
 		<br>
 		Passwort:
 		<br>
-		<input type="password" size="40" maxlength="250" name="passwort">
+		<input type="password" size="40" maxlength="250" name="passwort" class="input_text">
 		<br>
 		<br>
 		Passwort wiederholen:
 		<br>
-		<input type="password" size="40" maxlength="250" name="passwort2">
+		<input type="password" size="40" maxlength="250" name="passwort2" class="input_text">
 		<br>
 		<br>
-		<input type="submit" value="Abschicken">
+		<input type="submit" value="Hinzufügen" class="mybuttons">
 	</form>
 </div>
 <?php

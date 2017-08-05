@@ -9,7 +9,10 @@ class user {
 	private $count_login_trys;
 	private $error;
 	private $run_script;
-	
+	private $logfile;
+	const LEVEL_ERROR = 1;
+	const LEVEL_WARNING = 2;
+	const LEVEL_NOTICE = 3;
 	
 	/*
 	 * runscript: Variable, die auf true gesetzt wird, wenn Script erfolgreich geladen wurde und ausgeführt werden darf
@@ -122,6 +125,7 @@ class user {
 		$return = query_db("SELECT * FROM `users` WHERE email = :email", $email);
 		if (!$return) {
 			$this->error = "Datenbankfehler!";
+			$this->log(user::LEVEL_WARNING, "DB-Fehler beim anlegen von neuem User");
 			return false;
 		}
 		$return = $return->fetch();
@@ -186,23 +190,48 @@ class user {
 		query_db("UPDATE `users` SET count_login = :count WHERE email = :email", 0, $this->email);
 		$this->count_login_trys = 0;
 	}
+	function log(int $error_level, string $logstring) {
+		$string = date("D,d.m.Y-H:i:s", time());
+		$string .= ": ".$this->email;
+		if($error_level == $this::LEVEL_ERROR) {
+			$string .= " ERROR ";
+		}elseif($error_level == $this::LEVEL_WARNING) {
+			$string .= " WARNING ";
+		}elseif($error_level == $this::LEVEL_NOTICE) {
+			$string .= " NOTICE ";
+		}
+		$debug = debug_backtrace();
+		$string .= $logstring."   <<<<<<";
+		for($i=(count($debug)-1); $i >= 0; $i--) {
+			$string .= "{".$debug[$i]['file'].":".$debug[$i]['line']."-".$debug[$i]['function'];
+			if(count($debug[$i]['args']) > 0) {
+				$string .= "[".implode("_", $debug[$i]['args'])."]";
+			}
+			$string .= "}";
+		}
+		$string .= ">>>>>>>\n\n";
+		$this->logfile = fopen("error.log", "a");
+		fwrite($this->logfile, $string);
+		fclose($this->logfile);
+	}
 	function testpassword($password) {
 		if (isset($this->hash_password) && isset($password)) {
 			if ($this->count_login_trys < 5) {
 				$return = password_verify($password, $this->hash_password);
 				$return ?: $this->error = 'Das Passwort war leider falsch!';
 				$return ? $this->reset_count_login() : $this->increase_count_login();
+				$return ? $this->log(user::LEVEL_NOTICE, "Login erfolgreich"): $this->log(user::LEVEL_NOTICE, "Anmeldung fehlgeschlagen");
 				return $return;
 			} else {
 				$this->error = "Sie haben mindestens fünfmal versucht, sich mit falschem Passwort anzumelden.<br><br> Bitte kontaktieren Sie den Admin." . $this->vname . $this->nname;
 				if ($this->count_login_trys == 5)
 					$this->send_mail();
 				$this->increase_count_login();
+				$this->log(user::LEVEL_NOTICE, "Anmeldung erfolgreich");
 				return false;
 			}
 		}
 	}
-	//noch nicht funktionstüchtig!!!
 	function neuespassword($passwortaktuell, $password_neu, $password_neu2) {
 		if (strlen($password_neu) < 4) {
 			$this->error = 'Das neue Passwort muss mindestens 4 Zeichen lang sein';
@@ -223,9 +252,11 @@ class user {
 		$passwort_hash = password_hash($password_neu, PASSWORD_DEFAULT);
 		$return = query_db("UPDATE `users` SET passwort = :passwort_hash WHERE id = :id", $passwort_hash, $this->id);
 		if($return) {
+			$this->log(user::LEVEL_NOTICE, "Passwort erfolgreich geändert");
 			return true;
 		}else{
 			$this->error = 'Ein Datenbankfehler ist aufgetreten';
+			$this->log(user::LEVEL_WARNING, "DB-Fehler bei Passwortänderung");
 			return false;
 		}
 	}
@@ -241,15 +272,15 @@ class user {
 		// $mail->isSMTP();
 		$mail->Host = 'mail.gmx.net';
 		$mail->SMTPAuth = true;
-		$mail->Username = 'schuelerfirma.hgr@gmx.de';
-		$mail->Password = 'schick2014';
+		$mail->Username = $GLOBAL_CONFIG['mail_address'];
+		$mail->Password = $GLOBAL_CONFIG['mail_passwd'];
 		$mail->SMTPSecure = 'tls';
 		$mail->Port = 587;
 		$mail->isHTML(True);
 		$mail->CharSet = 'utf-8';
 		$mail->SetLanguage("de");
 		
-		$mail->setFrom('schuelerfirma.hgr@gmx.de', 'Schülerfirma HGR');
+		$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
 		$stat = $pdo_obj->query("SELECT `email` FROM `users` WHERE `account` = 'v'");
 		$result = $stat->fetch();
 		while ( $result ) {
@@ -285,10 +316,12 @@ class user {
 		$this->id = NULL;
 		$this->vname = "";
 		$this->nname = "";
-		$this->email = "";
 		$this->account = "";
 		$this->password = "";
 		$this->count_login_trys = 0;
 		$pdo = NULL;
+		//email ist notwendig, um zu sehen, wer sich abmeldet
+		$this->log(user::LEVEL_NOTICE, "Logout erfolgreich");
+		$this->email = "";
 	}
 }

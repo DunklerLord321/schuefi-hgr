@@ -5,7 +5,11 @@ if (isset($user) && $user->runscript()) {
 	require 'includes/class_lehrer.php';
 	require 'includes/class_schueler.php';
 	if (isset($_GET['lehrer']) && $_GET['lehrer'] == 1) {
-		$return = query_db("SELECT * FROM `lehrer` WHERE `schuljahr` = :schuljahr", get_current_year());
+		if(isset($_GET['filter'])) {
+			$return = query_db("SELECT * FROM `lehrer` WHERE `schuljahr` = :schuljahr AND `pid` = :pid", get_current_year(), $_GET['filter']);
+		}else{
+			$return = query_db("SELECT * FROM `lehrer` WHERE `schuljahr` = :schuljahr", get_current_year());
+		}
 		if ($return === false) {
 			echo "Ein Problem";
 			die();
@@ -16,7 +20,7 @@ if (isset($user) && $user->runscript()) {
 				$lehrer = new lehrer(-1, $result['id']);
 				?>
 <fieldset style="padding: 40px; width: 80%; padding-top: 10px;">
-	<legend><?php echo $lehrer->person->vname.' '.$lehrer->person->nname?></legend>
+	<legend><?php echo "<a href=\"index.php?page=output_person&filter=".$lehrer->person->id."\" class=\"links2\">".$lehrer->person->vname.' '.$lehrer->person->nname."</a>"?></legend>
 	<div style="display: flex;">
 		<div style="width: 70%; display: inline-block;">
 					<?php
@@ -51,11 +55,19 @@ if (isset($user) && $user->runscript()) {
 				$result = $return->fetch();
 			}
 		} else {
-			echo "Es wurde noch kein Lehrer hinzugefügt";
+			if(isset($_GET['filter'])) {
+				echo "Es trat ein Fehler auf. Zu der Person konnte kein Lehrer gefunden werden";
+			}else{
+				echo "Es wurde noch kein Lehrer hinzugefügt";
+			}
 		}
 	}
 	if (isset($_GET['schueler']) && $_GET['schueler'] == 1) {
-		$return = query_db("SELECT * FROM `schueler` WHERE `schuljahr` = :schuljahr", get_current_year());
+		if(isset($_GET['filter'])) {
+			$return = query_db("SELECT * FROM `schueler` WHERE `schuljahr` = :schuljahr AND `pid` = :pid", get_current_year(), $_GET['filter']);
+		}else{
+			$return = query_db("SELECT * FROM `schueler` WHERE `schuljahr` = :schuljahr", get_current_year());
+		}
 		if ($return === false) {
 			echo "Ein Problem";
 			die();
@@ -66,7 +78,7 @@ if (isset($user) && $user->runscript()) {
 				$schueler = new schueler(-1, $result['id']);
 				?>
 <fieldset style="padding: 40px; width: 80%; padding-top: 10px;">
-	<legend><?php echo $schueler->person->vname.' '.$schueler->person->nname?></legend>
+	<legend><?php echo "<a href=\"index.php?page=output_person&filter=".$schueler->person->id."\" class=\"links2\">".$schueler->person->vname.' '.$schueler->person->nname."</a>"?></legend>
 	<div style="display: flex;">
 		<div style="width: 70%; display: inline-block;">
 							<?php
@@ -102,7 +114,11 @@ if (isset($user) && $user->runscript()) {
 				$result = $return->fetch();
 			}
 		} else {
-			echo "Es wurde noch kein Schüler hinzugefügt";
+			if(isset($_GET['filter'])) {
+				echo "Es trat ein Fehler auf. Zu dieser Person konnte kein Schüler gefunden werden";
+			}else{
+				echo "Es wurde noch kein Schüler hinzugefügt";
+			}
 		}
 	}
 	if(isset($_GET['paare']) && $_GET['paare'] == 1) {
@@ -115,24 +131,25 @@ if (isset($user) && $user->runscript()) {
 				$npaar = new paar($paar['id']);
 				echo "<fieldset>";
 				echo "<legend>Nachhilfepaar</legend>";
-				echo "<p>Im Fach ".get_faecher_name_of_id($npaar->fid)."</p><details class=\"detail\"><summary>Lehrer: ".$npaar->lehrer->person->vname." ".$npaar->lehrer->person->nname."</summary><p>";
+				echo "<p>Im Fach ".get_faecher_name_of_id($npaar->fid)."</p><details class=\"detail\"><summary>Lehrer: <a href=\"index.php?page=output&lehrer=1&filter=".$npaar->lehrer->person->id."\" class=\"links2\">".$npaar->lehrer->person->vname." ".$npaar->lehrer->person->nname."</a></summary><p>";
 				echo "Klasse: " . format_klassenstufe_kurs($npaar->lehrer->get_klassenstufe(), $npaar->lehrer->get_klasse());
 				echo "<br>Klassenlehrer/in: " . $npaar->lehrer->get_klassenlehrer();
 				echo "</p></details><br>";
-				echo "<details class=\"detail\"><summary>Schüler: ".$npaar->schueler->person->vname." ".$npaar->schueler->person->nname."</summary><p>";
+				echo "<details class=\"detail\"><summary>Schüler: <a href=\"index.php?page=output&schueler=1&filter=".$npaar->schueler->person->id."\" class=\"links2\">".$npaar->schueler->person->vname." ".$npaar->schueler->person->nname."</a></summary><p>";
 				echo "Klasse: " . format_klassenstufe_kurs($npaar->schueler->get_klassenstufe(), $npaar->schueler->get_klasse());
 				echo "<br>Klassenlehrer/in: " . $npaar->schueler->get_klassenlehrer();
 				echo "</p></details>";
 				echo "<br>Zeitpunkt: ".get_name_of_tag($npaar->tag)." von ".$npaar->anfang." Uhr bis ".$npaar->ende." Uhr";
 				echo "<br><br>Im Zimmer: ".$npaar->raum."<br><br>";
 				if(strlen($npaar->lehrer_dokument) > 0) {
-					echo "<a href=\"docs/unterricht/".$npaar->lehrer_dokument."\" class=\"links\">Vermittlungsdokument für Lehrer ist vorhanden</a><br><br>";
+					echo "<a href=\"docs/unterricht/".$npaar->lehrer_dokument."\" class=\"links\">Vermittlungsdokument für Lehrer ansehen</a><br><br>";
 				}else{
 					echo "Vermittlungsdokument für Lehrer ist noch nicht vorhanden";
 					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a><br><br><br>";
 				}
 				if(strlen($npaar->schueler_dokument) > 0) {
-					echo "<a href=\"docs/unterricht/".$npaar->schueler_dokument."\" class=\"links\">Vermittlungsdokument für Schüler ist vorhanden</a>";
+					echo "<a href=\"docs/unterricht/".$npaar->schueler_dokument."\" class=\"links\">Vermittlungsdokument für Schüler ansehen</a><br><br><br>";
+					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erneut erstellen</a><br><br><br>";
 				}else{
 					echo "Vermittlungsdokument für Schüler ist noch nicht vorhanden";
 					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a>";
@@ -142,7 +159,6 @@ if (isset($user) && $user->runscript()) {
 				$i++;
 			}
 		}
-		//Ausgabe der Paare
 	}
 } else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";

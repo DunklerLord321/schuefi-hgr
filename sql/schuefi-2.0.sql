@@ -7,7 +7,7 @@
 -- Server version: 5.7.17-0ubuntu0.16.04.1
 -- PHP Version: 7.0.15-0ubuntu0.16.04.4
 
--- Version 1.0
+-- Version 2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -132,6 +132,17 @@ CREATE TABLE `unterricht` (
   `schueler_dokument` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
+DROP TABLE IF EXISTS `finanzuebersicht`;
+CREATE TABLE `finanzuebersicht` (
+  `id` int(11) NOT NULL,
+  `pid` int(11) NOT NULL,
+  `geldbetrag` int(11) NOT NULL,
+  `betreff` enum('schueler','lehrer','sonstiges') COLLATE utf8_german2_ci DEFAULT NULL,
+  `bemerkung` text COLLATE utf8_german2_ci,
+  `dokument` varchar(50) DEFAULT NULL,
+  `erstellungsdatum` datetime DEFAULT CURRENT_TIMESTAMP,
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
+
 --
 -- Indexes
 --
@@ -163,6 +174,8 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
 
+ ALTER TABLE `finanzuebersicht`
+  ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `person` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `lehrer` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
@@ -173,7 +186,7 @@ ALTER TABLE `bietet_an` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `fragt_nach` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `unterricht` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `users`  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
+ALTER TABLE `finanzuebersicht` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- Constraints for dumped tables
 --
