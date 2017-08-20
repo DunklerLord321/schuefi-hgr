@@ -18,7 +18,8 @@ if (isset($user) && $user->runscript()) {
 		if($result !== false) {
 			echo "Das Paar existiert schon!";
 		}else{
-			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, treff_zeit, treff_zeit_ende, treff_raum) VALUES (:lid, :sid, :fid, :treff_zeit, :treff_zeit_ende, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum']);
+			$return = query_db("UPDATE `fragt_nach` SET `status` = 'vermittelt' WHERE sid = :sid AND fid = :fid", $schueler_ex[0], $schueler_ex[1]);
+			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, treff_zeit, treff_zeit_ende, treff_raum) VALUES (:lid, :sid, :fid, :treff_zeit, :treff_zeit_ende, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['from'], $_POST['zeit']['until'], intval($_POST['raum']));
 			if($return !== false) {
 				echo "Das Paar wurde erfolgreich hinzugefügt";
 			}
@@ -110,7 +111,7 @@ $('body').on('focus','.timepickerbis', function(){
 				while ( $lehrer ) {
 					$lehrer = new lehrer(-1, $lehrer['id']);
 					$faecher = $lehrer->get_angebot_faecher();
-					var_dump($lehrer);
+//					var_dump($lehrer);
 					for($i = 0; $i < count($faecher); $i++) {
 						if(isset($_GET['control_paar']) && isset($_GET['lid']) && $_GET['lid'] == $lehrer->get_id()) {
 							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\" selected >" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";

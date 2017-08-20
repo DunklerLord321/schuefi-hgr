@@ -2,6 +2,7 @@
 if(isset($user) && $user->runscript()){
 	echo "<h1>Backups</h1>";
 	echo "<a href=\"index.php?page=backup_data&newbackup=1\" class=\"links\">Neues Backup</a><br><br>";
+	echo "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">";
 	$tables = array('person','faecher','schueler','lehrer','zeit','bietet_an','fragt_nach','unterricht');
 	if(isset($_GET['restore'])) {
 		if(file_exists($GLOBAL_CONFIG['backup_dir'].$_GET['restore'])) {

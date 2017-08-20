@@ -123,10 +123,13 @@ if (isset($user) && $user->runscript()) {
 	}
 	if(isset($_GET['paare']) && $_GET['paare'] == 1) {
 		require 'includes/class_paar.php';
-		$return = query_db("SELECT * FROM `unterricht`;");
+		$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = '".get_current_year()."';");
 		$i = 0;
 		if($return) {
 			$paar = $return->fetch();
+			if(!$paar) {
+				echo "Es wurde noch kein Paar hinzugefügt";
+			}
 			while ($paar) {
 				$npaar = new paar($paar['id']);
 				echo "<fieldset>";

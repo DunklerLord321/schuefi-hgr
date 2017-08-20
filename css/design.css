@@ -204,7 +204,6 @@ button {
 	float: left;
 	width: 24%;
 	border-left: 1px solid white;
-	cursor: inherit;
 }
 
 .mail_steps li a{
@@ -213,6 +212,8 @@ button {
 	text-decoration: none;
 	text-align: center;
 	padding: 10px 2px;
+	cursor: not-allowed;
+	pointer-events: none;
 }
 
 .mail_steps_active {

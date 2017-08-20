@@ -1,29 +1,31 @@
+<?php
+//Es darf keinerlei Ausgabe vor session_name() stattfinden
+session_name("hgr-schuelerfirma");
+session_start();
+error_reporting(E_ERROR);
+?>
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <title>Verwaltung der Daten der Schülerfirma</title>
 <meta name="description" content="Verwalte die Daten der Schülerfirma 'Schüler helfen Schülern' einfach und automatisiert.">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="css/design.css" rel="stylesheet">
 <link href="includes/jquery/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet">
 <script type="text/javascript" src="includes/jquery/jquery-3.2.1.min.js"></script>
 <script src="includes/jquery/jquery-ui-1.12.1/jquery.js"></script>
 <script src="includes/jquery/jquery-ui-1.12.1/jquery-ui.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 <?php
-session_start();
-error_reporting(E_ALL);
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
 try{
-$pdo_obj = new PDO('mysql:host=localhost;dbname=schuefi', $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
+$pdo_obj = new PDO('mysql:host='.$GLOBAL_CONFIG['host'].';dbname='.$GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 		PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 ));
 } catch (PDOException $e) {
-	echo "<h1>Ein DB-Fehler ist aufgetreten (01)<h1>";
+	echo "<h1>Ein DB-Fehler ist aufgetreten (01)$e<h1>";
 	die();
 }
 if (isset($_SESSION['user']) && strlen($_SESSION['user']) > 0) {
@@ -60,7 +62,7 @@ if (isset($_GET['page'])) {
 		<div class="navigation">
 			<a <?php if(strcmp($active, "content") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?> href="index.php?page=content">Hauptseite</a>
 			<a <?php if(strcmp($active, "user") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?> href="index.php?page=user" id="log_in">Passwort ändern</a>
-				<div class="dropdiv <?php if(strcmp($active, "settings") == 0 ) { echo "dropdiv_active"; }?>">
+				<div class="dropdiv <?php if(strcmp($active, "settings") == 0 || strcmp($active, "backup_data") == 0 ) { echo "dropdiv_active"; }?>">
 					<button class="dropdown">Einstellungen</button>
 					<div class="dropdown-content">
 						<a href="index.php?page=settings">Log-Datei</a>
@@ -74,6 +76,7 @@ if (isset($_GET['page'])) {
 		</nav>
 	<nav>
 		<ul class="nav_seite">
+		<?php if($user->isuserallowed('k')) {?>
 			<li <?php if(strcmp($active, "person") == 0 ) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=person"> Neue Person</a>
 			</li>
@@ -86,6 +89,7 @@ if (isset($_GET['page'])) {
 			<li <?php if(strcmp($active, "input_paar") == 0) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=input_paar&paar=1"> Neues Paar</a>
 			</li>
+			<?php }?>
 			<li <?php if(strcmp($active, "output_person") == 0) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=output_person"> Ausgeben der Personen</a>
 			</li>
@@ -141,16 +145,18 @@ if (isset($_GET['page'])) {
 			<li <?php if(strcmp($active, "mail") == 0 ) { echo "class=\"active\""; }?>>
 				<a href="index.php?page=mail&step=1"> Sende E-Mail</a>
 			</li>
-<!-- -			<li <?php //if(strcmp($active, "create_doc") == 0 ) { echo "class=\"active\""; }?>>
-				<a href="index.php?page=create_doc">Erstelle Dokumente</a>
-			</li>----->
+			<?php if($user->isuserallowed('f')) {?>
+			<li <?php if(strcmp($active, "input_finanzen") == 0 ) { echo "class=\"active\""; }?>>
+				<a href="index.php?page=input_finanzen">Eingabe Finanzen</a>
+			</li>
+			<?php }?>
 		</ul>
 	</nav>
 	<!-- - div endet in letzter Zeile   -->
 	<div class="content">
 	<?php
 		try {
-			$pdo = new PDO("mysql:host=localhost;dbname=schuefi", $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
+			$pdo = new PDO("mysql:host=".$GLOBAL_CONFIG['host'].";dbname=".$GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 					PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 			));
 		} catch (pdoException $e) {

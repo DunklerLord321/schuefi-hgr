@@ -38,10 +38,7 @@ CREATE TABLE `users` (
   `account` enum('k','f','v','w') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'w',
   `createt_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_login` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `count_login` int(11) DEFAULT 0,
-  `logged_in` tinyint(1) NOT NULL DEFAULT '0',
-  `last_active` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `count_login` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 DROP TABLE IF EXISTS `person`;
@@ -92,7 +89,7 @@ CREATE TABLE `bietet_an` (
   `fachlehrer` varchar(50) COLLATE utf8_german2_ci NOT NULL,
   `notenschnitt` varchar(50) COLLATE utf8_german2_ci NOT NULL,
   `nachweis_vorhanden` tinyint(1) DEFAULT 1,
-  `status` enum('neu','ausstehend','schueler_gefunden') COLLATE utf8_german2_ci DEFAULT NULL
+  `status` enum('neu','ausstehend','vermittelt') COLLATE utf8_german2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `schueler`;
@@ -114,7 +111,7 @@ CREATE TABLE `fragt_nach` (
   `fid` int(11) NOT NULL,
   `fachlehrer` varchar(50) COLLATE utf8_german2_ci NOT NULL,
   `langfristig` tinyint(1) DEFAULT 1,
-  `status` enum('neu','noetig','ausstehend','nicht_moeglich','lehrer_gefunden') COLLATE utf8_german2_ci DEFAULT NULL
+  `status` enum('neu','notwendig','ausstehend','nicht vermittelbar','vermittelt') COLLATE utf8_german2_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `unterricht`;
@@ -135,12 +132,14 @@ CREATE TABLE `unterricht` (
 DROP TABLE IF EXISTS `finanzuebersicht`;
 CREATE TABLE `finanzuebersicht` (
   `id` int(11) NOT NULL,
-  `pid` int(11) NOT NULL,
+  `pid` int(11),
+  `uid` int(11),
   `geldbetrag` int(11) NOT NULL,
+  `konto_bar` enum('bar', 'konto') COLLATE utf8_german2_ci DEFAULT NULL,
   `betreff` enum('schueler','lehrer','sonstiges') COLLATE utf8_german2_ci DEFAULT NULL,
   `bemerkung` text COLLATE utf8_german2_ci,
   `dokument` varchar(50) DEFAULT NULL,
-  `erstellungsdatum` datetime DEFAULT CURRENT_TIMESTAMP,
+  `datum` datetime DEFAULT CURRENT_TIMESTAMP
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 --
@@ -213,14 +212,8 @@ ALTER TABLE `bietet_an` ADD FOREIGN KEY (`lid`) REFERENCES `lehrer`(`id`) ON DEL
 ALTER TABLE `bietet_an` ADD FOREIGN KEY (`fid`) REFERENCES `faecher`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `fragt_nach` ADD FOREIGN KEY (`sid`) REFERENCES `schueler`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `fragt_nach` ADD FOREIGN KEY (`fid`) REFERENCES `faecher`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
-
-
-INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwort`, `account`, `createt_time`, `update_time`, `last_login`, `count_login`, `logged_in`, `last_active`) VALUES
-(1, 'Karla', 'Großer', 'karla.grosser@mail.com', 'test', 'k', '2017-02-08 08:32:30', '2017-02-08 08:32:30', '2017-02-17 17:17:08', 0, 0, '2017-02-17 17:39:17'),
-(6, 'Yannik', 'Weber', 'yajo10@yahoo.de', '$2y$10$rs27PVrKUl5I8hVP0V/U5eAjLoHHw5llQCZGbICaEb2R2J5TuypSC', 'v', '2017-02-13 10:42:52', '2017-02-13 10:42:52', '2017-02-17 17:17:08', 1, 4, '2017-03-09 16:12:27'),
-(7, 'Christopher', 'Stäglich', 'joyajo108@gmail.com', '$2y$10$.3nbeE6OajtDUiFqj0wD0ePAn/3.rF0W0XueUzvh7xMTGuJT8JlWO', 'v', '2017-02-14 09:37:42', '2017-02-14 09:37:42', '2017-02-17 17:17:08', 0, 3, '2017-03-09 15:13:29'),
-(8, 'Vorsitzender', 'Schülerfirma', 'schuelerfirma.hgr@gmx.de', '$2y$10$Wu5yJYPTFO6Qs.YWUnf6jepPDRCXED5A/hf11BWABIPo69vBOL3By', 'v', '2017-02-27 17:45:55', '2017-02-27 17:45:55', '2017-02-27 16:45:55', 0, 0, '2017-03-07 14:39:36'),
-(9, 'gast', 'Schülerfirma', 'gast@gast.de', '$2y$10$jFttMshNesyHH86CQ0XOwegRO7bQluzN2pRd.3xSuGKrToCxLYtqy', 'f', '2017-03-02 15:42:58', '2017-03-02 15:42:58', '2017-03-02 14:42:58', 1, 4, '2017-03-09 16:28:06');
+ALTER TABLE `finanzuebersicht` ADD FOREIGN KEY (`pid`) REFERENCES `person`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `finanzuebersicht` ADD FOREIGN KEY (`uid`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

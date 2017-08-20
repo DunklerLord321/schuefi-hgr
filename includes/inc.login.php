@@ -1,6 +1,7 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	if (!$user->is_valid()) {
+		echo "<h1>Anmelden</h1>";
 		if (!isset($_GET['loginreal']) || $_GET['loginreal'] != 1) {
 			?>
 <form action="?loginreal=1" method="post">

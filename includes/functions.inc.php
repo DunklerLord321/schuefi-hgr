@@ -91,6 +91,7 @@ function format_klassenstufe_kurs($klassenstufe, $klasse) {
 function query_db($statement, ...$params) {
 	global $exit_on_db_failure;
 	global $pdo;
+	global $user;
 	$stat_ex = explode(' ', $statement);
 	$i = 0;
 //	var_dump(debug_backtrace());
@@ -119,6 +120,7 @@ function query_db($statement, ...$params) {
 //var_dump($ret_prep);
 	if ($ret_prep === false) {
 		echo "Ein DB-Fehler ist aufgetreten - 1";
+		$user->log(user::LEVEL_ERROR, "DB-Fehler ist aufgetreten!".$ret_prep->errorInfo());
 		var_dump($ret_prep->errorInfo());
 		var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 		$exit_on_db_failure == 0 ?: die();
@@ -127,6 +129,7 @@ function query_db($statement, ...$params) {
 		$return = $ret_prep->execute($parameter);
 		if ($return === false) {
 			echo "Ein DB-Fehler ist aufgtreten";
+			$user->log(user::LEVEL_ERROR, "DB-Fehler ist aufgetreten!".implode("-", $ret_prep->errorInfo()));
 			var_dump($ret_prep->errorInfo());
 			$exit_on_db_failure == 0 ?: die();
 			return false;

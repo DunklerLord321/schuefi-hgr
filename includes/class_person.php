@@ -104,7 +104,7 @@ class person {
 				return true;
 			} else {
 				echo "Ein Fehler ist  aufgetreten";
-				var_dump($pdo->errorInfo());
+//				var_dump($pdo->errorInfo());
 				return false;
 			}
 		}
@@ -189,7 +189,7 @@ class person {
 				return true;
 			} else {
 				echo "Ein Fehler ist  aufgetreten";
-				var_dump($pdo->errorInfo());
+//				var_dump($pdo->errorInfo());
 				return false;
 			}
 		}

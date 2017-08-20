@@ -24,7 +24,6 @@ if (isset($user) && $user->runscript()) {
 		if(!$schueler->add_schueler($schueler_array)) {
 			die();
 		}
-		var_dump($_POST);
 		for($i = 1; $i <= count($_POST['fach']); $i++) {
 			$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer']);
 		}
@@ -44,11 +43,9 @@ if (isset($user) && $user->runscript()) {
 		);
 		$lehrer = new lehrer($_POST['person']);
 		echo $lehrer->get_id();
-		var_dump($lehrer->person);
 		if(!$lehrer->add_lehrer($lehrer_array)) {
 			die();
 		}
-		var_dump($_POST);
 		for($i = 1; $i <= count($_POST['fach']); $i++) {
 			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], $_POST['fach'][$i]['nachweis'], $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt']);
 		}
@@ -183,7 +180,7 @@ $('body').on('focus','.timepickerbis', function(){
 			<span style="float: right; width: 50%;">Klasse/Kurs (a, b, c, d, L, L1, L2):</span>
 			<br>
 			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;" class="input_text">
-			<input type="text" pattern="([ABCDabcdlL123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" class="input_text">
+			<input type="text" pattern="([ABCDabcdlL1234567]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" class="input_text">
 			<br>
 			<br>
 			Klassenlehrer:

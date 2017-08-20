@@ -135,7 +135,7 @@ class user {
 		}
 		$return = query_db("INSERT INTO `users` (vname, nname, email, passwort, account) VALUES (:vname, :nname, :email, :passwort, :account)", $vname, $nname, $email, password_hash($passwort, PASSWORD_DEFAULT), $type);
 		if ($return) {
-			return 'Der neue Nutzer wurde erfolgreich registriert. <a href="index.php">Zum Login</a>';
+			return 'Der neue Nutzer wurde erfolgreich registriert. <a href="index.php" class="links2">Zum Login</a>';
 		} else {
 			$this->error = 'Beim Abspeichern ist leider ein Fehler aufgetreten<br>';
 			return false;
@@ -161,7 +161,7 @@ class user {
 			$this->id = $user['id'];
 			$this->count_login_trys = intval($user['count_login']);
 			require 'includes/global_vars.inc.php';
-			$pdo = new PDO("mysql:host=localhost;dbname=schuefi", $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
+			$pdo = new PDO("mysql:host=".$GLOBAL_CONFIG['host'].";dbname=".$GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 					PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 			));
 			return true;
@@ -205,7 +205,11 @@ class user {
 		for($i=(count($debug)-1); $i >= 0; $i--) {
 			$string .= "{".$debug[$i]['file'].":".$debug[$i]['line']."-".$debug[$i]['function'];
 			if(count($debug[$i]['args']) > 0) {
-				$string .= "[".implode("_", $debug[$i]['args'])."]";
+				if($debug[$i]['function'] == "testpassword") {
+					$string .= "[*****]";
+				}else{
+					$string .= "[".implode("_", $debug[$i]['args'])."]";
+				}
 			}
 			$string .= "}";
 		}

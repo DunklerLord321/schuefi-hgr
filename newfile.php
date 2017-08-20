@@ -1,4 +1,5 @@
 <?php
+echo password_hash("schuefionline123", PASSWORD_DEFAULT);
 /******************
  //$empfaenger = "gajo01@gmx.de";
  $empfaenger = "yajo10@yahoo.de";

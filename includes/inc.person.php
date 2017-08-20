@@ -35,7 +35,7 @@ if (isset($user) && $user->runscript()) {
   $( function() {
     $( "#datepicker" ).datepicker({
         changeYear: true,
-        yearRange: "c-20:c-10",
+        yearRange: "1995:2010",
 	    });
   } );
   </script>

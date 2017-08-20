@@ -8,6 +8,7 @@ class schueler {
 	public $person = person::class;
 	public $faecher = array();
 	public $zeit = array();
+	const stati = array('neu','notwendig','ausstehend','nicht vermittelbar','vermittelt');
 	function __construct(int $pid, int $id = -1) {
 		if ($id != -1) {
 			$return = query_db("SELECT * FROM `schueler` WHERE id = :sid AND schuljahr = :schuljahr", $id, get_current_year());
@@ -139,7 +140,6 @@ class schueler {
 			$params_arr['klassenlehrer_name'] = htmlspecialchars($params_arr['klassenlehrer_name'], ENT_QUOTES, 'UTF-8');
 			$params_arr['klasse'] = htmlspecialchars($params_arr['klasse'], ENT_QUOTES, 'UTF-8');
 			$params_arr['comment'] = htmlspecialchars($params_arr['comment'], ENT_QUOTES, 'UTF-8');
-			echo $params_arr['klassenlehrer_name'];
 			$error = '';
 			if (!isset($params_arr['klassenlehrer_name']) || strlen($params_arr['klassenlehrer_name']) < 3 || strlen($params_arr['klassenlehrer_name']) > 49 || !preg_match("/^(Herr|Frau|herr|frau|Hr.|Fr.|hr.|fr.|Dr.|Doktor|DR.|Dr) [A-Za-z]*/", $params_arr['klassenlehrer_name'])) {
 				$error = $error . "<br><br>Bitte gib einen korrekten Namen des Klassenlehrers an, der zwischen 3 und 49 Zeichen lang ist.";
@@ -161,7 +161,6 @@ class schueler {
 					$this->klassenstufe = $params_arr['klassenstufe'];
 					$this->klassenlehrer_name = $params_arr['klassenlehrer_name'];
 					$this->comment = $params_arr['comment'];
-					echo $params_arr['klassenlehrer_name'];
 					$return_prep = query_db("UPDATE `schueler` SET `klassenstufe` = :klassenstufe, `klasse` = :klasse, `klassenlehrer_name` = :klassenelehrer_name, `comment` = :comment WHERE id = :id;", $this->klassenstufe, $this->klasse, $this->klassenlehrer_name, $this->comment, $this->id);
 					echo "Die Daten des Schülers wurden erfolgreich geändert";
 					return true;
@@ -245,21 +244,21 @@ class schueler {
 			return false;
 		}
 	}
-	function add_nachfrage_fach($fachid, bool $langfristig, $fachlehrer) {
+	function add_nachfrage_fach($fachid, bool $langfristig, $fachlehrer, $status) {
 		$fachid = intval($fachid);
 //		echo $fachid;
-		if (isset($this->id) && is_bool($langfristig) && is_int($fachid)) {
+		if (isset($this->id) && is_bool($langfristig) && is_int($fachid) && array_search($status, self::stati) != false) {
 			$return = query_db("SELECT * FROM `fragt_nach` WHERE sid = :sid AND fid = :fid", $this->id, $fachid);
 			if ($return->fetch() !== false) {
 				echo "Es existiert bereits ein Angebot für diesen Schüler und für dieses Fach!";
 			} else {
-				query_db("INSERT INTO `fragt_nach` (`sid`,`fid`,`langfristig`,`fachlehrer`, `status`) VALUES (:sid, :fid, :langfristig, :fachlehrer, :status)", $this->id, $fachid, intval($langfristig), $fachlehrer, 'neu');
+				query_db("INSERT INTO `fragt_nach` (`sid`,`fid`,`langfristig`,`fachlehrer`, `status`) VALUES (:sid, :fid, :langfristig, :fachlehrer, :status)", $this->id, $fachid, intval($langfristig), $fachlehrer, $status);
 				$this->load_schueler_pid($this->person->id);
 			}
 		} else {
-			var_dump($this);
-			var_dump($langfristig);
-			var_dump($fachid);
+//			var_dump($this);
+//			var_dump($langfristig);
+//			var_dump($fachid);
 			echo "Ein Fehler ist aufgetreten";
 		}
 	}

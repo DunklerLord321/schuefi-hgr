@@ -26,7 +26,10 @@ if (isset($user) && $user->runscript()) {
 					'comment' => $_POST['comment']
 			);
 			$schueler->change_schueler($params);
-			var_dump($schueler);
+//			var_dump($schueler);
+			//Ändere Zeit
+			//array neu indizieren, falls Eintrag in der Mitte gelöscht wurde (element 1 und 3 existieren, aber count nur 2)
+			$_POST['zeit'] = array_values($_POST['zeit']);
 			if(!isset($_POST['zeit']) && count($schueler->zeit) != 0) {
 				for ($i = 0; $i < count($schueler->zeit); $i++) {
 					$schueler->remove_time($schueler->zeit[$i]['id']);
@@ -47,31 +50,25 @@ if (isset($user) && $user->runscript()) {
 			}
 			
 			//Ändere Fächer
+			$_POST['fach'] = array_values($_POST['fach']);
 			if(!isset($_POST['fach']) && count($schueler->faecher) != 0) {
 				for ($i = 0; $i < count($schueler->faecher); $i++) {
-					echo "ttztztztztz".$schueler->faecher[$i]['fachlehrer'];
-					var_dump($schueler->remove_nachfrage_fach($schueler->faecher[$i]['fid']));
+					$schueler->remove_nachfrage_fach($schueler->faecher[$i]['fid']);
 				}
 			}
 			if(isset($_POST['fach']) && count($schueler->faecher) != 0) {
 				for ($i = 0; $i < count($schueler->faecher); $i++) {
-					echo "ttztztztztz".$schueler->faecher[$i]['fachlehrer'];
-					var_dump($schueler->remove_nachfrage_fach($schueler->faecher[$i]['fid']));
+					$schueler->remove_nachfrage_fach($schueler->faecher[$i]['fid']);
 				}
 				$schueler->load_schueler_pid(-1);
 			}
-			var_dump($schueler);
 			if(isset($_POST['fach']) && count($schueler->faecher) == 0) {
-				echo "ld";
 				for ($i = 0; $i <= count($_POST['fach']); $i++) {
 					if(isset($_POST['fach'][$i])) {
-						echo "test";
-						$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer']);
+						$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'],$_POST['fach'][$i]['status']);
 					}
 				}
 			}
-			var_dump($schueler);
-			var_dump($_POST);
 		}
 		if($_GET['change'] == 3) {
 			require 'includes/class_lehrer.php';
@@ -82,8 +79,9 @@ if (isset($user) && $user->runscript()) {
 					'klassenlehrer_name' => $_POST['klassenlehrer'],
 					'comment' => $_POST['comment']
 			);
+			//array neu indizieren, falls Eintrag in der Mitte gelöscht wurde (element 1 und 3 existieren, aber count nur 2)
+			$_POST['zeit'] = array_values($_POST['zeit']);
 			$lehrer->change_lehrer($params);
-			var_dump($lehrer);
 			if(!isset($_POST['zeit']) && count($lehrer->zeit) != 0) {
 				for ($i = 0; $i < count($lehrer->zeit); $i++) {
 					$lehrer->remove_time($lehrer->zeit[$i]['id']);
@@ -104,31 +102,26 @@ if (isset($user) && $user->runscript()) {
 			}
 				
 			//Ändere Fächer
+			$_POST['fach'] = array_values($_POST['fach']);
 			if(!isset($_POST['fach']) && count($lehrer->faecher) != 0) {
 				for ($i = 0; $i < count($lehrer->faecher); $i++) {
-					echo "ttztztztztz".$lehrer->faecher[$i]['fachlehrer'];
-					var_dump($lehrer->remove_angebot_fach($lehrer->faecher[$i]['fid']));
+					$lehrer->remove_angebot_fach($lehrer->faecher[$i]['fid']);
 				}
 			}
 			if(isset($_POST['fach']) && count($lehrer->faecher) != 0) {
 				for ($i = 0; $i < count($lehrer->faecher); $i++) {
-					echo "ttztztztztz".$lehrer->faecher[$i]['fachlehrer'];
-					var_dump($lehrer->remove_angebot_fach($lehrer->faecher[$i]['fid']));
+					$lehrer->remove_angebot_fach($lehrer->faecher[$i]['fid']);
 				}
 				$lehrer->load_lehrer_pid(-1);
 			}
-			var_dump($lehrer);
 			if(isset($_POST['fach']) && count($lehrer->faecher) == 0) {
-				echo "ld";
 				for ($i = 0; $i <= count($_POST['fach']); $i++) {
 					if(isset($_POST['fach'][$i])) {
-						echo "test";
-						$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt']);
+						$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt'], $_POST['fach'][$i]['status']);
 					}
 				}
 			}
-			var_dump($lehrer);
-			var_dump($_POST);
+			echo "Die Daten des Lehrers wurden erfolgreich geändert";
 		}
 	}
 	if (isset($_GET['person'])) {
@@ -141,7 +134,7 @@ if (isset($user) && $user->runscript()) {
 		}
 		?>
 <div class="formular_class">
-	<form action="index.php?page=change&change=1" method="POST" novalidate="novalidate">
+	<form action="index.php?page=change&change=1" method="POST">
 		<fieldset style="padding: 40px;">
 			<legend>
 				<b>Person</b>
@@ -221,6 +214,17 @@ if (isset($user) && $user->runscript()) {
 			echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
 			echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
 			echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
+			echo "<select name=\"fach['+ fachzahl +'][status]\">";
+			for($j = 0; $j < count(lehrer::stati); $j++) {
+				echo "<option value=\"". lehrer::stati[$j]."\">". lehrer::stati[$j]."</option>";
+			}
+			echo "</select>";
+		}else{
+			echo "<select name=\"fach['+ fachzahl +'][status]\">";
+			for($j = 0; $j < count(schueler::stati); $j++) {
+				echo "<option value=\"". schueler::stati[$j]."\">". schueler::stati[$j]."</option>";
+			}
+			echo "</select>";
 		}
 		echo "<br><br><a class=\"mybuttons\" onClick=\"deletefach(\'faecherdiv-'+ fachzahl +'\')\">Fach löschen</a><br><br>";
 		?>
@@ -235,12 +239,17 @@ if (isset($user) && $user->runscript()) {
 			document.getElementById(id).parentNode.removeChild(document.getElementById(id));
 			fachzahl--;
 		}
+
+		function deletetime(id) {
+			document.getElementById(id).parentNode.removeChild(document.getElementById(id));
+			zeitzahl--;
+		}
 		
 		function addtime() {
 			var doc = document.createDocumentFragment();
 			var element = document.createElement('div');
 			zeitzahl++;
-			element.innerHTML = '<select name="zeit['+ zeitzahl + '][tag]"><option value="mo">Montag</option><option value="di">Dienstag</option>\
+			element.innerHTML = '<div id="timediv-'+ zeitzahl+'"><select name="zeit['+ zeitzahl + '][tag]"><option value="mo">Montag</option><option value="di">Dienstag</option>\
 	<option value="mi">Mittwoch</option><option value="do">Donnerstag</option>\
 	<option value="fr">Freitag</option>\
 	</select><br>\
@@ -248,7 +257,8 @@ if (isset($user) && $user->runscript()) {
 	<input type="text" class="timepickervon input_text" name="zeit['+zeitzahl + '][from]" value="13:00">\
 	     Bis: \
  	<input type="text" class="timepickerbis input_text" name="zeit['+zeitzahl + '][until]" value="14:00">\
-	<br><br><br><br>';
+ 	<a class="mybuttons" onclick="deletetime(\'timediv-'+zeitzahl+'\')">Zeit löschen</a>\
+	<br><br><br><br></div>';
 			while(element.firstChild) {
 				doc.appendChild(element.firstChild);
 			}
@@ -348,6 +358,25 @@ if (isset($user) && $user->runscript()) {
 					echo "<br><input type=\"radio\" name=\"fach[".($i+1)."][nachweis]\" value=\"true\">Ja";
 					echo "<input type=\"radio\" name=\"fach[".($i+1)."][nachweis]\" value=\"false\" checked style=\"margin-left: 20%;\">Nein";
 				}
+				echo "<select name=\"fach[".($i+1)."][status]\">";
+				for($j = 0; $j < count(lehrer::stati); $j++) {
+					if($sl->faecher[$i]['status'] == lehrer::stati[$j]) {
+						echo "<option value=\"". lehrer::stati[$j]."\" selected>". lehrer::stati[$j]."</option>";
+					}else{
+						echo "<option value=\"". lehrer::stati[$j]."\">". lehrer::stati[$j]."</option>";
+					}
+				}
+				echo "</select>";
+			}else{
+				echo "<select name=\"fach[".($i+1)."][status]\">";
+				for($j = 0; $j < count(schueler::stati); $j++) {
+					if($sl->faecher[$i]['status'] == schueler::stati[$j]) {
+						echo "<option value=\"". schueler::stati[$j]."\" selected>". schueler::stati[$j]."</option>";
+					}else{
+						echo "<option value=\"". schueler::stati[$j]."\">". schueler::stati[$j]."</option>";
+					}
+				}
+				echo "</select>";
 			}
 			echo "<br><br><a class=\"mybuttons\" onClick=\"document.getElementById('faecherdiv-".($i + 1)."').parentNode.removeChild(document.getElementById('faecherdiv-".($i + 1)."'))\">Fach löschen</a><br><br>";
 			echo "</div>";
@@ -363,7 +392,7 @@ if (isset($user) && $user->runscript()) {
 			<div id="insertzeit">
 			<?php
 		for($i = 0; $i < count($sl->zeit); $i++) {
-			echo "<select name=\"zeit[$i][tag]\">";
+			echo "<div id=\"timediv-".( $i+1 )."\"><select name=\"zeit[".($i+1)."][tag]\">";
 			$tagekuerzel = array(
 					"mo",
 					"di",
@@ -387,10 +416,11 @@ if (isset($user) && $user->runscript()) {
 			}
 			echo "</select><br>
 			<br>Von: 
-			<input type=\"text\" class=\"timepickervon input_text\" name=\"zeit[". $i . "][from]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['anfang'])) . "\">
+			<input type=\"text\" class=\"timepickervon input_text\" name=\"zeit[". ($i+1) . "][from]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['anfang'])) . "\">
 	    	 Bis: 
-		 	<input type=\"text\" class=\"timepickerbis input_text\" name=\"zeit[". $i ."][until]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['ende'])) . "\">
-			<br><br><br><br>";
+		 	<input type=\"text\" class=\"timepickerbis input_text\" name=\"zeit[". ($i+1) ."][until]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['ende'])) . "\">
+	 		<a class=\"mybuttons\" onclick=\"deletetime('timediv-". ($i+1) ."')\">Zeit löschen</a>
+			<br><br><br><br></div>";
 		}
 		?>
 			</div>

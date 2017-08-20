@@ -4,7 +4,9 @@ $GLOBAL_CONFIG = array();
 
 // 0 = nur return false, 1 = die();
 $GLOBAL_CONFIG['$exit_on_db_failure'] = 0;
-$GLOBAL_CONFIG['dbuser'] = 'schuefi';
+$GLOBAL_CONFIG['dbuser'] = '';
+$GLOBAL_CONFIG['host'] = '';
+$GLOBAL_CONFIG['dbname'] = '';
 $GLOBAL_CONFIG['mail_address'] = 'schuelerfirma.sender.hgr@gmx.de';
 
 //passwörter werden in includes/db_data.php gesetzt

@@ -27,7 +27,6 @@ if(isset($user) && $user->runscript()){
 
 <?php
 	if(isset($_GET['send'])){
-		var_dump($_POST);
 		$mail = new PHPMailer();
 		$mail->Host = 'mail.gmx.net';
 		$mail->SMTPAuth = true;
@@ -45,23 +44,32 @@ if(isset($user) && $user->runscript()){
 		if(isset($_SESSION['mail_step3']) && isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step2'])){
 			if($_SESSION['mail_step1']['mailart'] == 1 && isset($_SESSION['schuelermail']) && isset($_SESSION['lehrermail'])){
 				$mail->addAddress('yajo10@yahoo.de', 'Kundenberatung - Schülerfirma');
-//				$mail->addBCC("schuelerfirma.hgr@gmx.de", "Schülerfirma");
-				$mail->addReplyTo("schuelerfirma.hgr@gmx.de", "Schülerfirma - Kundenbetreuung");
+				$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
+				$mail->addReplyTo("schuelerfirma@hgr-web.de", "Schülerfirma - Kundenbetreuung");
 				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
 				$mail->addAttachment("docs/unterricht/".$_SESSION['lehrermail']['anhang']);
 				$mail->Body = $_SESSION['lehrermail']['text'];
 				$mail->Subject = $_SESSION['lehrermail']['betreff'];
-				echo "Mail an Lehrer gesendet";
-				var_dump($mail->send());
+				if (!$mail->send()) {
+					echo "Es ist ein Fehler beim Versenden der Mail aufgetreten.";
+					echo $mail->ErrorInfo;
+				}else{
+					echo "<br><br>Mail an Lehrer erfolgreich gesendet<br>";
+				}
+				$mail->clearAttachments();
+				$mail->clearQueuedAddresses("to");
 				$mail->addAddress('yajo10@yahoo.de', 'Kundenberatung - Schülerfirma');
-//				$mail->addBCC("schuelerfirma.hgr@gmx.de", "Schülerfirma");
-				$mail->addReplyTo("schuelerfirma.hgr@gmx.de", "Schülerfirma - Kundenbetreuung");
 				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
 				$mail->addAttachment("docs/unterricht/".$_SESSION['schuelermail']['anhang']);
 				$mail->Body = $_SESSION['schuelermail']['text'];
 				$mail->Subject = $_SESSION['schuelermail']['betreff'];
-				echo "Mail an Schüler gesendet";
-				var_dump($mail->send());
+				if (!$mail->send()) {
+					echo "Es ist ein Fehler beim Versenden der Mail aufgetreten.";
+					echo $mail->ErrorInfo;
+				}else{
+					echo "<br><br>Mail an Schüler erfolgreich gesendet<br>";
+				}
+				echo "<br><b>Hinweis: Es kann vorkommen, dass trotz der Meldung \"Mail erfolgreich gesendet\" die E-Mail-Adresse falsch war.<br>Deswegen musst du unbedingt nochmal in unseren Mail-Account schauen, ob dort eine Fehlermeldung vorliegt</b>";
 			}
 		}
 		// $mail->send();
@@ -150,7 +158,7 @@ if(isset($user) && $user->runscript()){
 			echo $schueler_output;
 			echo "</div>";
 		}else{
-			$return = query_db("SELECT * FROM `unterricht`");
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = '".get_current_year()."';");
 			$result = $return->fetch();
 			$i = 0;
 			$paar_output = '';
@@ -189,7 +197,6 @@ if(isset($user) && $user->runscript()){
 		if(!isset($_SESSION['mail_step2']) || $_SESSION['mail_step2'] == 0 || count($_POST) != 0){
 			$_SESSION['mail_step2'] = $_POST;
 		}
-		echo "Schritt 3";
 		?>
 <script type="text/javascript">
 	function vermittlungsmail() {
@@ -197,8 +204,8 @@ if(isset($user) && $user->runscript()){
 		document.getElementById('subject').value = 'Deine Nachhilfe in :fach';
 		document.getElementById('anhang').checked = 'checked';
 		document.getElementById('anhang2').checked = 'checked';
-		document.getElementById('textarea2').value = 'Hallo :vorname :nachname,\ndeine erste Nachhilfestunde wird am :tag um :treff_zeit im Zimmer :treff_raum stattfinden.\nDein Schüler ist :vorname_schueler :nachname_schueler.\nBitte setze dich mit Ihm in Kontakt. Du kannst Ihn unter :mail_schueler erreichen.\nBitte lies unbedingt die der E-Mail anghängten Datein.\nSolltest du noch Fragen haben, kannst du uns gerne anschreiben.\n\nLiebe Grüße\nDie Schülerfirma\n\n';
-		
+		document.getElementById('textarea2').value = 'Hallo :vorname :nachname,\ndeine erste Nachhilfestunde wird am :tag um :treff_zeit im Zimmer :treff_raum stattfinden.\nDein Schüler ist :vorname_schueler :nachname_schueler.\nBitte setze dich mit Ihm in Kontakt. Du kannst Ihn unter :email_schueler erreichen.\nBitte lies unbedingt die der E-Mail anghängten Datein.\nSolltest du noch Fragen haben, kannst du uns gerne anschreiben.\n\nLiebe Grüße\nDie Schülerfirma\n\n';
+		document.getElementById('textarea1').value = 'Hallo :vorname :nachname,\ndeine erste Nachhilfestunde wird am :tag um :treff_zeit im Zimmer :treff_raum stattfinden.\nDein Lehrer ist :vorname_lehrer :nachname_lehrer.\nBitte lies unbedingt die der E-Mail angehängten Datein.\nSolltest du noch Fragen haben, kannst du uns gerne schreiben.\n\nLiebe Grüße\nDie Schülerfirma\n';
 	}
 	function add_text(text, element) {
 		var content = document.getElementById(element).value;
