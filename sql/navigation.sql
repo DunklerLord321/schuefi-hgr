@@ -38,4 +38,5 @@ INSERT INTO `navigation` (`kuerzel`, `path`, `allowed_users`, `visible`) VALUES
 ('create_doc', 'includes/inc.create_doc.php', 'k',1),
 ('output_person' ,'includes/inc.output_person.php', 'w', 1),
 ('input_finanzen', 'includes/inc.input_finanz.php','f',1),
+('output_finanzen', 'includes/inc.output_finanz.php', 'w', 1),
 ('backup_data', 'includes/inc.backup_data.php', 'v',1);

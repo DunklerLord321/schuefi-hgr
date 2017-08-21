@@ -21,7 +21,7 @@ error_reporting(E_ERROR);
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
 try{
-$pdo_obj = new PDO('mysql:host='.$GLOBAL_CONFIG['host'].';dbname='.$GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
+$pdo = new PDO('mysql:host='.$GLOBAL_CONFIG['host'].';dbname='.$GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 		PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
 ));
 } catch (PDOException $e) {
@@ -150,18 +150,14 @@ if (isset($_GET['page'])) {
 				<a href="index.php?page=input_finanzen">Eingabe Finanzen</a>
 			</li>
 			<?php }?>
+			<li <?php if(strcmp($active, "output_finanzen") == 0 ) { echo "class=\"active\""; }?>>
+				<a href="index.php?page=output_finanzen">Ausgabe Finanzen</a>
+			</li>
 		</ul>
 	</nav>
 	<!-- - div endet in letzter Zeile   -->
 	<div class="content">
 	<?php
-		try {
-			$pdo = new PDO("mysql:host=".$GLOBAL_CONFIG['host'].";dbname=".$GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
-					PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
-			));
-		} catch (pdoException $e) {
-			echo 'Connection failed: ' . $e->getMessage();
-		}
 		require 'includes/functions.inc.php';
 		$ret_prep = query_db("SELECT * FROM navigation WHERE kuerzel = :kuerzel", $_GET['page']);
 		$result = $ret_prep->fetch();

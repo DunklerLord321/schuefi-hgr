@@ -144,14 +144,8 @@ class user {
 
 	//Holt alle Informationen über Nutzer aus DB, wenn angegebene E-Mail existiert
 	function setmail($m_mail) {
-		global $pdo_obj;
-		global $pdo;
-		// var_dump($this->pdo_obj);
 		$this->email = $m_mail;
-		$statement = $pdo_obj->prepare("SELECT * FROM users WHERE email = :email");
-		$result = $statement->execute(array(
-				'email' => $this->email
-		));
+		$result = query_db("SELECT * FROM users WHERE email = :email", $this->email);
 		$user = $statement->fetch();
 		if ($user !== false) {
 			$this->vname = $user['vname'];
@@ -160,10 +154,6 @@ class user {
 			$this->hash_password = $user['passwort'];
 			$this->id = $user['id'];
 			$this->count_login_trys = intval($user['count_login']);
-			require 'includes/global_vars.inc.php';
-			$pdo = new PDO("mysql:host=".$GLOBAL_CONFIG['host'].";dbname=".$GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
-					PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
-			));
 			return true;
 		} else {
 			$this->error = "Ein Nutzer mit dieser E-Mail-Adresse existiert leider nicht";
@@ -271,7 +261,6 @@ class user {
 	private function send_mail() {
 		require 'mail/class.phpmailer.php';
 		require 'mail/class.smtp.php';
-		global $pdo_obj;
 		$mail = new PHPMailer();
 		// $mail->isSMTP();
 		$mail->Host = 'mail.gmx.net';
@@ -285,7 +274,7 @@ class user {
 		$mail->SetLanguage("de");
 		
 		$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
-		$stat = $pdo_obj->query("SELECT `email` FROM `users` WHERE `account` = 'v'");
+		$stat = query_db("SELECT `email` FROM `users` WHERE `account` = 'v'");
 		$result = $stat->fetch();
 		while ( $result ) {
 			$mail->addAddress($result['email'], 'Anmeldefehler');

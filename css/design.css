@@ -365,3 +365,17 @@ button {
     border-style: solid;
     border-color: transparent black transparent transparent;
 }
+
+.table1 {
+	width: 100%;
+	border: none;
+	border-collapse: collapse;
+}
+
+.table1 td{
+	text-align: center;
+}
+
+.table1 tr:NTH-CHILD(even) {
+	background-color: #dddddd;	
+}

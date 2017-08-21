@@ -1,6 +1,4 @@
 <?php
-global $pdo_obj;
-
 function get_name_of_tag($kuerzel) {
 	$tage = array(
 			'mo' => 'Montag',
@@ -88,6 +86,7 @@ function format_klassenstufe_kurs($klassenstufe, $klasse) {
 	}
 }
 
+//Bei Fehler wird false zurückgegeben
 function query_db($statement, ...$params) {
 	global $exit_on_db_failure;
 	global $pdo;
