@@ -25,7 +25,7 @@ if (isset($user) && $user->runscript()) {
 			die();
 		}
 		for($i = 1; $i <= count($_POST['fach']); $i++) {
-			$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer']);
+			$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], 'neu');
 		}
 		for($i = 1; $i <= count($_POST['zeit']); $i++) {
 			$schueler->add_time($_POST['zeit'][$i]);
@@ -47,7 +47,7 @@ if (isset($user) && $user->runscript()) {
 			die();
 		}
 		for($i = 1; $i <= count($_POST['fach']); $i++) {
-			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], $_POST['fach'][$i]['nachweis'], $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt']);
+			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], $_POST['fach'][$i]['nachweis'], $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt'], 'neu');
 		}
 		for($i = 1; $i <= count($_POST['zeit']); $i++) {
 			$lehrer->add_time($_POST['zeit'][$i]);

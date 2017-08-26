@@ -17,6 +17,7 @@ error_reporting(E_ERROR);
 <script src="includes/jquery/jquery-ui-1.12.1/jquery-ui.js"></script>
 
 </head>
+<body>
 <?php
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
@@ -37,9 +38,9 @@ if (!isset($user)) {
 if (isset($_GET['reset'])) {
 	$user->reset();
 }
-
 if (isset($_GET['page'])) {
 	if ($_GET['page'] == 'logout') {
+		$user->logout();
 		?>
 	<nav>
 		<div class="navigation">
@@ -61,11 +62,12 @@ if (isset($_GET['page'])) {
 		<nav style="position: fixed;" class="nav">
 		<div class="navigation">
 			<a <?php if(strcmp($active, "content") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?> href="index.php?page=content">Hauptseite</a>
-			<a <?php if(strcmp($active, "user") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?> href="index.php?page=user" id="log_in">Passwort ändern</a>
-				<div class="dropdiv <?php if(strcmp($active, "settings") == 0 || strcmp($active, "backup_data") == 0 ) { echo "dropdiv_active"; }?>">
+			<a <?php if(strcmp($active, "change_passwd") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?> href="index.php?page=change_passwd" id="log_in">Passwort ändern</a>
+				<div class="dropdiv <?php if(strcmp($active, "settings") == 0 || strcmp($active, "backup_data") == 0 || strcmp($active, "user") == 0 ) { echo "dropdiv_active"; }?>">
 					<button class="dropdown">Einstellungen</button>
 					<div class="dropdown-content">
 						<a href="index.php?page=settings">Log-Datei</a>
+						<a href="index.php?page=user">Ausgeben aller Nutzer</a>
 						<a href="index.php?page=backup_data">Backups</a>
 					</div>
 				</div>

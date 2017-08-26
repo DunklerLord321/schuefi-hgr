@@ -4,8 +4,10 @@
 	margin-right: 100px;
 	margin-top: 0px;
 }
+@import url('https://fonts.googleapis.com/css?family=Roboto+Slab|Merriweather+Sans:300');
+
 body{
-	font-family: 'Open Sans', 'sans-serif';
+	font-family: 'Merriweather Sans Light', 'Merriweather Sans', sans-serif;
 }
 
 .content {
@@ -370,6 +372,7 @@ button {
 	width: 100%;
 	border: none;
 	border-collapse: collapse;
+	line-height: 150%;
 }
 
 .table1 td{

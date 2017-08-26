@@ -2,6 +2,11 @@
 if(isset($user) && $user->runscript()){
 	echo "<h1>Neuer Finanzeintrag</h1>";
 	if(isset($_GET['finanzeingabe'])) {
+		if((!isset($_POST['uid']) && !isset($_POST['pid'])) || ($_POST['uid'] == "-1" && $_POST['pid'] == "-1")) {
+			echo "Bitte wähle eine Person oder einen Schülerfirmamitarbeiter aus";
+			$user->log(user::LEVEL_WARNING, "Weder Person noch Schufimitarbeiter ausgewählt beim Finanzeingeben");
+			die();
+		}
 		if(!isset($_POST['uid'])) {
 			$_POST['uid'] = NULL;
 			$_POST['pid'] = intval($_POST['pid']);
@@ -13,9 +18,15 @@ if(isset($user) && $user->runscript()){
 			$error = $error . "<br><br>Bitte gib ein gültiges Datum an.";
 		} else {
 			$time = strtotime($_POST['datum']);
-			$datum = date('Y-m-d', $time);
+			$datum = date('Y-m-d H:i:s', $time);
 		}
-		$return = query_db("INSERT INTO `finanzuebersicht` (`pid`, `uid`, `geldbetrag`, `betreff`, `bemerkung`, `konto_bar`,`datum`) VALUES(:pid, :uid, :betrag, :betreff, :bemerkung, :konto_bar, :datum)", $_POST['pid'], $_POST['uid'], intval($_POST['betrag']), $_POST['betreff'], $_POST['bemerkung'], $_POST['typ'], $_POST['datum']);
+		if(strlen($_POST['eingabe']) != 0) {
+			$betrag = intval($_POST['eingabe']);
+		}else{
+			$betrag = intval($_POST['ausgabe']);
+			$betrag = 0-$betrag;
+		}
+		$return = query_db("INSERT INTO `finanzuebersicht` (`pid`, `uid`, `geldbetrag`, `betreff`, `bemerkung`, `konto_bar`,`datum`) VALUES(:pid, :uid, :betrag, :betreff, :bemerkung, :konto_bar, :datum)", $_POST['pid'], $_POST['uid'], intval($betrag), $_POST['betreff'], $_POST['bemerkung'], $_POST['typ'], $datum);
 		if($return) {
 			echo "Erfolgreich hinzugefügt";
 		}else{

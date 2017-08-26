@@ -144,9 +144,10 @@ class user {
 
 	//Holt alle Informationen über Nutzer aus DB, wenn angegebene E-Mail existiert
 	function setmail($m_mail) {
+		require 'includes/functions.inc.php';
 		$this->email = $m_mail;
 		$result = query_db("SELECT * FROM users WHERE email = :email", $this->email);
-		$user = $statement->fetch();
+		$user = $result->fetch();
 		if ($user !== false) {
 			$this->vname = $user['vname'];
 			$this->nname = $user['nname'];
@@ -244,7 +245,7 @@ class user {
 			return  false;
 		}
 		$passwort_hash = password_hash($password_neu, PASSWORD_DEFAULT);
-		$return = query_db("UPDATE `users` SET passwort = :passwort_hash WHERE id = :id", $passwort_hash, $this->id);
+		$return = query_db("UPDATE `users` SET passwort = :passwort_hash, `update_time` = CURRENT_TIME() WHERE id = :id", $passwort_hash, $this->id);
 		if($return) {
 			$this->log(user::LEVEL_NOTICE, "Passwort erfolgreich geändert");
 			return true;
@@ -305,16 +306,20 @@ class user {
 		}
 	}
 	function logout() {
-		global $pdo;
+		global $user;
+		unset($_SESSION['user']);
 		$this->id = NULL;
 		$this->vname = "";
 		$this->nname = "";
 		$this->account = "";
+		$this->hash_password = "";
 		$this->password = "";
 		$this->count_login_trys = 0;
-		$pdo = NULL;
 		//email ist notwendig, um zu sehen, wer sich abmeldet
-		$this->log(user::LEVEL_NOTICE, "Logout erfolgreich");
+		if(isset($this->email)) {
+			$this->log(user::LEVEL_NOTICE, "Logout erfolgreich");
+		}
 		$this->email = "";
+		$_SESSION['user'] = serialize($user);
 	}
 }

@@ -44,6 +44,9 @@ if (isset($user) && $user->runscript()) {
 					echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . $zeit[$i]['anfang'] . " Uhr bis " . $zeit[$i]['ende'] . " Uhr";
 				}
 				echo "</div>";
+				if(strlen($lehrer->get_comment()) > 0) {
+					echo "<br>Kommentar: ".$lehrer->get_comment();
+				}
 				?>
 		</div>
 		<div style="width: 30%; display: inline-block; padding-top: 40px;">
@@ -103,6 +106,9 @@ if (isset($user) && $user->runscript()) {
 					echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . $zeit[$i]['anfang'] . " Uhr bis " . $zeit[$i]['ende'] . " Uhr";
 				}
 				echo "</div>";
+				if(strlen($schueler->get_comment()) > 0) {
+					echo "<br>Kommentar: ".$schueler->get_comment();
+				}
 				?>
 				</div>
 		<div style="width: 30%; display: inline-block; padding-top: 40px;">

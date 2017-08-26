@@ -260,7 +260,7 @@ class lehrer {
 //		var_dump($nachweis_vorhanden);
 //		var_dump($this->id);
 		$nachweis_vorhanden = boolval($nachweis_vorhanden);
-		if (isset($this->id) && is_bool($nachweis_vorhanden) && is_int(intval($fachid)) && array_search($status, self::stati) != false) {
+		if (isset($this->id) && is_bool($nachweis_vorhanden) && is_int(intval($fachid)) && array_search($status, self::stati) !== false) {
 			$return = query_db("SELECT * FROM `bietet_an` WHERE lid = :lid AND fid = :fid", $this->id, $fachid);
 			if ($return->fetch() !== false) {
 				echo "Es existiert bereits ein Angebot für diesen Lehrer und für dieses Fach!";

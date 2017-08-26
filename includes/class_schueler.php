@@ -247,7 +247,7 @@ class schueler {
 	function add_nachfrage_fach($fachid, bool $langfristig, $fachlehrer, $status) {
 		$fachid = intval($fachid);
 //		echo $fachid;
-		if (isset($this->id) && is_bool($langfristig) && is_int($fachid) && array_search($status, self::stati) != false) {
+		if (isset($this->id) && is_bool($langfristig) && is_int($fachid) && array_search($status, self::stati) !== false) {
 			$return = query_db("SELECT * FROM `fragt_nach` WHERE sid = :sid AND fid = :fid", $this->id, $fachid);
 			if ($return->fetch() !== false) {
 				echo "Es existiert bereits ein Angebot für diesen Schüler und für dieses Fach!";
@@ -259,6 +259,7 @@ class schueler {
 //			var_dump($this);
 //			var_dump($langfristig);
 //			var_dump($fachid);
+//			var_dump(array_search($status, self::stati));
 			echo "Ein Fehler ist aufgetreten";
 		}
 	}

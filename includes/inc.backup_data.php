@@ -3,7 +3,7 @@ if(isset($user) && $user->runscript()){
 	echo "<h1>Backups</h1>";
 	echo "<a href=\"index.php?page=backup_data&newbackup=1\" class=\"links\">Neues Backup</a><br><br>";
 	echo "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">";
-	$tables = array('person','faecher','schueler','lehrer','zeit','bietet_an','fragt_nach','unterricht');
+	$tables = array('person','schueler','lehrer','zeit','bietet_an','fragt_nach','unterricht', 'finanzuebersicht');
 	if(isset($_GET['restore'])) {
 		if(file_exists($GLOBAL_CONFIG['backup_dir'].$_GET['restore'])) {
 			$zip = new ZipArchive();
@@ -29,10 +29,16 @@ if(isset($user) && $user->runscript()){
 			if(!$pdo->exec($content)) {
 				$user->log(user::LEVEL_ERROR, "DB-FEHLER:".$pdo-errorInfo());
 			}
-			$pdo->exec("SET foreign_key_checks = 0");
+			$pdo->exec("SET foreign_key_checks = 1");
 		}else{
 			echo "Dieses Backup existiert leider nicht!<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}
+	}else if(isset($_GET['deleteall'])) {
+		$pdo->exec("SET foreign_key_checks = 0");
+		for($i=0; $i < count($tables); $i++) {
+			$result = query_db("DELETE FROM `".$tables[$i]."`;");
+		}
+		$pdo->exec("SET foreign_key_checks = 1");
 	}else if(isset($_GET['delete'])) {
 		if(file_exists($GLOBAL_CONFIG['backup_dir'].$_GET['delete'])) {
 			if(unlink($GLOBAL_CONFIG['backup_dir'].$_GET['delete'])) {
@@ -152,6 +158,7 @@ function warnfordelete() {
 				
 				<?php
 			}	
+			echo "<br><br><a href=\"index.php?page=backup_data&deleteall=1\" class=\"links2\">Lösche alle Daten aus der Datenbank ohne Wiederherstellen eines Backups</a>";
 		}else{
 			echo "Es existiert noch kein Backup";
 		}

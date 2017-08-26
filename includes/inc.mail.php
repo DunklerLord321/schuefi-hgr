@@ -43,7 +43,7 @@ if(isset($user) && $user->runscript()){
 		// $mail->addReplyTo($email, $vorname.' '.$name);
 		if(isset($_SESSION['mail_step3']) && isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step2'])){
 			if($_SESSION['mail_step1']['mailart'] == 1 && isset($_SESSION['schuelermail']) && isset($_SESSION['lehrermail'])){
-				$mail->addAddress('yajo10@yahoo.de', 'Kundenberatung - Schülerfirma');
+				$mail->addAddress($_SESSION['lehrermail']['empfaenger'], 'Kundenberatung - Schülerfirma');
 				$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
 				$mail->addReplyTo("schuelerfirma@hgr-web.de", "Schülerfirma - Kundenbetreuung");
 				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
@@ -58,7 +58,7 @@ if(isset($user) && $user->runscript()){
 				}
 				$mail->clearAttachments();
 				$mail->clearQueuedAddresses("to");
-				$mail->addAddress('yajo10@yahoo.de', 'Kundenberatung - Schülerfirma');
+				$mail->addAddress($_SESSION['schuelermail']['empfaenger'], 'Kundenberatung - Schülerfirma');
 				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
 				$mail->addAttachment("docs/unterricht/".$_SESSION['schuelermail']['anhang']);
 				$mail->Body = $_SESSION['schuelermail']['text'];

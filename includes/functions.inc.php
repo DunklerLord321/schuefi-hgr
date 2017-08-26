@@ -62,7 +62,7 @@ function get_faecher_id_of_name($fachname) {
 	}
 }
 function get_current_year() {
-	return "1617";
+//	return "1617";
 	$year = intval(date('y'));
 	// echo date('y');
 	$comp_date = intval(date('md'));
