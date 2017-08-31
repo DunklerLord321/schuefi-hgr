@@ -4,7 +4,7 @@ if (isset($user) && $user->runscript()) {
 	$showFormular = true;
 	if (isset($_GET['register'])) {
 		$return = $user->adduser($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['passwort'], $_POST['passwort2'], $_POST['account']);
-		if($return !== false) {
+		if ($return !== false) {
 			echo $return;
 		}else {
 			$user->geterror();
@@ -57,7 +57,7 @@ if (isset($user) && $user->runscript()) {
 </div>
 <?php
 	} // Ende von if($showFormular)
-} else {
+}else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }
 

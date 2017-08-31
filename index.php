@@ -21,11 +21,11 @@ error_reporting(E_ERROR);
 <?php
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
-try{
-$pdo = new PDO('mysql:host='.$GLOBAL_CONFIG['host'].';dbname='.$GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
-		PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
-));
-} catch (PDOException $e) {
+try {
+	$pdo = new PDO('mysql:host=' . $GLOBAL_CONFIG['host'] . ';dbname=' . $GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
+			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
+	));
+}catch (PDOException $e) {
 	echo "<h1>Ein DB-Fehler ist aufgetreten (01)$e<h1>";
 	die();
 }
@@ -50,21 +50,45 @@ if (isset($_GET['page'])) {
 	<div class="content">
 		<h1>Logout</h1>
 		<br>
-		<?php if($GLOBAL_CONFIG['bauarbeiten']){echo "Es finden gerade Bauarbeiten am System statt. Bitte versuche es später nochmal.<br><br>";}?>
+		<?php
+		
+if ($GLOBAL_CONFIG['bauarbeiten']) {
+			echo "Es finden gerade Bauarbeiten am System statt. Bitte versuche es später nochmal.<br><br>";
+		}
+		?>
 		Sie wurden erfolgreich abgemeldet.
 		<br>
 		<br>
 		<a href="index.php?login=1" class="links2">Hier geht es zum Login.</a>
 	</div>
 		<?php
-	} else if ($user->is_valid()) {
+	}else if ($user->is_valid()) {
 		$active = $_GET['page'];
 		?>
 		<nav style="position: fixed;" class="nav">
 		<div class="navigation">
-			<a <?php if(strcmp($active, "content") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?> href="index.php?page=content">Hauptseite</a>
-			<a <?php if(strcmp($active, "change_passwd") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?> href="index.php?page=change_passwd" id="log_in">Passwort ändern</a>
-				<div class="dropdiv <?php if(strcmp($active, "settings") == 0 || strcmp($active, "backup_data") == 0 || strcmp($active, "user") == 0 ) { echo "dropdiv_active"; }?>">
+			<a <?php
+		
+if (strcmp($active, "content") == 0) {
+			echo "class=\"navigation_active\"";
+		}else {
+			echo "class=\"navigation_li\"";
+		}
+		?> href="index.php?page=content">Hauptseite</a>
+			<a <?php
+		
+if (strcmp($active, "change_passwd") == 0) {
+			echo "class=\"navigation_active\"";
+		}else {
+			echo "class=\"navigation_li\"";
+		}
+		?> href="index.php?page=change_passwd" id="log_in">Passwort ändern</a>
+				<div class="dropdiv <?php
+		
+if (strcmp($active, "settings") == 0 || strcmp($active, "backup_data") == 0 || strcmp($active, "user") == 0) {
+			echo "dropdiv_active";
+		}
+		?>">
 					<button class="dropdown">Einstellungen</button>
 					<div class="dropdown-content">
 						<a href="index.php?page=settings">Log-Datei</a>
@@ -72,39 +96,84 @@ if (isset($_GET['page'])) {
 						<a href="index.php?page=backup_data">Backups</a>
 					</div>
 				</div>
-			<a <?php if(strcmp($active, "logout") == 0 ) { echo "class=\"navigation_active\""; }else { echo "class=\"navigation_li\"";}?> href="index.php?page=logout">Abmelden</a>
-				<?php	echo "<a class=\"navigation_li\" href=\"index.php?page=user\">Du bist als " . $user->getemail() . " angemeldet.</a>";
+			<a <?php
+		
+if (strcmp($active, "logout") == 0) {
+			echo "class=\"navigation_active\"";
+		}else {
+			echo "class=\"navigation_li\"";
+		}
+		?> href="index.php?page=logout">Abmelden</a>
+				<?php
+		
+echo "<a class=\"navigation_li\" href=\"index.php?page=user\">Du bist als " . $user->getemail() . " angemeldet.</a>";
 		?>
 		</div>
 		</nav>
 	<nav>
 		<ul class="nav_seite">
-		<?php if($user->isuserallowed('k')) {?>
-			<li <?php if(strcmp($active, "person") == 0 ) { echo "class=\"active\""; }?>>
+		<?php
+		
+if ($user->isuserallowed('k')) {
+			?>
+			<li <?php
+			
+if (strcmp($active, "person") == 0) {
+				echo "class=\"active\"";
+			}
+			?>>
 				<a href="index.php?page=person"> Neue Person</a>
 			</li>
-			<li <?php if(strcmp($active, "input") == 0 && strpos($_SERVER['QUERY_STRING'], "schueler=1") !== false) { echo "class=\"active\""; }?>>
+			<li <?php
+			
+if (strcmp($active, "input") == 0 && strpos($_SERVER['QUERY_STRING'], "schueler=1") !== false) {
+				echo "class=\"active\"";
+			}
+			?>>
 				<a href="index.php?page=input&schueler=1"> Neuer Nachhilfeschüler</a>
 			</li>
-			<li <?php if(strcmp($active, "input") == 0 && strpos($_SERVER['QUERY_STRING'], "lehrer=1") !== false) { echo "class=\"active\""; }?>>
+			<li <?php
+			
+if (strcmp($active, "input") == 0 && strpos($_SERVER['QUERY_STRING'], "lehrer=1") !== false) {
+				echo "class=\"active\"";
+			}
+			?>>
 				<a href="index.php?page=input&lehrer=1"> Neuer Nachhilfelehrer</a>
 			</li>
-			<li <?php if(strcmp($active, "input_paar") == 0) { echo "class=\"active\""; }?>>
+			<li <?php
+			
+if (strcmp($active, "input_paar") == 0) {
+				echo "class=\"active\"";
+			}
+			?>>
 				<a href="index.php?page=input_paar&paar=1"> Neues Paar</a>
 			</li>
-			<?php }?>
-			<li <?php if(strcmp($active, "output_person") == 0) { echo "class=\"active\""; }?>>
+			<?php
+		
+}
+		?>
+			<li <?php
+		
+if (strcmp($active, "output_person") == 0) {
+			echo "class=\"active\"";
+		}
+		?>>
 				<a href="index.php?page=output_person"> Ausgeben der Personen</a>
 			</li>
-			<?php 
-			if (strcmp($active, "change") == 0 && strpos($_SERVER['QUERY_STRING'], 'person') !== false) {
-				?>
+			<?php
+		if (strcmp($active, "change") == 0 && strpos($_SERVER['QUERY_STRING'], 'person') !== false) {
+			?>
 			<li class="active">
 				<a href="index.php?page=output_person" style="text-align: right;"> Ändern einer Person</a>
 			</li><?php
-					}
-			?>
-			<li <?php if(strcmp($active, "output") == 0 && strpos($_SERVER['QUERY_STRING'], "schueler=1") !== false) { echo "class=\"active\""; }?>>
+		}
+		?>
+			<li <?php
+		
+if (strcmp($active, "output") == 0 && strpos($_SERVER['QUERY_STRING'], "schueler=1") !== false) {
+			echo "class=\"active\"";
+		}
+		?>>
 				<a href="index.php?page=output&schueler=1"> Ausgeben der Schüler</a>
 			</li>
 				<?php
@@ -123,7 +192,12 @@ if (isset($_GET['page'])) {
 			</li><?php
 		}
 		?>
-			<li <?php if(strcmp($active, "output") == 0 && strpos($_SERVER['QUERY_STRING'], "lehrer=1") !== false) { echo "class=\"active\""; }?>>
+			<li <?php
+		
+if (strcmp($active, "output") == 0 && strpos($_SERVER['QUERY_STRING'], "lehrer=1") !== false) {
+			echo "class=\"active\"";
+		}
+		?>>
 				<a href="index.php?page=output&lehrer=1"> Ausgeben der Lehrer</a>
 			</li>
 				<?php
@@ -142,18 +216,44 @@ if (isset($_GET['page'])) {
 			</li><?php
 		}
 		?>
-			<li <?php if(strcmp($active, "output") == 0 && strcmp($_SERVER['QUERY_STRING'], "paare=1") == 0) { echo "class=\"active\""; }?>>
+			<li <?php
+		
+if (strcmp($active, "output") == 0 && strcmp($_SERVER['QUERY_STRING'], "paare=1") == 0) {
+			echo "class=\"active\"";
+		}
+		?>>
 				<a href="index.php?page=output&paare=1"> Ausgeben der Paare</a>
 			</li>
-			<li <?php if(strcmp($active, "mail") == 0 ) { echo "class=\"active\""; }?>>
+			<li <?php
+		
+if (strcmp($active, "mail") == 0) {
+			echo "class=\"active\"";
+		}
+		?>>
 				<a href="index.php?page=mail&step=1"> Sende E-Mail</a>
 			</li>
-			<?php if($user->isuserallowed('f')) {?>
-			<li <?php if(strcmp($active, "input_finanzen") == 0 ) { echo "class=\"active\""; }?>>
+			<?php
+		
+if ($user->isuserallowed('f')) {
+			?>
+			<li <?php
+			
+if (strcmp($active, "input_finanzen") == 0) {
+				echo "class=\"active\"";
+			}
+			?>>
 				<a href="index.php?page=input_finanzen">Eingabe Finanzen</a>
 			</li>
-			<?php }?>
-			<li <?php if(strcmp($active, "output_finanzen") == 0 ) { echo "class=\"active\""; }?>>
+			<?php
+		
+}
+		?>
+			<li <?php
+		
+if (strcmp($active, "output_finanzen") == 0) {
+			echo "class=\"active\"";
+		}
+		?>>
 				<a href="index.php?page=output_finanzen">Ausgabe Finanzen</a>
 			</li>
 		</ul>
@@ -171,23 +271,23 @@ if (isset($_GET['page'])) {
 						$user->allowrunscript();
 						require $result['path'];
 						$user->denyrunscript();
-					} else {
+					}else {
 						print("Die angefragte Seite konnte nicht gefunden werden!");
 					}
-				} else {
+				}else {
 					echo "Die Seite ist im Moment gesperrt.";
 				}
-			} else {
+			}else {
 				echo "Die gewünschte Seite darfst du nicht besuchen!";
 			}
-		} else {
+		}else {
 			echo "Die angefragte Seite wurde nicht gefunden!";
 		}
 		
 		?>
 	</div>
 	<?php
-	} else {
+	}else {
 		?>
 	<nav>
 		<div class="navigation">
@@ -206,7 +306,7 @@ if (isset($_GET['page'])) {
 <?php
 		die();
 	}
-} else {
+}else {
 	$user->logout();
 	?>
 	<nav>

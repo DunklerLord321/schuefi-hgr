@@ -23,7 +23,7 @@ class person {
 				'id' => $pid
 		));
 		$result = $ret_prep->fetch();
-		if($result === false) {
+		if ($result === false) {
 			return false;
 		}
 		$this->id = $pid;
@@ -60,11 +60,11 @@ class person {
 		if (strlen($geburtstag) != 0) {
 			if (!strtotime($geburtstag)) {
 				$error = $error . "<br><br>Bitte gib ein gültiges Geburtsdatum an.";
-			} else {
+			}else {
 				$time = strtotime($geburtstag);
 				$geburtstag = date('Y-m-d', $time);
 			}
-		} else {
+		}else {
 			$geburtstag = NULL;
 		}
 		if (strlen($error) > 0) {
@@ -74,7 +74,7 @@ class person {
 		// Teste, ob Person bereits vorhanden ist
 		$ret_prep = $pdo->prepare("SELECT * FROM `person` WHERE vname = :vname AND nname = :nname");
 		$return = $ret_prep->execute(array(
-				'vname' => $vname,
+				'vname' => $vname, 
 				'nname' => $nname
 		));
 		if ($return === false)
@@ -82,14 +82,14 @@ class person {
 		$result = $ret_prep->fetch();
 		if ($result !== FALSE) {
 			echo "Diese Person existiert bereits!";
-		} else {
+		}else {
 			// Füge Person zu DB hinzu
 			$ret_prep = $pdo->prepare("INSERT INTO `person` (`vname`,`nname`,`email`,`telefon`,`geburtstag`) VALUES( :vname, :nname, :email, :telefon, :geburtstag)");
 			$return = $ret_prep->execute(array(
-					'vname' => $vname,
-					'nname' => $nname,
-					'email' => $email,
-					'telefon' => $telefon,
+					'vname' => $vname, 
+					'nname' => $nname, 
+					'email' => $email, 
+					'telefon' => $telefon, 
 					'geburtstag' => $geburtstag
 			));
 			if ($return) {
@@ -102,9 +102,9 @@ class person {
 				$result = $return->fetch();
 				$this->id = $result['id'];
 				return true;
-			} else {
+			}else {
 				echo "Ein Fehler ist  aufgetreten";
-//				var_dump($pdo->errorInfo());
+				// var_dump($pdo->errorInfo());
 				return false;
 			}
 		}
@@ -121,12 +121,12 @@ class person {
 		}
 		if (isset($lehrer) && isset($schueler)) {
 			return array(
-					'lehrer' => $lehrer,
+					'lehrer' => $lehrer, 
 					'schueler' => $schueler
 			);
-		} else {
+		}else {
 			return array(
-					'lehrer' => NULL,
+					'lehrer' => NULL, 
 					'schueler' => NULL
 			);
 		}
@@ -157,11 +157,11 @@ class person {
 		if (strlen($geburtstag) != 0) {
 			if (!strtotime($geburtstag)) {
 				$error = $error . "<br><br>Bitte gib ein gültiges Geburtsdatum an.";
-			} else {
+			}else {
 				$time = strtotime($geburtstag);
 				$geburtstag = date('Y-m-d', $time);
 			}
-		} else {
+		}else {
 			$geburtstag = NULL;
 		}
 		if (strlen($error) > 0) {
@@ -177,9 +177,10 @@ class person {
 		if ($result === false) {
 			echo "Diese Person existiert nicht!";
 			return false;
-		} else {
+		}else {
 			// Ändere Person
-			$ret_prep = query_db("UPDATE `person` SET `vname` = :vname, `nname` = :nname, `email` = :email, `telefon` = :telefon, `geburtstag` = :geburtstag WHERE `id` = :id", $vname, $nname, $email, $telefon, $geburtstag, $this->id);;
+			$ret_prep = query_db("UPDATE `person` SET `vname` = :vname, `nname` = :nname, `email` = :email, `telefon` = :telefon, `geburtstag` = :geburtstag WHERE `id` = :id", $vname, $nname, $email, $telefon, $geburtstag, $this->id);
+			;
 			if ($ret_prep) {
 				$this->vname = $vname;
 				$this->nname = $nname;
@@ -187,9 +188,9 @@ class person {
 				$this->telefon = $telefon;
 				$this->geburtstag = $geburtstag;
 				return true;
-			} else {
+			}else {
 				echo "Ein Fehler ist  aufgetreten";
-//				var_dump($pdo->errorInfo());
+				// var_dump($pdo->errorInfo());
 				return false;
 			}
 		}

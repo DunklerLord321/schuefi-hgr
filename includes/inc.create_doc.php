@@ -1,12 +1,11 @@
 <?php
-if(isset($user) && $user->runscript()){
-	if(isset($_GET['createdoc_paar'])){
+if (isset($user) && $user->runscript()) {
+	if (isset($_GET['createdoc_paar'])) {
 		require 'includes/class_paar.php';
 		$paar = new paar($_GET['createdoc_paar']);
 		require 'extensions/tcpdf/TCPDF-master/tcpdf.php';
 		echo "<h2>Erstelle Vermittlungsdokumente</h2>";
 		class MYPDF extends TCPDF {
-		
 			public function Header() {
 				$image_file = 'img/logo.jpg';
 				$this->Image($image_file, 10, 5, 25, '', 'JPG', 'www.hgr-web.de/schuelerfirma', 'T', false, 300, '', false, false, 0, false, false, false);
@@ -16,21 +15,29 @@ if(isset($user) && $user->runscript()){
 				$this->Ln(10);
 				$this->SetFont('helvetica', '', 15);
 				$this->Cell(0, 15, 'Schülerfirma \'Schüler helfen Schülern\'', 0, false, 'C', 0, '', 0, false, 'M', 'M');
-				}
-				public function Footer() {
-					$this->SetY(-15);
-					$this->SetFont('helvetica', '', 8);
-					$this->addHtmlLink('www.hgr-web.de/schuelerfirma', "Website: www.hgr-web.de/schuelerfirma", false, true, array(0,0,0),'',false);
-					$this->Ln(5);
-					$this->addHtmlLink("mailto:schuelerfirma.hgr@gmx.de", "E-Mail-Adresse: schuelerfirma.hgr@gmx.de" ,false, true, array(0,0,0),'',false);
-					$this->Cell(0, 0, 'Seite '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');
-				}
+			}
+			public function Footer() {
+				$this->SetY(-15);
+				$this->SetFont('helvetica', '', 8);
+				$this->addHtmlLink('www.hgr-web.de/schuelerfirma', "Website: www.hgr-web.de/schuelerfirma", false, true, array(
+						0, 
+						0, 
+						0
+				), '', false);
+				$this->Ln(5);
+				$this->addHtmlLink("mailto:schuelerfirma.hgr@gmx.de", "E-Mail-Adresse: schuelerfirma.hgr@gmx.de", false, true, array(
+						0, 
+						0, 
+						0
+				), '', false);
+				$this->Cell(0, 0, 'Seite ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');
+			}
 		}
 		
-		for($i = 0; $i < 2; $i++){
-			if($i == 0) {
+		for ($i = 0; $i < 2; $i++) {
+			if ($i == 0) {
 				$file = file_get_contents("docs/vorlage.html");
-			}else{
+			}else {
 				$file = file_get_contents("docs/vorlage_schueler.html");
 			}
 			$file = str_replace("::namelehrer", $paar->lehrer->person->vname . " " . $paar->lehrer->person->nname, $file);
@@ -48,13 +55,13 @@ if(isset($user) && $user->runscript()){
 			$pdf->SetSubject('Vermittlung');
 			
 			$pdf->setHeaderFont(Array(
-					PDF_FONT_NAME_MAIN,
-					'',
+					PDF_FONT_NAME_MAIN, 
+					'', 
 					PDF_FONT_SIZE_MAIN
 			));
 			$pdf->setFooterFont(Array(
-					PDF_FONT_NAME_DATA,
-					'',
+					PDF_FONT_NAME_DATA, 
+					'', 
 					PDF_FONT_SIZE_DATA
 			));
 			$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
@@ -67,18 +74,18 @@ if(isset($user) && $user->runscript()){
 			
 			$pdf->AddPage();
 			$pdf->writeHTML($file, true, false, true, false, '');
-			if($i == 0) {
+			if ($i == 0) {
 				$pdf->Output(__DIR__ . '/../docs/unterricht/lehrer-' . $paar->lehrer->get_id() . 'paar-' . $paar->paarid . '.pdf', 'F');
 				$paar->adddokument('lehrer-' . $paar->lehrer->get_id() . 'paar-' . $paar->paarid . '.pdf');
 				echo "Dokument 1 erfolgreich erstellt<br><br>";
-			}else{
+			}else {
 				$pdf->Output(__DIR__ . '/../docs/unterricht/schueler-' . $paar->schueler->get_id() . 'paar-' . $paar->paarid . '.pdf', 'F');
-				$paar->adddokument("",'schueler-' . $paar->schueler->get_id() . 'paar-' . $paar->paarid . '.pdf');
+				$paar->adddokument("", 'schueler-' . $paar->schueler->get_id() . 'paar-' . $paar->paarid . '.pdf');
 				echo "Dokument 2 erfolgreich erstellt<br><br>";
 			}
 		}
-		echo "<a href=\"index.php?page=output&paare=1&filter=".$paar->paarid."\" class=\"links2\">Zurück zum Paar</a>";
+		echo "<a href=\"index.php?page=output&paare=1&filter=" . $paar->paarid . "\" class=\"links2\">Zurück zum Paar</a>";
 	}
-}else{
+}else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }

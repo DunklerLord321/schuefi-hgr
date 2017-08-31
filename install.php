@@ -1,11 +1,11 @@
 <?php
-if(isset($_GET['user']) && isset($_GET['passwd'])) {
+if (isset($_GET['user']) && isset($_GET['passwd'])) {
 	echo "Test Connection";
 	var_dump($_GET);
-	try{
+	try {
 		$pdo = new PDO('mysql:dbname=DB3071995;host=rdbms.strato.de', 'U3071995', 'hg8BG3A+gKlr5H4e86S5-P');
 	}catch (PDOException $e) {
-		echo "FEHLER ".$e;
+		echo "FEHLER " . $e;
 		die();
 	}
 	var_dump($pdo);
@@ -34,6 +34,6 @@ if(isset($_GET['user']) && isset($_GET['passwd'])) {
 	var_dump($pdo->exec($content));
 	fclose($file);
 	echo "Finish";
-}else{
+}else {
 	echo "Gib als GET user, host, dbname und passwd an";
 }

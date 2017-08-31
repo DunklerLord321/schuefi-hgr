@@ -3,14 +3,14 @@ if (isset($user) && $user->runscript()) {
 	echo "<h2>Profil ändern</h2>";
 	$show_formular = true;
 	if (isset($_GET['change']) && $_GET['change'] == 1) {
-		if($user->neuespassword($_POST['passwort_alt'], $_POST['passwort_neu1'], $_POST['passwort_neu2'])) {
+		if ($user->neuespassword($_POST['passwort_alt'], $_POST['passwort_neu1'], $_POST['passwort_neu2'])) {
 			unset($_SESSION['user']);
 			echo "Dein Passwort wurde erfolgreich geändert. Bitte melde dich erneut an.
 					<meta http-equiv=\"refresh\" content=\"5;url=index.php\"
 					<br>Du wirst in 5 Sekunden auttomatisch zum Logout weitergeleitet.<br><br>
 			  		Für manuelle Weiterleitung hier klicken: <a href=\"index.php\">Login</a>";
 			$show_formular = false;
-		}else{
+		}else {
 			echo $user->geterror();
 		}
 	}
@@ -38,7 +38,7 @@ if (isset($user) && $user->runscript()) {
 
 <?php
 	}
-} else {
+}else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }
 

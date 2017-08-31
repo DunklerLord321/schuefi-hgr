@@ -1,9 +1,9 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Ausgabe</h2>";
-	if(isset($_GET['filter'])) {
+	if (isset($_GET['filter'])) {
 		$return = query_db("Select * FROM `person` WHERE id = :id", $_GET['filter']);
-	}else{
+	}else {
 		$return = query_db("SELECT * FROM `person`");
 	}
 	$result = $return->fetch();
@@ -12,7 +12,7 @@ if (isset($user) && $user->runscript()) {
 	require 'includes/class_schueler.php';
 	$person = new person();
 	if ($result !== false) {
-		while ( $result ) {
+		while ($result) {
 			$person->load_person($result['id']);
 			?>
 <fieldset style="padding: 40px; width: 80%;">
@@ -33,24 +33,25 @@ if (isset($user) && $user->runscript()) {
 				?>
 				<div style="padding-left: 10%;">
 				<?php
-				echo "<br><br><a href=\"index.php?page=output&lehrer=1&filter=".$person->id."\" class=\"links2\">$person->vname $person->nname ist als Nachhilfelehrer tätig</a>";
+				echo "<br><br><a href=\"index.php?page=output&lehrer=1&filter=" . $person->id . "\" class=\"links2\">$person->vname $person->nname ist als Nachhilfelehrer tätig</a>";
 				?>
 				</div>
 				<?php
 			}
-			if(is_array($schueler_lehrer['schueler'])) {
+			if (is_array($schueler_lehrer['schueler'])) {
 				?>
 				<div style="padding-left: 10%;">
 				<?php
-				echo "<br><br><a href=\"index.php?page=output&schueler=1&filter=".$person->id."\" class=\"links2\">$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet</a>";
+				echo "<br><br><a href=\"index.php?page=output&schueler=1&filter=" . $person->id . "\" class=\"links2\">$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet</a>";
 				?>
 				</div>
 				<?php
 			}
 			?>
 		</div>
-		<?php 
-		if($user->isuserallowed('k')) {?>
+		<?php
+			if ($user->isuserallowed('k')) {
+				?>
 		<div style="width: 30%;">
 			<a href="index.php?page=change&person=<?php echo $person->id;?>" class="links">Ändere die Daten</a>
 		</div>	
@@ -60,9 +61,9 @@ if (isset($user) && $user->runscript()) {
 <?php
 			$result = $return->fetch();
 		}
-	} else {
+	}else {
 		echo "Es wurde noch keine Person hinzugefügt";
 	}
-} else {
+}else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }

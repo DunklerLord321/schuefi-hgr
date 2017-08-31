@@ -1,5 +1,5 @@
-<?php 
-//global $GLOBAL_CONFIG;
+<?php
+// global $GLOBAL_CONFIG;
 $GLOBAL_CONFIG = array();
 
 // 0 = nur return false, 1 = die();
@@ -10,32 +10,32 @@ $GLOBAL_CONFIG['dbname'] = '';
 $GLOBAL_CONFIG['mail_address'] = 'schuelerfirma.sender.hgr@gmx.de';
 $GLOBAL_CONFIG['bauarbeiten'] = false;
 
-//passwörter werden in includes/db_data.php gesetzt
+// passwörter werden in includes/db_data.php gesetzt
 $GLOBAL_CONFIG['dbuser_passwd'] = '';
 $GLOBAL_CONFIG['mail_passwd'] = '';
 require 'includes/db_data.php';
 
 $GLOBAL_CONFIG['klassen'] = array(
-		"a",
-		"b",
-		"c",
-		"d",
-		"l",
-		"A",
-		"B",
-		"C",
-		"D",
-		"L",
-		"l1",
-		"l2",
-		"L1",
-		"L2",
-		"1",
-		"2",
-		"3",
-		"4",
-		"5",
-		"6",
+		"a", 
+		"b", 
+		"c", 
+		"d", 
+		"l", 
+		"A", 
+		"B", 
+		"C", 
+		"D", 
+		"L", 
+		"l1", 
+		"l2", 
+		"L1", 
+		"L2", 
+		"1", 
+		"2", 
+		"3", 
+		"4", 
+		"5", 
+		"6", 
 		"7"
 );
 $GLOBAL_CONFIG['backup_dir'] = 'docs/backup/';

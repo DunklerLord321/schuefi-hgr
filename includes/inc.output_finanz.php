@@ -1,11 +1,11 @@
 <?php
-if(isset($user) && $user->runscript()){
+if (isset($user) && $user->runscript()) {
 	// $return = query_db("SELECT * FROM finanzuebersicht WHERE MONTH(datum) = MONTH(CURRENT_DATE);");
 	$return = query_db("SELECT finanzuebersicht.*, users.vname, users.nname, person.vname AS pvname, person.nname AS pnname FROM `finanzuebersicht` LEFT JOIN `users` ON finanzuebersicht.uid = users.id LEFT JOIN `person` ON finanzuebersicht.pid = person.id;");
-	if($return != false){
+	if ($return != false) {
 		$result = $return->fetch();
 		?>
-		<h1>Ausgaben der Finanzen</h1>
+<h1>Ausgaben der Finanzen</h1>
 <table class="table1">
 	<tr>
 		<th>Vorname</th>
@@ -19,25 +19,25 @@ if(isset($user) && $user->runscript()){
 		<th>Datum</th>
 	</tr>
   <?php
-		while ( $result ){
-			if($result['pid'] == NULL) {
+		while ($result) {
+			if ($result['pid'] == NULL) {
 				echo "<tr><td>" . $result['vname'] . "</td><td>" . $result['nname'] . "</td>";
-			}else{
+			}else {
 				echo "<tr><td>" . $result['pvname'] . "</td><td>" . $result['pnname'] . "</td>";
 			}
-			if($result['geldbetrag'] < 0){
+			if ($result['geldbetrag'] < 0) {
 				echo "<td></td><td style=\"text-align: right;\">" . abs($result['geldbetrag']) . "</td>";
-			}else{
-				echo "<td style=\"text-align: right;\">".$result['geldbetrag'] . "</td><td></td>";
+			}else {
+				echo "<td style=\"text-align: right;\">" . $result['geldbetrag'] . "</td><td></td>";
 			}
-			echo "<td>" . $result['konto_bar'] . "</td><td>" . $result['betreff'] . "</td><td>" . $result['dokument'] . "</td><td>" . $result['dokuemnt'] . "</td><td>".date('H:i d:m:Y',strtotime($result['datum']))."</td></tr>";
+			echo "<td>" . $result['konto_bar'] . "</td><td>" . $result['betreff'] . "</td><td>" . $result['dokument'] . "</td><td>" . $result['dokuemnt'] . "</td><td>" . date('H:i d:m:Y', strtotime($result['datum'])) . "</td></tr>";
 			$result = $return->fetch();
 		}
 		?>
 </table>
 <?php
 	}
-}else{
+}else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }
 	

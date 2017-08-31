@@ -53,46 +53,46 @@ class user {
 	 */
 	function isuserallowed($rights) {
 		switch ($this->account) {
-			case 'v' :
+			case 'v':
 				return true;
 				break;
-			case 'f' :
+			case 'f':
 				if ($rights == 'w' || $rights == 'f' || $rights == 'fk' || $rights == 'kf')
 					return true;
 				else
 					return false;
 				break;
-			case 'k' :
+			case 'k':
 				if ($rights == 'w' || $rights == 'k' || $rights == 'fk' || $rights == 'kf')
 					return true;
 				else
 					return false;
 				break;
-			case 'w' :
+			case 'w':
 				if ($rights == 'w')
 					return true;
 				else
 					return false;
-			default :
+			default:
 				return false;
 		}
 	}
-	//Überprüfen, ob Accounttyp existiert
+	// Überprüfen, ob Accounttyp existiert
 	function testaccount($type) {
 		switch ($type) {
-			case 'v' :
+			case 'v':
 				return true;
 				break;
-			case 'f' :
+			case 'f':
 				return true;
 				break;
-			case 'k' :
+			case 'k':
 				return true;
 				break;
-			case 'w' :
+			case 'w':
 				return true;
 				break;
-			default :
+			default:
 				return false;
 		}
 		return false;
@@ -136,13 +136,13 @@ class user {
 		$return = query_db("INSERT INTO `users` (vname, nname, email, passwort, account) VALUES (:vname, :nname, :email, :passwort, :account)", $vname, $nname, $email, password_hash($passwort, PASSWORD_DEFAULT), $type);
 		if ($return) {
 			return 'Der neue Nutzer wurde erfolgreich registriert. <a href="index.php" class="links2">Zum Login</a>';
-		} else {
+		}else {
 			$this->error = 'Beim Abspeichern ist leider ein Fehler aufgetreten<br>';
 			return false;
 		}
 	}
-
-	//Holt alle Informationen über Nutzer aus DB, wenn angegebene E-Mail existiert
+	
+	// Holt alle Informationen über Nutzer aus DB, wenn angegebene E-Mail existiert
 	function setmail($m_mail) {
 		require 'includes/functions.inc.php';
 		$this->email = $m_mail;
@@ -156,16 +156,16 @@ class user {
 			$this->id = $user['id'];
 			$this->count_login_trys = intval($user['count_login']);
 			return true;
-		} else {
+		}else {
 			$this->error = "Ein Nutzer mit dieser E-Mail-Adresse existiert leider nicht";
 			return false;
 		}
 	}
 	
 	/*
-	 * Anzahl der fehlerhaften Loginversuche mit bestimmter E-Mail werden in DB gespeichert. 
+	 * Anzahl der fehlerhaften Loginversuche mit bestimmter E-Mail werden in DB gespeichert.
 	 * Max. 5 Versuche sind möglich, dann muss Login mit best. E-Mail von Admin freigegeben werden.
-	 *  
+	 *
 	 */
 	private function increase_count_login() {
 		if (!function_exists("query_db")) {
@@ -183,23 +183,23 @@ class user {
 	}
 	function log(int $error_level, string $logstring) {
 		$string = date("D,d.m.Y-H:i:s", time());
-		$string .= ": ".$this->email;
-		if($error_level == $this::LEVEL_ERROR) {
+		$string .= ": " . $this->email;
+		if ($error_level == $this::LEVEL_ERROR) {
 			$string .= " ERROR ";
-		}elseif($error_level == $this::LEVEL_WARNING) {
+		}elseif ($error_level == $this::LEVEL_WARNING) {
 			$string .= " WARNING ";
-		}elseif($error_level == $this::LEVEL_NOTICE) {
+		}elseif ($error_level == $this::LEVEL_NOTICE) {
 			$string .= " NOTICE ";
 		}
 		$debug = debug_backtrace();
-		$string .= $logstring."   <<<<<<";
-		for($i=(count($debug)-1); $i >= 0; $i--) {
-			$string .= "{".$debug[$i]['file'].":".$debug[$i]['line']."-".$debug[$i]['function'];
-			if(count($debug[$i]['args']) > 0) {
-				if($debug[$i]['function'] == "testpassword") {
+		$string .= $logstring . "   <<<<<<";
+		for ($i = (count($debug) - 1); $i >= 0; $i--) {
+			$string .= "{" . $debug[$i]['file'] . ":" . $debug[$i]['line'] . "-" . $debug[$i]['function'];
+			if (count($debug[$i]['args']) > 0) {
+				if ($debug[$i]['function'] == "testpassword") {
 					$string .= "[*****]";
-				}else{
-					$string .= "[".implode("_", $debug[$i]['args'])."]";
+				}else {
+					$string .= "[" . implode("_", $debug[$i]['args']) . "]";
 				}
 			}
 			$string .= "}";
@@ -215,9 +215,9 @@ class user {
 				$return = password_verify($password, $this->hash_password);
 				$return ?: $this->error = 'Das Passwort war leider falsch!';
 				$return ? $this->reset_count_login() : $this->increase_count_login();
-				$return ? $this->log(user::LEVEL_NOTICE, "Login erfolgreich"): $this->log(user::LEVEL_NOTICE, "Anmeldung fehlgeschlagen");
+				$return ? $this->log(user::LEVEL_NOTICE, "Login erfolgreich") : $this->log(user::LEVEL_NOTICE, "Anmeldung fehlgeschlagen");
 				return $return;
-			} else {
+			}else {
 				$this->error = "Sie haben mindestens fünfmal versucht, sich mit falschem Passwort anzumelden.<br><br> Bitte kontaktieren Sie den Admin." . $this->vname . $this->nname;
 				if ($this->count_login_trys == 5)
 					$this->send_mail();
@@ -240,16 +240,16 @@ class user {
 			$this->error = 'Das neue Passwort darf nicht mit dem alten Passwort übereinstimmen';
 			return false;
 		}
-		if (!$this->testpassword($passwortaktuell) ) {
+		if (!$this->testpassword($passwortaktuell)) {
 			$this->error = 'Das alte Passwort war leider falsch';
-			return  false;
+			return false;
 		}
 		$passwort_hash = password_hash($password_neu, PASSWORD_DEFAULT);
 		$return = query_db("UPDATE `users` SET passwort = :passwort_hash, `update_time` = CURRENT_TIME() WHERE id = :id", $passwort_hash, $this->id);
-		if($return) {
+		if ($return) {
 			$this->log(user::LEVEL_NOTICE, "Passwort erfolgreich geändert");
 			return true;
-		}else{
+		}else {
 			$this->error = 'Ein Datenbankfehler ist aufgetreten';
 			$this->log(user::LEVEL_WARNING, "DB-Fehler bei Passwortänderung");
 			return false;
@@ -277,13 +277,14 @@ class user {
 		$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
 		$stat = query_db("SELECT `email` FROM `users` WHERE `account` = 'v'");
 		$result = $stat->fetch();
-		while ( $result ) {
+		while ($result) {
 			$mail->addAddress($result['email'], 'Anmeldefehler');
 			$result = $stat->fetch();
 		}
 		// $mail->addAddress('schuelerfirma.hgr@gmx.de', 'Kundenberatung - Schülerfirma');
 		// $mail->addReplyTo($email, $vorname.' '.$name);
 		
+
 		$Body = "Lieber Admin / Liebe Admins,<br> der Schüler/in " . $this->vname . " " . $this->nname . " mit der E-Mail-Addresse $this->email hat zu oft versucht, sich mit einem flaschen Passwort anzumelden.
 		<br>Bitte überprüfe, ob es wirklich der Schüler war und nehme mit ihm Kontakt auf.
 		<br><br>Vielen Dank
@@ -301,7 +302,7 @@ class user {
 	function is_valid() {
 		if (strlen($this->vname) > 0 && strlen($this->nname) > 0 && strlen($this->email) > 0 && strlen($this->account) > 0 && $this->id !== 0) {
 			return true;
-		} else {
+		}else {
 			return false;
 		}
 	}
@@ -315,8 +316,8 @@ class user {
 		$this->hash_password = "";
 		$this->password = "";
 		$this->count_login_trys = 0;
-		//email ist notwendig, um zu sehen, wer sich abmeldet
-		if(isset($this->email) && strlen($this->email) > 0) {
+		// email ist notwendig, um zu sehen, wer sich abmeldet
+		if (isset($this->email) && strlen($this->email) > 0) {
 			$this->log(user::LEVEL_NOTICE, "Logout erfolgreich");
 		}
 		$this->email = "";

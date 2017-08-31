@@ -2,15 +2,15 @@
 if (isset($user) && $user->runscript()) {
 	echo "<h1>Neue Person</h1>";
 	if (isset($_GET['addperson']) && $_GET['addperson'] == 1) {
-//		echo $_POST['geb'];
+		// echo $_POST['geb'];
 		require 'includes/class_person.php';
 		$person = new person();
-		if($person->addperson($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['telefon'], $_POST['geb'])) {
+		if ($person->addperson($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['telefon'], $_POST['geb'])) {
 			echo "Person wurde erfolgreich hinzugefügt!<br><br><br>";
 			echo "<br><a href=\"index.php?page=input&schueler=1&pid=" . $person->id . "\" class=\"links\">Gib der Person eine Rolle als Nachhilfeschüler</a><br><br>";
 			echo "<br><a href=\"index.php?page=input&lehrer=1&pid=" . $person->id . "\" class=\"links\">Gib der Person eine Rolle als Nachhilfelehrer</a><br><br>";
 		}
-	} else {
+	}else {
 		?>
 <div class="formular_class">
 	<script type="text/javascript" src="includes/jquery/jquery-ui-1.12.1/datepicker-de.js"></script>
@@ -31,7 +31,7 @@ if (isset($user) && $user->runscript()) {
 			Geburtstag:
 			<br>
 			<input type="text" id="datepicker" name="geb" class="input_text">
-			  <script>
+			<script>
   $( function() {
     $( "#datepicker" ).datepicker({
         changeYear: true,
@@ -39,7 +39,7 @@ if (isset($user) && $user->runscript()) {
 	    });
   } );
   </script>
-			
+
 			<br>
 			<br>
 			Email:
@@ -58,6 +58,6 @@ if (isset($user) && $user->runscript()) {
 </div>
 <?php
 	}
-} else {
+}else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }

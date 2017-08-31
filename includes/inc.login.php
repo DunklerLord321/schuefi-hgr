@@ -18,8 +18,8 @@ if (isset($user) && $user->runscript()) {
 	<input type="submit" value="Anmelden" class="mybuttons">
 </form>
 <?php
-		} else {
-			if(!$user->setmail($_POST['email'])) {
+		}else {
+			if (!$user->setmail($_POST['email'])) {
 				echo "Ein Fehler trat auf:<br><br>";
 				echo $user->geterror();
 				echo "<br><br><a href=\"index.php?login=1\">Erneut anmelden?</a>";
@@ -28,7 +28,7 @@ if (isset($user) && $user->runscript()) {
 			$return = $user->testpassword($_POST['passwort']);
 			if (!$return) {
 				echo $user->geterror();
-			} else {
+			}else {
 				$_SESSION['user'] = serialize($user);
 				// var_dump($_SESSION);
 				echo "Hallo " . $user->vname . " " . $user->nname . "!<br><br>Du wurdest erfolgreich angemeldet.<br><br>
@@ -39,7 +39,7 @@ if (isset($user) && $user->runscript()) {
 		}
 	}
 	// var_dump($user);
-} else {
+}else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }
 	

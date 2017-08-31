@@ -6,7 +6,7 @@ if (isset($user) && $user->runscript()) {
 	if (isset($_GET['lehrer']) && $_GET['lehrer'] == 1) {
 		$show_formular_lehrer = true;
 		$show_formular_schueler = false;
-	} else if (isset($_GET['schueler']) && $_GET['schueler'] == 1) {
+	}else if (isset($_GET['schueler']) && $_GET['schueler'] == 1) {
 		$show_formular_lehrer = false;
 		$show_formular_schueler = true;
 	}
@@ -15,19 +15,19 @@ if (isset($user) && $user->runscript()) {
 		require 'includes/class_person.php';
 		require 'includes/class_lehrer.php';
 		$schueler_array = array(
-				'klassenlehrer_name' => $_POST['klassenlehrer'],
-				'klasse' => $_POST['klasse'],
-				'klassenstufe' => $_POST['klassenstufe'],
+				'klassenlehrer_name' => $_POST['klassenlehrer'], 
+				'klasse' => $_POST['klasse'], 
+				'klassenstufe' => $_POST['klassenstufe'], 
 				'comment' => $_POST['comment']
 		);
 		$schueler = new schueler($_POST['person']);
-		if(!$schueler->add_schueler($schueler_array)) {
+		if (!$schueler->add_schueler($schueler_array)) {
 			die();
 		}
-		for($i = 1; $i <= count($_POST['fach']); $i++) {
+		for ($i = 1; $i <= count($_POST['fach']); $i++) {
 			$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], 'neu');
 		}
-		for($i = 1; $i <= count($_POST['zeit']); $i++) {
+		for ($i = 1; $i <= count($_POST['zeit']); $i++) {
 			$schueler->add_time($_POST['zeit'][$i]);
 		}
 		$show_formular_schueler = false;
@@ -36,20 +36,20 @@ if (isset($user) && $user->runscript()) {
 		require 'includes/class_person.php';
 		require 'includes/class_lehrer.php';
 		$lehrer_array = array(
-				'klassenlehrer_name' => $_POST['klassenlehrer'],
-				'klasse' => $_POST['klasse'],
-				'klassenstufe' => $_POST['klassenstufe'],
+				'klassenlehrer_name' => $_POST['klassenlehrer'], 
+				'klasse' => $_POST['klasse'], 
+				'klassenstufe' => $_POST['klassenstufe'], 
 				'comment' => $_POST['comment']
 		);
 		$lehrer = new lehrer($_POST['person']);
 		echo $lehrer->get_id();
-		if(!$lehrer->add_lehrer($lehrer_array)) {
+		if (!$lehrer->add_lehrer($lehrer_array)) {
 			die();
 		}
-		for($i = 1; $i <= count($_POST['fach']); $i++) {
+		for ($i = 1; $i <= count($_POST['fach']); $i++) {
 			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], $_POST['fach'][$i]['nachweis'], $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt'], 'neu');
 		}
-		for($i = 1; $i <= count($_POST['zeit']); $i++) {
+		for ($i = 1; $i <= count($_POST['zeit']); $i++) {
 			$lehrer->add_time($_POST['zeit'][$i]);
 		}
 		$show_formular_lehrer = false;
@@ -80,12 +80,15 @@ function addfach() {
 		<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
 		<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
 		</select><br><br>Fachlehrer:<br><input type="text" class="input_text" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]" style="width: 95%;"><br>\
-		<?php if($show_formular_lehrer) {
-			echo "Notenschnitt:<br><input class=\"textinput input_text\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
-			echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
-			echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
-			echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
-		}?>
+		<?php
+			
+			if ($show_formular_lehrer) {
+				echo "Notenschnitt:<br><input class=\"textinput input_text\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
+				echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
+				echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
+				echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
+			}
+			?>
 		</div>';
 	while(element.firstChild) {
 		doc.appendChild(element.firstChild);
@@ -164,10 +167,10 @@ $('body').on('focus','.timepickerbis', function(){
 			<select name="person">
 			<?php
 			$person_db = $return->fetch();
-			while ( $person_db ) {
+			while ($person_db) {
 				if (isset($_GET['pid']) && $_GET['pid'] == $person_db['id']) {
 					echo "<option value=\"" . $person_db['id'] . "\" selected >" . $person_db['vname'] . " " . $person_db['nname'] . "</option>";
-				} else {
+				}else {
 					echo "<option value=\"" . $person_db['id'] . "\" >" . $person_db['vname'] . " " . $person_db['nname'] . "</option>";
 				}
 				$person_db = $return->fetch();
@@ -190,11 +193,15 @@ $('body').on('focus','.timepickerbis', function(){
 			<br>
 			<br>
 			<input type="button" value="Füge Fach hinzu" onclick="addfach()" class="mybuttons">
-			<div id="insertfach"><br></div>
+			<div id="insertfach">
+				<br>
+			</div>
 			<br>
 			<br>
 			<h3>Zeit:</h3>
-			<input type="button" value="Füge Zeit hinzu" onclick="addtime()" class="mybuttons"><br><br>
+			<input type="button" value="Füge Zeit hinzu" onclick="addtime()" class="mybuttons">
+			<br>
+			<br>
 			<div id="insertzeit"></div>
 			<br>
 			Kommentar:
@@ -210,6 +217,6 @@ $('body').on('focus','.timepickerbis', function(){
 <?php
 		}
 	}
-} else {
+}else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }

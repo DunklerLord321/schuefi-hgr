@@ -36,6 +36,7 @@ INSERT INTO `navigation` (`kuerzel`, `path`, `allowed_users`, `visible`) VALUES
 ('user', 'includes/inc.user.php', 'v', 1),
 ('change_passwd', 'includes/inc.change_passwd.php', 'w', 1),
 ('person', 'includes/inc.person.php', 'k', 1),
+('imap', 'includes/inc.imapmail.php', 'v', 1),
 ('create_doc', 'includes/inc.create_doc.php', 'k',1),
 ('output_person' ,'includes/inc.output_person.php', 'w', 1),
 ('input_finanzen', 'includes/inc.input_finanz.php','f',1),
