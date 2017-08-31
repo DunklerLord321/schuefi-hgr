@@ -19,7 +19,7 @@ if (isset($user) && $user->runscript()) {
 			echo "Das Paar existiert schon!";
 		}else{
 			$return = query_db("UPDATE `fragt_nach` SET `status` = 'vermittelt' WHERE sid = :sid AND fid = :fid", $schueler_ex[0], $schueler_ex[1]);
-			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, treff_zeit, treff_zeit_ende, treff_raum) VALUES (:lid, :sid, :fid, :treff_zeit, :treff_zeit_ende, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['from'], $_POST['zeit']['until'], intval($_POST['raum']));
+			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, tag, treff_zeit, treff_zeit_ende, treff_raum) VALUES (:lid, :sid, :fid, :tag, :treff_zeit, :treff_zeit_ende, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1],$_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], intval($_POST['raum']));
 			if($return !== false) {
 				echo "Das Paar wurde erfolgreich hinzugefügt";
 			}

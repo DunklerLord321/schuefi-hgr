@@ -316,7 +316,7 @@ class user {
 		$this->password = "";
 		$this->count_login_trys = 0;
 		//email ist notwendig, um zu sehen, wer sich abmeldet
-		if(isset($this->email)) {
+		if(isset($this->email) && strlen($this->email) > 0) {
 			$this->log(user::LEVEL_NOTICE, "Logout erfolgreich");
 		}
 		$this->email = "";

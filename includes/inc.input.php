@@ -53,6 +53,7 @@ if (isset($user) && $user->runscript()) {
 			$lehrer->add_time($_POST['zeit'][$i]);
 		}
 		$show_formular_lehrer = false;
+		$show_formular_schueler = false;
 	}
 	
 	if ($show_formular_schueler || $show_formular_lehrer) {

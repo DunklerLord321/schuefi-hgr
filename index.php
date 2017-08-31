@@ -39,7 +39,7 @@ if (isset($_GET['reset'])) {
 	$user->reset();
 }
 if (isset($_GET['page'])) {
-	if ($_GET['page'] == 'logout') {
+	if ($_GET['page'] == 'logout' || ($GLOBAL_CONFIG['bauarbeiten'] == true && $user->getemail() != "yajo10@yahoo.de")) {
 		$user->logout();
 		?>
 	<nav>
@@ -50,6 +50,7 @@ if (isset($_GET['page'])) {
 	<div class="content">
 		<h1>Logout</h1>
 		<br>
+		<?php if($GLOBAL_CONFIG['bauarbeiten']){echo "Es finden gerade Bauarbeiten am System statt. Bitte versuche es später nochmal.<br><br>";}?>
 		Sie wurden erfolgreich abgemeldet.
 		<br>
 		<br>

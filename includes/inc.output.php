@@ -41,7 +41,7 @@ if (isset($user) && $user->runscript()) {
 				echo "<br><b>Zeiten:</b>";
 				echo "<div style=\"padding-left: 5%;\">";
 				for($i = 0; $i < count($zeit); $i++) {
-					echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . $zeit[$i]['anfang'] . " Uhr bis " . $zeit[$i]['ende'] . " Uhr";
+					echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i",strtotime($zeit[$i]['anfang'])) . " Uhr bis " . date("H:i",strtotime($zeit[$i]['ende'])) . " Uhr";
 				}
 				echo "</div>";
 				if(strlen($lehrer->get_comment()) > 0) {
@@ -103,7 +103,7 @@ if (isset($user) && $user->runscript()) {
 				echo "<br><b>Zeiten:</b>";
 				echo "<div style=\"padding-left: 5%;\">";
 				for($i = 0; $i < count($zeit); $i++) {
-					echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . $zeit[$i]['anfang'] . " Uhr bis " . $zeit[$i]['ende'] . " Uhr";
+					echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i",strtotime($zeit[$i]['anfang'])) . " Uhr bis " . date("H:i",strtotime($zeit[$i]['ende'])) . " Uhr";
 				}
 				echo "</div>";
 				if(strlen($schueler->get_comment()) > 0) {

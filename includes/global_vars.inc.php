@@ -8,6 +8,7 @@ $GLOBAL_CONFIG['dbuser'] = '';
 $GLOBAL_CONFIG['host'] = '';
 $GLOBAL_CONFIG['dbname'] = '';
 $GLOBAL_CONFIG['mail_address'] = 'schuelerfirma.sender.hgr@gmx.de';
+$GLOBAL_CONFIG['bauarbeiten'] = false;
 
 //passwörter werden in includes/db_data.php gesetzt
 $GLOBAL_CONFIG['dbuser_passwd'] = '';

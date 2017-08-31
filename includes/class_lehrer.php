@@ -31,8 +31,8 @@ class lehrer {
 					$this->zeit[] = array(
 							'id' => $times['id'],
 							'tag' => $times['tag'],
-							'anfang' => $times['anfang'],
-							'ende' => $times['ende']
+							'anfang' => date("H:i",strtotime($times['anfang'])),
+							'ende' => date("H:i",strtotime($times['ende']))
 					);
 					$times = $return->fetch();
 				}
@@ -126,6 +126,7 @@ class lehrer {
 					$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, get_current_year());
 					$lehrer = $return->fetch();
 					$this->id = $lehrer['id'];
+					echo "Der Lehrer wurde erfolgreich hinzugefügt";
 					return true;
 				} else {
 					echo "Der Lehrer existiert bereits in dem Schuljahr";
@@ -195,8 +196,8 @@ class lehrer {
 				$this->zeit[] = array(
 						'id' => $times['id'],
 						'tag' => $times['tag'],
-						'anfang' => $times['anfang'],
-						'ende' => $times['ende']
+						'anfang' => date("H:i",strtotime($times['anfang'])),
+						'ende' => date("H:i",strtotime($times['ende']))
 				);
 				$times = $return->fetch();
 			}

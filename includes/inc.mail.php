@@ -1,8 +1,7 @@
 <?php
 if(isset($user) && $user->runscript()){
 	
-	require 'mail/class.phpmailer.php';
-	require 'mail/class.smtp.php';
+	require 'mail/PHPMailer-master/PHPMailerAutoload.php';
 	?>
 <nav>
 	<ul class="mail_steps">
@@ -39,15 +38,17 @@ if(isset($user) && $user->runscript()){
 		$mail->SetLanguage("de");
 		
 		$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
+		$mail->addReplyTo("schuelerfirma@hgr-web.de", "Schülerfirma - Kundenbetreuung");
 		// $mail->addAddress ( 'schuelerfirma.hgr@gmx.de', 'Kundenberatung - Schülerfirma' );
 		// $mail->addReplyTo($email, $vorname.' '.$name);
 		if(isset($_SESSION['mail_step3']) && isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step2'])){
 			if($_SESSION['mail_step1']['mailart'] == 1 && isset($_SESSION['schuelermail']) && isset($_SESSION['lehrermail'])){
-				$mail->addAddress($_SESSION['lehrermail']['empfaenger'], 'Kundenberatung - Schülerfirma');
+				$mail->addAddress($_SESSION['lehrermail']['empfaenger'], $_SESSION['lehrermail']['empfaenger']);
+//				$mail->addAddress("yajo10@yahoo.de", $_SESSION['lehrermail']['empfaenger']);
 				$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
-				$mail->addReplyTo("schuelerfirma@hgr-web.de", "Schülerfirma - Kundenbetreuung");
 				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
-				$mail->addAttachment("docs/unterricht/".$_SESSION['lehrermail']['anhang']);
+				$mail->addAttachment("docs/nachweis_lehrer.pdf", "Lohnkarte-Lehrer.pdf");
+				$mail->addAttachment("docs/unterricht/".$_SESSION['lehrermail']['anhang'], "Vermittlungsdokument.pdf");
 				$mail->Body = $_SESSION['lehrermail']['text'];
 				$mail->Subject = $_SESSION['lehrermail']['betreff'];
 				if (!$mail->send()) {
@@ -57,10 +58,13 @@ if(isset($user) && $user->runscript()){
 					echo "<br><br>Mail an Lehrer erfolgreich gesendet<br>";
 				}
 				$mail->clearAttachments();
-				$mail->clearQueuedAddresses("to");
-				$mail->addAddress($_SESSION['schuelermail']['empfaenger'], 'Kundenberatung - Schülerfirma');
+				$mail->clearAllRecipients();
+				$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
+				$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
+//				$mail->addAddress("joyajo108@gmail.com", $_SESSION['schulermail']['empfaenger']);
+				$mail->addAddress($_SESSION['schuelermail']['empfaenger'], $_SESSION['schuelermail']['empfaenger']);
 				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
-				$mail->addAttachment("docs/unterricht/".$_SESSION['schuelermail']['anhang']);
+				$mail->addAttachment("docs/unterricht/".$_SESSION['schuelermail']['anhang'], "Vermittlungsdokument.pdf");
 				$mail->Body = $_SESSION['schuelermail']['text'];
 				$mail->Subject = $_SESSION['schuelermail']['betreff'];
 				if (!$mail->send()) {
@@ -70,6 +74,30 @@ if(isset($user) && $user->runscript()){
 					echo "<br><br>Mail an Schüler erfolgreich gesendet<br>";
 				}
 				echo "<br><b>Hinweis: Es kann vorkommen, dass trotz der Meldung \"Mail erfolgreich gesendet\" die E-Mail-Adresse falsch war.<br>Deswegen musst du unbedingt nochmal in unseren Mail-Account schauen, ob dort eine Fehlermeldung vorliegt</b>";
+			}
+			if(isset($_SESSION['serienmail']) && is_array($_SESSION['serienmail'])) {
+				$successsend = 0;
+				for($i = 0; $i < count($_SESSION['serienmail']); $i++) {
+					$mail->clearAllRecipients();
+					$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
+					$mail->addReplyTo("schuelerfirma@hgr-web.de", "Schülerfirma - Kundenbetreuung");
+					$mail->addAddress($_SESSION['serienmail'][$i]['mail'], $_SESSION['serienmail'][$i]['vname']." ".$_SESSION['serienmail'][$i]['nname']);
+//					$mail->addAddress("yajo10@yahoo.de", $_SESSION['serienmail'][$i]['vname']." ".$_SESSION['serienmail'][$i]['nname']);
+					if($i == 0) {
+						//nur einmal an Schüfi in BCC
+						$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
+					}
+					$mail->Body = $_SESSION['serienmail'][$i]['text'];
+					$mail->Subject = $_SESSION['mail_step3']['subject'];
+					if (!$mail->send()) {
+						echo "Es ist ein Fehler beim Versenden der Mail aufgetreten.";
+						echo $mail->ErrorInfo;
+					}else{
+						$successsend++;
+					}
+				}
+				echo "Es wurden $successsend von $i E-Mails erfolgreich versendet";
+				echo "<br><b>Hinweis: Es kann vorkommen, dass trotz der Meldung \"Mail erfolgreich gesendet\" die E-Mail-Adresse falsch war.<br>Deswegen musst du unbedingt nochmal in unseren Mail-Account schauen, ob dort eine Fehlermeldung vorliegt</b>Bei SerienMails wird die erste Mail als BCC an schuelerfirma@hgr-web.de gesendet.";
 			}
 		}
 		// $mail->send();
@@ -128,10 +156,10 @@ if(isset($user) && $user->runscript()){
 						$lehrer = new lehrer($person->id);
 						$lehrer->load_lehrer_pid();
 						
-						if(isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest-' . $i]) && $_SESSION['mail_step2']['dest-' . $i] == $person->email){
-							echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+						if(isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest-' . $i]) && $_SESSION['mail_step2']['dest-' . $i] == $person->id."-".$person->email){
+							echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->id."-".$person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 						}else{
-							echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->id."-".$person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 						}
 					}
 					if(is_array($lehrerschueler['schueler'])){
@@ -139,10 +167,10 @@ if(isset($user) && $user->runscript()){
 						$schueler = new schueler($person->id);
 						$schueler->load_schueler_pid();
 						
-						if(isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest-' . $i]) && $_SESSION['mail_step2']['dest-' . $i] == $person->email){
-							$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+						if(isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest-' . $i]) && $_SESSION['mail_step2']['dest-' . $i] == $person->id."-".$person->email){
+							$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->id."-".$person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 						}else{
-							$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->id."-".$person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 						}
 					}
 					// var_dump($lehrer);
@@ -158,6 +186,7 @@ if(isset($user) && $user->runscript()){
 			echo $schueler_output;
 			echo "</div>";
 		}else{
+			//Nachhilfepaar
 			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = '".get_current_year()."';");
 			$result = $return->fetch();
 			$i = 0;
@@ -209,7 +238,6 @@ if(isset($user) && $user->runscript()){
 	}
 	function add_text(text, element) {
 		var content = document.getElementById(element).value;
-		console.log(content);
 		document.getElementById(element).value = content + text;
 	}
 	function reset_text(element) {
@@ -218,6 +246,7 @@ if(isset($user) && $user->runscript()){
 	</script>
 <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=4"?>" method="POST">
 	<?php
+		// Email an Nachhilfepaar
 		if(isset($_SESSION['mail_step1']['mailart']) && $_SESSION['mail_step1']['mailart'] == 1){
 			echo "<h3>E-Mail an Nachhilfelehrer:</h3>";
 			echo "<p>Hinweis: <i>Die AGB's werden automatisch mit an die Vermittlungsemails angehängt sowie die Lohnkarte für den Lehrer und die Kontoinformationen für den Schüler</i></p>";
@@ -390,6 +419,37 @@ if(isset($user) && $user->runscript()){
 				$_SESSION['schuelermail'] = $schuelermail;
 			}else{
 				// serienmail
+				echo "<br><br>";
+				require 'includes/class_person.php';
+				if(!is_array($_SESSION['mail_step2'])) {
+					echo "Ein Fehler ist aufgetreten";
+					$user->log(user::LEVEL_ERROR, "Array mail_step2 nicht definiert");
+				}
+//				var_dump($_SESSION);
+//				echo $_SESSION['mail_step2']["dest-1"];
+				$personen = array();
+				$mailpersonen = array();
+				$personid = array();
+				$person = new person();
+				$personen = array_values($_SESSION['mail_step2']);
+				for($i = 0; $i < count($personen); $i++) {
+					$personid = explode("-", $personen[$i]);
+//					echo "<br>".$personen[$i]."  ".$personid[0];
+					$person->load_person($personid[0]);
+					$string = str_replace("\n", "<br>", $_SESSION['mail_step3']['text']);
+					$string = str_replace(":vorname", $person->vname, $string);
+					$string = str_replace(":nachname", $person->nname, $string);
+					$string = str_replace(":email", $person->email, $string);
+					$mailpersonen[] = array('mail' => $person->email, 'vname' => $person->vname, 'nname' => $person->nname, 'text' => $string);
+					echo "<br>Betreff: <i>".$_SESSION['mail_step3']['subject']."</i><br>";
+					echo "An: <i>".$mailpersonen[$i]['mail']."</i><br>";
+					echo "Text: <br><i>".$mailpersonen[$i]['text']."</i><br><br><hr>";
+				}
+//				var_dump($string);
+//				var_dump($personen);
+//				var_dump($mailpersonen);
+//				$_SESSION['serienmail'] = $mailpersonen;
+//				var_dump($_SESSION);
 			}
 		}
 		echo "Schritt 3";

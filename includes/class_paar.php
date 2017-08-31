@@ -29,8 +29,8 @@ class paar {
 					$this->lehrer = new lehrer(-1, $return['lid']);
 					$this->raum = $return['treff_raum'];
 					$this->fid = $return['fid'];
-					$this->anfang = $return['treff_zeit'];
-					$this->ende = $return['treff_zeit_ende'];
+					$this->anfang = date("H:i",strtotime($return['treff_zeit']));
+					$this->ende = date("H:i",strtotime($return['treff_zeit_ende']));
 					$this->erstellungstag = $return['erstellungs_date'];
 					$this->tag = $return['tag'];
 					$this->lehrer_dokument = $return['lehrer_dokument'];

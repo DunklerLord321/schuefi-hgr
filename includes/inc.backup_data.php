@@ -23,6 +23,7 @@ if(isset($user) && $user->runscript()){
 			}
 			global $pdo;
 			$pdo->exec("SET foreign_key_checks = 0");
+			$user->log(user::LEVEL_WARNING, "Backup wird wiederhergestellt");
 			for($i=0; $i < count($tables); $i++) {
 				$result = query_db("DELETE FROM `".$tables[$i]."`;");
 			}
@@ -30,10 +31,12 @@ if(isset($user) && $user->runscript()){
 				$user->log(user::LEVEL_ERROR, "DB-FEHLER:".$pdo-errorInfo());
 			}
 			$pdo->exec("SET foreign_key_checks = 1");
+			//PDF-Dateien müssen noch wiederhergestellt werden
 		}else{
 			echo "Dieses Backup existiert leider nicht!<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}
 	}else if(isset($_GET['deleteall'])) {
+		$user->log(user::LEVEL_WARNING, "Alle Daten werden gelöscht");
 		$pdo->exec("SET foreign_key_checks = 0");
 		for($i=0; $i < count($tables); $i++) {
 			$result = query_db("DELETE FROM `".$tables[$i]."`;");
@@ -52,8 +55,10 @@ if(isset($user) && $user->runscript()){
 			echo "Dieses Backup existiert leider nicht!<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}
 	}else if(isset($_GET['newbackup']) && $_GET['newbackup'] == 1) {
+		$user->log(user::LEVEL_WARNING, "Neues Backup wird erstellt");
 		$content = '';
 		$content = "\n-- Automatisch generiert\n-- erstellt von: ".$user->vname." ".$user->nname." (".$user->getemail().")\n-- erstellt am ".date(DATE_RSS, time())."\n\n";
+		$dokumente = array();
 		for($i=0; $i < count($tables); $i++) {
 			$result = query_db("SHOW COLUMNS FROM ".$tables[$i].";");
 			if($result) {
@@ -67,7 +72,6 @@ if(isset($user) && $user->runscript()){
 				}
 				$content = substr($content, 0,-1).") VALUES\n";
 				$result = query_db("SELECT * FROM ".$tables[$i]);
-				$dokumente = array();
 				if($result) {
 					$rows = $result->fetchAll();
 //					var_dump($rows);
@@ -141,16 +145,15 @@ if(isset($user) && $user->runscript()){
 		if(count($backups > 0)) {
 			for($i = 0; $i < count($backups); $i++) {
 				echo "<br>".$backups[$i][0].":  ".$backups[$i][3].".".$backups[$i][2].".".$backups[$i][1]." ".$backups[$i][5].":".$backups[$i][6].":".$backups[$i][7]."Uhr";
-				echo "<div class=\"tooltip\" style=\"margin-top: 10px; margin-left: 100px;\"><a href=\"index.php?page=backup_data&delete=".$backups[$i][8]."\" class=\"fa fa-trash links2 \" style=\"font-style: normal; text-decoration: none;\">";
+				echo "<div class=\"tooltip\" style=\"margin-top: 10px; margin-left: 100px;\"><a href=\"index.php?page=backup_data&delete=".$backups[$i][8]."\" class=\"fa fa-trash links2 \" onclick=\"return warn('Willst du das Backup wirklich löschen?')\" style=\"font-style: normal; text-decoration: none;\">";
 				echo "<span class=\"tooltext\">Lösche das Backup</span></a></div>";
-				echo "<span style=\"margin-left: 100px;\"><a href=\"index.php?page=backup_data&restore=".$backups[$i][8]."\" class=\"links2\">Wiederherstellen</a></span>"; 
+				echo "<span style=\"margin-left: 100px;\"><a href=\"index.php?page=backup_data&restore=".$backups[$i][8]."\" onclick=\"return warn('Willst du das Backup wirklich wiederherstellen? Alle jetzigen Daten gehen dabei verloren...')\"class=\"links2\">Wiederherstellen</a></span>"; 
+				echo "<span style=\"margin-left: 100px;\"><a href=\"".$GLOBAL_CONFIG['backup_dir'].$backups[$i][8]."\" class=\"links2\">Download</a></span>";
 				?>
 				<script type="text/javascript">
-function warnfordelete() {
-	if(confirm("Willst du das Backup wirklich löschen?") == true) {
+function warn(string) {
+	if(confirm(string) == true) {
 		return true;
-	}else{
-		return false;
 	}
 	return false;
 }
@@ -158,7 +161,8 @@ function warnfordelete() {
 				
 				<?php
 			}	
-			echo "<br><br><a href=\"index.php?page=backup_data&deleteall=1\" class=\"links2\">Lösche alle Daten aus der Datenbank ohne Wiederherstellen eines Backups</a>";
+			echo "<br><br><a href=\"index.php?page=backup_data&deleteall=1\" onclick=\"return warn('Willst du alle Daten wirklich löschen? Das solltest du nur machen, wenn du vorher ein Backup angelegt hast.')\" class=\"links2\">Lösche alle Daten aus der Datenbank ohne Wiederherstellen eines Backups</a>";
+			echo "<br><br><br><b>Hinweis: Beim Wiederherstellen eines alten Backups kann es zu Fehlern kommen, da es möglicherweise in einer älteren Softwareversion erstellt wurde.</b>";
 		}else{
 			echo "Es existiert noch kein Backup";
 		}

@@ -31,15 +31,15 @@ USE `schuefi`;
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `vname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `nname` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `passwort` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `account` enum('k','f','v','w') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'w',
+  `vname` varchar(50) COLLATE utf8_german2_ci NOT NULL,
+  `nname` varchar(50) COLLATE utf8_german2_ci NOT NULL,
+  `email` varchar(50) COLLATE utf8_german2_ci NOT NULL,
+  `passwort` varchar(255) COLLATE utf8_german2_ci NOT NULL,
+  `account` enum('k','f','v','w') COLLATE utf8_german2_ci NOT NULL DEFAULT 'w',
   `createt_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `count_login` int(11) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `person`;
 CREATE TABLE `person` (
