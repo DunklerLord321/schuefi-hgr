@@ -8,7 +8,7 @@ if (isset($user) && $user->runscript()) {
 		if (isset($_GET['filter'])) {
 			$return = query_db("SELECT * FROM `lehrer` WHERE `schuljahr` = :schuljahr AND `pid` = :pid", get_current_year(), $_GET['filter']);
 		}else {
-			$return = query_db("SELECT * FROM `lehrer` WHERE `schuljahr` = :schuljahr", get_current_year());
+			$return = query_db("SELECT `lehrer`.*, `person`.`nname` FROM `lehrer` LEFT JOIN `person` ON `person`.`id` = `lehrer`.`pid` WHERE `schuljahr` = :schuljahr GROUP BY `person`.`nname`, `lehrer`.`id` ASC ", get_current_year());
 		}
 		if ($return === false) {
 			echo "Ein Problem";
@@ -20,7 +20,9 @@ if (isset($user) && $user->runscript()) {
 				$lehrer = new lehrer(-1, $result['id']);
 				?>
 <fieldset style="padding: 40px; width: 80%; padding-top: 10px;">
-	<legend><?php echo "<a href=\"index.php?page=output_person&filter=".$lehrer->person->id."\" class=\"links2\">".$lehrer->person->vname.' '.$lehrer->person->nname."</a>"?></legend>
+	<legend><?php
+				
+				echo "<a href=\"index.php?page=output_person&filter=" . $lehrer->person->id . "\" class=\"links2\">" . $lehrer->person->vname . ' ' . $lehrer->person->nname . "</a>"?></legend>
 	<div style="display: flex;">
 		<div style="width: 70%; display: inline-block;">
 					<?php
@@ -50,7 +52,10 @@ if (isset($user) && $user->runscript()) {
 				?>
 		</div>
 		<div style="width: 30%; display: inline-block; padding-top: 40px;">
-			<a href="index.php?page=change&lehrer=<?php echo $lehrer->get_id();?>" class="links">Ändere die Daten</a>
+			<a href="index.php?page=change&lehrer=<?php
+				
+				echo $lehrer->get_id();
+				?>" class="links">Ändere die Daten</a>
 		</div>
 	</div>
 </fieldset>
@@ -66,10 +71,52 @@ if (isset($user) && $user->runscript()) {
 		}
 	}
 	if (isset($_GET['schueler']) && $_GET['schueler'] == 1) {
-		if (isset($_GET['filter'])) {
+		?>
+		<fieldset  style="padding: 40px; width: 80%; padding-top: 10px;">
+		<form action="index.php?page=output&schueler=1" method="get">
+		<input type="hidden" name="page" value="output">
+		<input type="hidden" name="schueler" value="1">
+		Alle Schüler, bei denen Vermittlungsstatus =
+		<select name="filterstatus">
+		<option value="-1">Alle anzeigen</option>
+		<option value="neu" <?php
+		if (isset($_GET['filterstatus']) && $_GET['filterstatus'] == 'neu') {
+			echo "selected";
+		}
+		?>>Neu</option>
+		<option value="notwendig" <?php
+		if (isset($_GET['filterstatus']) && $_GET['filterstatus'] == 'notwendig') {
+			echo "selected";
+		}
+		?>>Notwendig</option>
+		<option value="ausstehend" <?php
+		if (isset($_GET['filterstatus']) && $_GET['filterstatus'] == 'ausstehend') {
+			echo "selected";
+		}
+		?>>Ausstehend</option>
+		<option value="nicht vermittelbar" <?php
+		if (isset($_GET['filterstatus']) && $_GET['filterstatus'] == 'nicht vermittelbar') {
+			echo "selected";
+		}
+		?>>Nicht vermittelbar</option>
+		<option value="vermittelt" <?php
+		if (isset($_GET['filterstatus']) && $_GET['filterstatus'] == 'vermittelt') {
+			echo "selected";
+		}
+		?>>Vermittelt</option>
+		</select>
+		<input type="submit" value="Filtern">
+		</form>
+		</fieldset>
+		
+		
+		<?php
+		if (isset($_GET['filterstatus']) && $_GET['filterstatus'] != -1) {
+			$return = query_db("SELECT `schueler`.* FROM `schueler` LEFT JOIN `fragt_nach` ON `schueler`.`id` = `fragt_nach`.`sid` WHERE `fragt_nach`.`status` = :status AND `schueler`.`schuljahr` = :schuljahr  ORDER BY `schueler`.`id` ASC", $_GET['filterstatus'], get_current_year());
+		}else if (isset($_GET['filter'])) {
 			$return = query_db("SELECT * FROM `schueler` WHERE `schuljahr` = :schuljahr AND `pid` = :pid", get_current_year(), $_GET['filter']);
 		}else {
-			$return = query_db("SELECT * FROM `schueler` WHERE `schuljahr` = :schuljahr", get_current_year());
+			$return = query_db("SELECT `schueler`.*, `person`.`nname` FROM `schueler` LEFT JOIN `person` ON `person`.`id` = `schueler`.`pid` WHERE `schuljahr` = :schuljahr GROUP BY `person`.`nname`, `schueler`.`id` ASC ", get_current_year());
 		}
 		if ($return === false) {
 			echo "Ein Problem";
@@ -78,10 +125,15 @@ if (isset($user) && $user->runscript()) {
 		$result = $return->fetch();
 		if ($result !== false) {
 			while ($result) {
+				if (isset($schueler) && $schueler->get_id() == $result['id']) {
+					$result = $return->fetch();
+				}
 				$schueler = new schueler(-1, $result['id']);
 				?>
 <fieldset style="padding: 40px; width: 80%; padding-top: 10px;">
-	<legend><?php echo "<a href=\"index.php?page=output_person&filter=".$schueler->person->id."\" class=\"links2\">".$schueler->person->vname.' '.$schueler->person->nname."</a>"?></legend>
+	<legend><?php
+				
+				echo "<a href=\"index.php?page=output_person&filter=" . $schueler->person->id . "\" class=\"links2\">" . $schueler->person->vname . ' ' . $schueler->person->nname . "</a>"?></legend>
 	<div style="display: flex;">
 		<div style="width: 70%; display: inline-block;">
 							<?php
@@ -91,7 +143,7 @@ if (isset($user) && $user->runscript()) {
 				$zeit = $schueler->get_zeit();
 				echo "<br><br><b>Fächer:</b>";
 				for ($i = 0; $i < count($faecher); $i++) {
-					if (isset($faecher[$i])) {
+					if (isset($faecher[$i]) || (isset($faecher[$i]) && isset($_GET['filterstatus']) && $_GET['filterstatus'] == $faecher[$i]['status'])) {
 						echo "<div style=\"padding-left: 5%;\">";
 						echo "<br>" . get_faecher_name_of_id($faecher[$i]['fid']) . " <br> Langfristig: " . ($faecher[$i]['langfristig'] == true ? "ja" : "nein");
 						echo "<br>Fachlehrer: " . $faecher[$i]['fachlehrer'];
@@ -112,7 +164,10 @@ if (isset($user) && $user->runscript()) {
 				?>
 				</div>
 		<div style="width: 30%; display: inline-block; padding-top: 40px;">
-			<a href="index.php?page=change&schueler=<?php echo $schueler->get_id();?>" class="links">Ändere die Daten</a>
+			<a href="index.php?page=change&schueler=<?php
+				
+				echo $schueler->get_id();
+				?>" class="links">Ändere die Daten</a>
 		</div>
 	</div>
 </fieldset>
@@ -120,7 +175,9 @@ if (isset($user) && $user->runscript()) {
 				$result = $return->fetch();
 			}
 		}else {
-			if (isset($_GET['filter'])) {
+			if (isset($_GET['filterstatus'])) {
+				echo "Es konnte kein Schüler mit diesem Vermittlungsstatus gefunden werden";
+			}else if (isset($_GET['filter'])) {
 				echo "Es trat ein Fehler auf. Zu dieser Person konnte kein Schüler gefunden werden";
 			}else {
 				echo "Es wurde noch kein Schüler hinzugefügt";

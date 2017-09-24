@@ -57,7 +57,7 @@ if (isset($user) && $user->runscript()) {
 	}
 	
 	if ($show_formular_schueler || $show_formular_lehrer) {
-		$return = query_db("SELECT * FROM `person`");
+		$return = query_db("SELECT * FROM `person` ORDER BY `person`.`nname` ASC");
 		if ($return) {
 			?>
 <script src="includes/jquery/jquery-ui-timepicker/jquery.ui.timepicker.js?v=0.3.3"></script>

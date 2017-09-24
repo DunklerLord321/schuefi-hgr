@@ -30,7 +30,7 @@ if (isset($user) && $user->runscript()) {
 			}else {
 				echo "<td style=\"text-align: right;\">" . $result['geldbetrag'] . "</td><td></td>";
 			}
-			echo "<td>" . $result['konto_bar'] . "</td><td>" . $result['betreff'] . "</td><td>" . $result['dokument'] . "</td><td>" . $result['dokuemnt'] . "</td><td>" . date('H:i d:m:Y', strtotime($result['datum'])) . "</td></tr>";
+			echo "<td>" . $result['konto_bar'] . "</td><td>" . $result['betreff'] . "</td><td>" . $result['dokument'] . "</td><td>" . $result['bemerkung'] . "</td><td>" . date('d.m.Y', strtotime($result['datum'])) . "</td></tr>";
 			$result = $return->fetch();
 		}
 		?>

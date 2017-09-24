@@ -87,6 +87,10 @@ function query_db($statement, ...$params) {
 	global $exit_on_db_failure;
 	global $pdo;
 	global $user;
+	if(!isset($pdo) || $pdo == null) {
+		echo "Ein DB_Fehler ist aufgetreten";
+		$user->log(user::LEVEL_ERROR, "\$pdo nicht definiert oder null");
+	}
 	$stat_ex = explode(' ', $statement);
 	$i = 0;
 	// var_dump(debug_backtrace());

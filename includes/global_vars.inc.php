@@ -13,7 +13,11 @@ $GLOBAL_CONFIG['bauarbeiten'] = false;
 // passwörter werden in includes/db_data.php gesetzt
 $GLOBAL_CONFIG['dbuser_passwd'] = '';
 $GLOBAL_CONFIG['mail_passwd'] = '';
-require 'includes/db_data.php';
+if (file_exists('includes/db_data.php')) {
+	require 'includes/db_data.php';
+}else if (file_exists('db_data.php')) {
+	require 'db_data.php';
+}
 
 $GLOBAL_CONFIG['klassen'] = array(
 		"a", 

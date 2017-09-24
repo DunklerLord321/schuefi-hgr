@@ -2,7 +2,7 @@
 if (isset($user) && $user->runscript()) {
 	echo "<h1>Neuer Finanzeintrag</h1>";
 	if (isset($_GET['finanzeingabe'])) {
-		if ((!isset($_POST['uid']) && !isset($_POST['pid'])) || ($_POST['uid'] == "-1" && $_POST['pid'] == "-1")) {
+		if ((!isset($_POST['uid']) && !isset($_POST['pid'])) || (isset($_POST['uid']) && isset($_POST['pid']) && $_POST['uid'] == "-1" && $_POST['pid'] == "-1")) {
 			echo "Bitte wähle eine Person oder einen Schülerfirmamitarbeiter aus";
 			$user->log(user::LEVEL_WARNING, "Weder Person noch Schufimitarbeiter ausgewählt beim Finanzeingeben");
 			die();
@@ -60,7 +60,7 @@ $( "#tooltip" ).tooltip();
 </script>
 <div class="formular_class">
 	<form method="post" action="index.php?page=input_finanzen&finanzeingabe=1">
-		<label>Person</label>
+		<label>Person:</label>
 		<select id="select1" name="pid" onchange="selectboxes('select1','select2')">
 			<option value="-1">Bitte wählen</option>
 	<?php
@@ -70,7 +70,7 @@ $( "#tooltip" ).tooltip();
 			require 'includes/class_schueler.php';
 			while ($schueler) {
 				$schueler = new schueler(-1, $schueler['id']);
-				echo "<option value=\"" . $schueler->get_id() . "\">" . $schueler->person->vname . " " . $schueler->person->nname . "</option>";
+				echo "<option value=\"" . $schueler->person->id. "\">" . $schueler->person->vname . " " . $schueler->person->nname . "</option>";
 				$schueler = $return->fetch();
 			}
 			$return = query_db("SELECT * FROM `lehrer` WHERE schuljahr = :schuljahr", get_current_year());
@@ -80,7 +80,7 @@ $( "#tooltip" ).tooltip();
 			$lehrer = $return->fetch();
 			while ($lehrer) {
 				$lehrer = new lehrer(-1, $lehrer['id']);
-				echo "<option value=\"" . $lehrer->get_id() . "\">" . $lehrer->person->vname . " " . $lehrer->person->nname . "</option>";
+				echo "<option value=\"" . $lehrer->person->id . "\">" . $lehrer->person->vname . " " . $lehrer->person->nname . "</option>";
 				$lehrer = $return->fetch();
 			}
 		}
@@ -88,7 +88,7 @@ $( "#tooltip" ).tooltip();
 	</select>
 		<br>
 		<br>
-		<label>Schülerfirmamitarbeiter</label>
+		<label>Schülerfirmamitarbeiter:</label>
 		<select id="select2" name="uid" onchange="selectboxes('select2','select1')">
 			<option value="-1">Bitte wählen</option>
 	<?php
@@ -126,11 +126,11 @@ $( "#tooltip" ).tooltip();
 		</select>
 		<br>
 		<br>
-		<label>Bar/Konto</label>
+		<label>Bar/Konto:</label>
 		<select name="typ">
 			<option value="bar">Bar</option>
 			<option value="konto">Konto</option>
-		</select>
+		</select><br><br>
 		<label>Bemerkung:</label>
 		<br>
 		<textarea rows="4" cols="100" name="bemerkung"></textarea>

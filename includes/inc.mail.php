@@ -6,22 +6,56 @@ if (isset($user) && $user->runscript()) {
 <nav>
 	<ul class="mail_steps">
 		<li>
-			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=1";?>" <?php if(!isset($_GET['step']) || $_GET['step'] == 1) {echo "class=\"mail_steps_active\"";}?>>1.Schritt</a>
+			<a href="<?php
+	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=1";
+	?>" <?php
+	
+	if (!isset($_GET['step']) || $_GET['step'] == 1) {
+		echo "class=\"mail_steps_active\"";
+	}
+	?>>1.Schritt</a>
 		</li>
 		<li>
-			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=2";?>" <?php if(isset($_GET['step']) && $_GET['step'] == 2) {echo "class=\"mail_steps_active\"";}?>>2.Schritt</a>
+			<a href="<?php
+	
+	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=2";
+	?>" <?php
+	
+	if (isset($_GET['step']) && $_GET['step'] == 2) {
+		echo "class=\"mail_steps_active\"";
+	}
+	?>>2.Schritt</a>
 		</li>
 		<li>
-			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=3";?>" <?php if(isset($_GET['step']) && $_GET['step'] == 3) {echo "class=\"mail_steps_active\"";}?>>3.Schritt</a>
+			<a href="<?php
+	
+	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=3";
+	?>" <?php
+	
+	if (isset($_GET['step']) && $_GET['step'] == 3) {
+		echo "class=\"mail_steps_active\"";
+	}
+	?>>3.Schritt</a>
 		</li>
 		<li>
-			<a href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=4";?>" <?php if(isset($_GET['step']) && $_GET['step'] == 4) {echo "class=\"mail_steps_active\"";}?>>4.Schritt</a>
+			<a href="<?php
+	
+	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=4";
+	?>" <?php
+	
+	if (isset($_GET['step']) && $_GET['step'] == 4) {
+		echo "class=\"mail_steps_active\"";
+	}
+	?>>4.Schritt</a>
 		</li>
 	</ul>
 </nav>
 
 <h2>Sende E-Mail an Schüler</h2>
-<a class="mybuttons links2" href="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&mail_reset=1";?>">Alle EIngaben zurücksetzen</a>
+<a class="mybuttons links2" href="<?php
+	
+	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&mail_reset=1";
+	?>">Alle EIngaben zurücksetzen</a>
 
 
 <?php
@@ -115,26 +149,28 @@ if (isset($user) && $user->runscript()) {
 		echo "<form action=\"" . htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=2\" method=\"POST\"><p></p>";
 		if (isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step1']['mailart']) && $_SESSION['mail_step1']['mailart'] == 1) {
 			echo "<label><input type=\"radio\" name=\"mailart\" value=\"1\" checked>E-Mail an ein Nachhilfepaar</label><br>";
-			echo "<label><input type=\"radio\" name=\"mailart\" value=\"2\" >Serien-E-Mail</label>";
+			echo "<label><input type=\"radio\" name=\"mailart\" value=\"2\" >Serien-E-Mail/E-Mail an eine Person</label>";
 		}else {
 			echo "<label><input type=\"radio\" name=\"mailart\" value=\"1\" checked>E-Mail an ein Nachhilfepaar</label><br>";
-			echo "<label><input type=\"radio\" name=\"mailart\" value=\"2\" >Serien-E-Mail</label>";
+			echo "<label><input type=\"radio\" name=\"mailart\" value=\"2\" >Serien-E-Mail/E-Mail an eine Person</label>";
 		}
-		echo "<br><br><input type=\"submit\" value=\"Weiter\" class=\"mybuttons\" style=\"float: right;\"><br><br></form>";
+		echo "<br><br><input type=\"submit\" value=\"Weiter\" class=\"mybuttons\" style=\"float: right;\"><br><br><br></form>";
 	}
 	if (isset($_GET['step']) && $_GET['step'] == 2) {
 		if (!isset($_SESSION['mail_step1']) || $_SESSION['mail_step1'] == 0 || count($_POST) != 0) {
 			$_SESSION['mail_step1'] = $_POST;
 		}
 		?>
-<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=3"?>" method="POST">
+<form action="<?php
+		
+		echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=3"?>" method="POST">
 	<div style="display: flex;"><?php
 		require 'includes/class_person.php';
 		require 'includes/class_lehrer.php';
 		require 'includes/class_schueler.php';
 		require 'includes/class_paar.php';
 		if (isset($_SESSION['mail_step1']['mailart']) && $_SESSION['mail_step1']['mailart'] != 1) {
-			$return = query_db("SELECT * FROM `person`");
+			$return = query_db("SELECT * FROM `person` ORDER BY `person`.`nname` ASC");
 			// $return = query_db("SELECT * FROM `lehrer` WHERE schuljahr = :schuljahr", get_current_year());
 			$i = 0;
 			$result = $return->fetch();
@@ -215,7 +251,7 @@ if (isset($user) && $user->runscript()) {
 		?>
 		
 	</div>
-		<input type="submit" value="Weiter" style="float: right;" class="mybuttons">
+		<input type="submit" value="Weiter" style="float: right;" class="mybuttons"><br>
 		<br>
 		<br>
 
@@ -236,6 +272,18 @@ if (isset($user) && $user->runscript()) {
 		document.getElementById('textarea2').value = 'Hallo :vorname :nachname,\ndeine erste Nachhilfestunde wird am :tag um :treff_zeit im Zimmer :treff_raum stattfinden.\nDein Schüler ist :vorname_schueler :nachname_schueler.\nBitte setze dich mit Ihm in Kontakt. Du kannst Ihn unter :email_schueler erreichen.\nBitte lies unbedingt die der E-Mail anghängten Datein.\nSolltest du noch Fragen haben, kannst du uns gerne anschreiben.\n\nLiebe Grüße\nDie Schülerfirma\n\n';
 		document.getElementById('textarea1').value = 'Hallo :vorname :nachname,\ndeine erste Nachhilfestunde wird am :tag um :treff_zeit im Zimmer :treff_raum stattfinden.\nDein Lehrer ist :vorname_lehrer :nachname_lehrer.\nBitte lies unbedingt die der E-Mail angehängten Datein.\nSolltest du noch Fragen haben, kannst du uns gerne schreiben.\n\nLiebe Grüße\nDie Schülerfirma\n';
 	}
+	function wartemail() {
+		document.getElementById('subject').value = 'Deine Nachhilfe';
+		document.getElementById('textarea1').value = 'Hallo :vorname :nachname,\nleider können wir dich momentan nicht vermitteln.\nWenn du willst, suchen wir aber weiter nach einem passenden Lehrer für dich.\n\nViele Grüße\nDie Schülerfirma';
+	}
+	function anmeldung_schueler() {
+		document.getElementById('subject').value = 'Anmeldung bei der Schülerfirma';
+		document.getElementById('textarea1').value = 'Hallo :vorname :nachname,\nvielen Dank für deine Anmeldung bei unserer Schülefirma "Schüler helfen Schülern".\nWir werden nun einen passenden Nachhilfelehrer für dich suchen. Wenn wir einen gefunden haben, melden wir uns wieder bei dir.\n\nViele Grüße\nDie Schülerfirma';
+	}
+	function anmeldung_lehrer() {
+		document.getElementById('subject').value = 'Anmeldung bei der Schülerfirma';
+		document.getElementById('textarea1').value = 'Hallo :vorname :nachname,\nvielen Dank für deine Anmeldung bei unserer Schülefirma "Schüler helfen Schülern".\nSobald wir einen passenden Schüler für dich gefunden haben, melden wir uns wieder bei dir.\n\nViele Grüße\nDie Schülerfirma';
+	}
 	function add_text(text, element) {
 		var content = document.getElementById(element).value;
 		document.getElementById(element).value = content + text;
@@ -244,7 +292,7 @@ if (isset($user) && $user->runscript()) {
 		document.getElementById(element).value = '';
 	}
 	</script>
-<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&step=4"?>" method="POST">
+<form action="index.php?page=mail&step=4" method="POST"><br>
 	<?php
 		// Email an Nachhilfepaar
 		if (isset($_SESSION['mail_step1']['mailart']) && $_SESSION['mail_step1']['mailart'] == 1) {
@@ -252,24 +300,18 @@ if (isset($user) && $user->runscript()) {
 			echo "<p>Hinweis: <i>Die AGB's werden automatisch mit an die Vermittlungsemails angehängt sowie die Lohnkarte für den Lehrer und die Kontoinformationen für den Schüler</i></p>";
 			echo "<button type=\"button\" class=\"mybuttons\" onclick=\"vermittlungsmail()\">Vorlage für Vermittlungsmail</button><br>";
 			if (isset($_SESSION['mail_step3']['subject2'])) {
-				?>
-			<input id="subject2" type="text" name="subject2" placeholder="Betreff" value="<?php echo strip_tags($_SESSION['mail_step3']['subject2']);?>" style="width: 40%">
-			<?php
+				echo "<input id=\"subject2\" type=\"text\" name=\"subject2\" placeholder=\"Betreff\" value=\"" . strip_tags($_SESSION['mail_step3']['subject2']) . "style=\"width: 40%\">";
 			}else {
-				?>
-					<input id="subject2" type="text" name="subject2" placeholder="Betreff" style="width: 40%">
-					<?php
+				echo "<input id=\"subject2\" type=\"text\" name=\"subject2\" placeholder=\"Betreff\" style=\"width: 40%\">";
 			}
-			?>
-			<br><?php
+			echo "<br>";
 			if (isset($_SESSION['mail_step3']['anhang2']) && $_SESSION['mail_step3']['anhang2'] == 1) {
 				echo "<label><input id=\"anhang2\" type=\"checkbox\" value=\"1\" name=\"anhang2\" checked>Vermittlungsdokument als Anhang</label>";
 			}else {
 				echo "<label><input id=\"anhang2\" type=\"checkbox\" value=\"1\" name=\"anhang2\">Vermittlungsdokument als Anhang</label>";
 			}
 			?>
-			<br>
-	<br>
+			<br><br>
 	<button type="button" onclick="add_text(' :vorname', 'textarea2')" class="mybuttons">Vorname</button>
 	<button type="button" onclick="add_text(' :nachname', 'textarea2')" class="mybuttons">Nachname</button>
 	<button type="button" onclick="add_text(' :email', 'textarea2')" class="mybuttons">Email</button><?php
@@ -283,22 +325,21 @@ if (isset($user) && $user->runscript()) {
 				echo "<button type=\"button\" onclick=\"add_text(' :email_schueler', 'textarea2')\" class=\"mybuttons\">E-Mail-Adresse des Schülers</button>";
 			}
 			?>
-			<button type="button" onclick="reset_text('textarea2')" class="mybuttons">Reset</button>
-	<br>
-	<textarea name="text2" rows="10" id="textarea2" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%; padding: 5px;"><?php if (isset($_SESSION['mail_step3']['text2'])) { echo strip_tags($_SESSION['mail_step3']['text2']); }?></textarea>
-	<br>
-	<br>
+	<button type="button" onclick="reset_text('textarea2')" class="mybuttons">Reset</button><br>
+	<textarea name="text2" rows="10" id="textarea2" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%; padding: 5px;"><?php
+			
+			if (isset($_SESSION['mail_step3']['text2'])) {
+				echo strip_tags($_SESSION['mail_step3']['text2']);
+			}
+			?>
+	</textarea><br><br>
 			<?php
 			echo "<h3>E-Mail an Nachhilfeschüler:</h3>";
 		}
 		if (isset($_SESSION['mail_step3']['subject'])) {
-			?>
-	<input id="subject" type="text" name="subject" placeholder="Betreff" value="<?php echo strip_tags($_SESSION['mail_step3']['subject']);?>" style="width: 40%">
-	<?php
+			echo "<input id=\"subject\" type=\"text\" name=\"subject\" placeholder=\"Betreff\" value=\"" . strip_tags($_SESSION['mail_step3']['subject']) . "\" style=\"width: 40%\">";
 		}else {
-			?>
-			<input id="subject" type="text" name="subject" placeholder="Betreff" style="width: 40%">
-			<?php
+			echo "<input id=\"subject\" type=\"text\" name=\"subject\" placeholder=\"Betreff\" style=\"width: 40%\">";
 		}
 		echo "<br>";
 		if (isset($_SESSION['mail_step1']['mailart']) && $_SESSION['mail_step1']['mailart'] == 1) {
@@ -322,13 +363,23 @@ if (isset($user) && $user->runscript()) {
 			echo "<br><button type=\"button\" onclick=\"add_text(' :vorname_lehrer', 'textarea1')\" class=\"mybuttons\">Vorname des Lehrers</button>";
 			echo "<button type=\"button\" onclick=\"add_text(' :nachname_lehrer', 'textarea1')\" class=\"mybuttons\">Nachname des Lehrers</button>";
 			echo "<button type=\"button\" onclick=\"add_text(' :email_lehrer', 'textarea1')\" class=\"mybuttons\">E-Mail-Adresse des Lehrers</button>";
+			echo "<button type=\"button\" onclick=\"reset_text('textarea1')\" class=\"mybuttons\">Reset</button>";
+		}else {
+			echo "<button type=\"button\" onclick=\"reset_text('textarea1')\" class=\"mybuttons\">Reset</button><br>";
+			echo "<button type=\"button\" onclick=\"wartemail()\" class=\"mybuttons\">Vorlage für Warteschreiben</button>";
+			echo "<button type=\"button\" onclick=\"anmeldung_schueler()\" class=\"mybuttons\">Anmmeldungs-E-Mail für Schüler</button>";
+			echo "<button type=\"button\" onclick=\"anmeldung_lehrer()\" class=\"mybuttons\">Anmeldungs-E-Mail für Lehrer</button>";
 		}
 		?>
-	<button type="button" onclick="reset_text('textarea1')" class="mybuttons">Reset</button>
-	<textarea name="text" rows="10" id="textarea1" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%; padding: 5px;"><?php if (isset($_SESSION['mail_step3']['text'])) { echo strip_tags($_SESSION['mail_step3']['text']); }?></textarea>
+	<textarea name="text" rows="10" id="textarea1" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%; padding: 5px;"><?php
+		
+		if (isset($_SESSION['mail_step3']['text'])) {
+			echo strip_tags($_SESSION['mail_step3']['text']);
+		}
+		?></textarea>
 	<br>
 	<br>
-	<input type="submit" value="Weiter" style="float: right;" class="mybuttons">
+	<input type="submit" value="Weiter" style="float: right;" class="mybuttons"><br>
 	<br>
 	<br>
 </form>
@@ -457,10 +508,11 @@ if (isset($user) && $user->runscript()) {
 				// var_dump($_SESSION);
 			}
 		}
-		echo "Schritt 3";
 		?>
-<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])."?page=mail&send=1"?>" method="POST">
-	<input type="submit" value="Absenden" style="float: right;" class="mybuttons">
+<form action="<?php
+		
+		echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&send=1"?>" method="POST">
+	<input type="submit" value="Absenden" style="float: right;" class="mybuttons"><br>
 	<br>
 	<br>
 </form>
