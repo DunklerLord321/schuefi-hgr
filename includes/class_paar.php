@@ -76,4 +76,14 @@ class paar {
 			query_db("UPDATE `unterricht` SET `schueler_dokument` = :schueler_dokument WHERE id = :id;", $schueler_dokument, $this->paarid);
 		}
 	}
+	
+	function delete() {
+		$return = query_db("DELETE FROM `unterricht` WHERE lid = :lid AND sid = :sid AND fid = :fid", $this->lehrer->get_id(), $this->schueler->get_id(), $this->fid);
+		if (!$return) {
+			echo "Es ist ein Fehler aufgetreten. Das Paar konnte nicht gelöscht werden";
+		}else{
+			echo "Das Paar wurde erfolgreich gelöscht";
+		}
+		
+	}
 }

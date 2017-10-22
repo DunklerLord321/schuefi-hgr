@@ -21,7 +21,10 @@ if (isset($user) && $user->runscript()) {
 			$return = query_db("UPDATE `fragt_nach` SET `status` = 'vermittelt' WHERE sid = :sid AND fid = :fid", $schueler_ex[0], $schueler_ex[1]);
 			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, tag, treff_zeit, treff_zeit_ende, treff_raum) VALUES (:lid, :sid, :fid, :tag, :treff_zeit, :treff_zeit_ende, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], intval($_POST['raum']));
 			if ($return !== false) {
-				echo "Das Paar wurde erfolgreich hinzugefügt";
+				$return = query_db("SELECT unterricht.id FROM unterricht WHERE unterricht.lid = :lid AND unterricht.fid = :fid AND unterricht.sid = :sid ", $lehrer_ex[0], $schueler_ex[1], $schueler_ex[0]);
+				$result = $return->fetch();
+				echo "Das Paar wurde erfolgreich hinzugefügt<br>";
+				echo "Zum Erstellen des Vermittlungsdokuments gehe nun auf <a href=\"index.php?page=output&paare=1&filter=" . $result['id'] . "\" class=\"links\">Ausgeben der Paare</a>";
 			}
 		}
 	}

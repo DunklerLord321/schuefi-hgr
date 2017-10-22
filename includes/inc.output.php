@@ -4,63 +4,105 @@ if (isset($user) && $user->runscript()) {
 	require 'includes/class_person.php';
 	require 'includes/class_lehrer.php';
 	require 'includes/class_schueler.php';
+	?>
+<script type="text/javascript">
+function warn(string) {
+	if(confirm(string) == true) {
+		return true;
+	}
+	return false;
+}
+</script>
+	<?php
 	if (isset($_GET['lehrer']) && $_GET['lehrer'] == 1) {
 		if (isset($_GET['filter'])) {
+			echo "Ansicht: <a href=\"index.php?page=output&lehrer=1&filter=".$_GET['filter']."&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&lehrer=1&filter=".$_GET['filter']."&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 			$return = query_db("SELECT * FROM `lehrer` WHERE `schuljahr` = :schuljahr AND `pid` = :pid", get_current_year(), $_GET['filter']);
 		}else {
+			echo "Ansicht: <a href=\"index.php?page=output&lehrer=1&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&lehrer=1&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 			$return = query_db("SELECT `lehrer`.*, `person`.`nname` FROM `lehrer` LEFT JOIN `person` ON `person`.`id` = `lehrer`.`pid` WHERE `schuljahr` = :schuljahr GROUP BY `person`.`nname`, `lehrer`.`id` ASC ", get_current_year());
 		}
 		if ($return === false) {
 			echo "Ein Problem";
 			die();
 		}
+		if (isset($_GET['layout']) && $_GET['layout'] == "table") {
+			set_view("table");
+		}
+		if (isset($_GET['layout']) && $_GET['layout'] == 'list') {
+			set_view("list");
+		}
+		if (get_view() == "table") {
+			echo "<div style=\"overflow-x:auto\"><table class=\"table1\"><tr><th>Name</th><th>Klasse</th><th>Klassenlehrer</th><th>Fächer</th><th>Zeiten</th><th>Kommentar</th><th></th></tr>";
+		}
 		$result = $return->fetch();
 		if ($result !== false) {
 			while ($result) {
 				$lehrer = new lehrer(-1, $result['id']);
-				?>
-<fieldset style="padding: 40px; width: 80%; padding-top: 10px;">
-	<legend><?php
-				
-				echo "<a href=\"index.php?page=output_person&filter=" . $lehrer->person->id . "\" class=\"links2\">" . $lehrer->person->vname . ' ' . $lehrer->person->nname . "</a>"?></legend>
-	<div style="display: flex;">
-		<div style="width: 70%; display: inline-block;">
-					<?php
-				echo "<br>Klasse: " . format_klassenstufe_kurs($lehrer->get_klassenstufe(), $lehrer->get_klasse());
-				echo "<br>Klassenlehrer/in: " . $lehrer->get_klassenlehrer();
-				$faecher = $lehrer->get_angebot_faecher();
-				$zeit = $lehrer->get_zeit();
-				echo "<br><br><b>Fächer:</b>";
-				for ($i = 0; $i < count($faecher); $i++) {
+				if (get_view() == "table") {
+					echo "<td><a href=\"index.php?page=output_person&filter=" . $lehrer->person->id . "\" class=\"links2\">" . $lehrer->person->vname . ' ' . $lehrer->person->nname . "</a></td>";
+					echo "<td>" . format_klassenstufe_kurs($lehrer->get_klassenstufe(), $lehrer->get_klasse())."</td>";
+					echo "<td>" . $lehrer->get_klassenlehrer()."</td><td>";
+					$faecher = $lehrer->get_angebot_faecher();
+					$zeit = $lehrer->get_zeit();
+					for ($i = 0; $i < count($faecher); $i++) {
+						echo get_faecher_name_of_id($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
+						echo "<br>Notenschnitt: " . $faecher[$i]['notenschnitt'];
+						echo " <br> Nachweis vorhanden: " . ($faecher[$i]['nachweis_vorhanden'] == true ? "ja" : "nein");
+						echo "<br>Vermittlungsstatus: " . $faecher[$i]['status'] . "<br>";
+					}
+					echo "</td><td>";
+					if (isset($zeit[0])) {
+						echo get_name_of_tag($zeit[0]['tag']) . " von " . date("H:i", strtotime($zeit[0]['anfang'])) . " - " . date("H:i", strtotime($zeit[0]['ende'])) . "<br>";
+					}
+					echo "</td>";
+					if (strlen($lehrer->get_comment()) > 0) {
+						echo "<td>" . $lehrer->get_comment()."</td>";
+					}else{
+						echo "<td>Kein Kommentar</td>";
+					}
+					echo "<td><a href=\"index.php?page=change&lehrer=".$lehrer->get_id()."\" class=\"links2\">Ändere die Daten</a></td></tr>";
+/*					if (count($zeit) > 1) {
+						for ($i = 1; $i < count($zeit); $i++) {
+							echo "<tr><td style=\"rowspan=2\">".get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br></td><td></td></tr>";
+						}
+					}*/
+				}else{
+					echo "<fieldset style=\"padding: 40px; width: 80%; padding-top: 10px;\"><legend>";
+					echo "<a href=\"index.php?page=output_person&filter=" . $lehrer->person->id . "\" class=\"links2\">" . $lehrer->person->vname . ' ' . $lehrer->person->nname . "</a></legend>";
+					echo "<div style=\"display: flex;\"><div style=\"width: 70%; display: inline-block;\">";
+					echo "<br>Klasse: " . format_klassenstufe_kurs($lehrer->get_klassenstufe(), $lehrer->get_klasse());
+					echo "<br>Klassenlehrer/in: " . $lehrer->get_klassenlehrer();
+					$faecher = $lehrer->get_angebot_faecher();
+					$zeit = $lehrer->get_zeit();
+					echo "<br><br><b>Fächer:</b>";
+					for ($i = 0; $i < count($faecher); $i++) {
+						echo "<div style=\"padding-left: 5%;\">";
+						echo "<br><b>" . get_faecher_name_of_id($faecher[$i]['fid']) . "</b>";
+						echo "<br>Fachlehrer: " . $faecher[$i]['fachlehrer'];
+						echo "<br>Notenschnitt: " . $faecher[$i]['notenschnitt'];
+						echo "<br> Nachweis vorhanden: " . ($faecher[$i]['nachweis_vorhanden'] == true ? "ja" : "nein");
+						echo "<br><b>Vermittlungsstatus: " . $faecher[$i]['status'] . "</b>";
+						echo "</div>";
+					}
+					echo "<br><b>Zeiten:</b>";
 					echo "<div style=\"padding-left: 5%;\">";
-					echo "<br><b>" . get_faecher_name_of_id($faecher[$i]['fid']) . "</b>";
-					echo "<br>Fachlehrer: " . $faecher[$i]['fachlehrer'];
-					echo "<br>Notenschnitt: " . $faecher[$i]['notenschnitt'];
-					echo " <br> Nachweis vorhanden: " . ($faecher[$i]['nachweis_vorhanden'] == true ? "ja" : "nein");
-					echo "<br><b>Vermittlungsstatus: " . $faecher[$i]['status'] . "</b>";
+					for ($i = 0; $i < count($zeit); $i++) {
+						echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " Uhr bis " . date("H:i", strtotime($zeit[$i]['ende'])) . " Uhr";
+					}
 					echo "</div>";
+					if (strlen($lehrer->get_comment()) > 0) {
+						echo "<br>Kommentar: " . $lehrer->get_comment();
+					}
+					echo "</div><div style=\"width: 30%; display: inline-block; padding-top: 40px;\"><a href=\"index.php?page=change&lehrer=" . $lehrer->get_id() . "\" class=\"links\">Ändere die Daten</a>
+								<br><br><br><br><br><a href=\"index.php?page=delete&lehrer=1&delete=" . $lehrer->get_id(). "\" class=\"links\" onclick=\"return warn('Willst du den Lehrer wirklich löschen? Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\">Löschen</a>
+								</div>";
+					echo "</div></fieldset>";
 				}
-				echo "<br><b>Zeiten:</b>";
-				echo "<div style=\"padding-left: 5%;\">";
-				for ($i = 0; $i < count($zeit); $i++) {
-					echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " Uhr bis " . date("H:i", strtotime($zeit[$i]['ende'])) . " Uhr";
-				}
-				echo "</div>";
-				if (strlen($lehrer->get_comment()) > 0) {
-					echo "<br>Kommentar: " . $lehrer->get_comment();
-				}
-				?>
-		</div>
-		<div style="width: 30%; display: inline-block; padding-top: 40px;">
-			<a href="index.php?page=change&lehrer=<?php
-				
-				echo $lehrer->get_id();
-				?>" class="links">Ändere die Daten</a>
-		</div>
-	</div>
-</fieldset>
-<?php
 				$result = $return->fetch();
+			}
+			if (get_view() == "table") {
+				echo "</div>";
 			}
 		}else {
 			if (isset($_GET['filter'])) {
@@ -164,10 +206,12 @@ if (isset($user) && $user->runscript()) {
 				?>
 				</div>
 		<div style="width: 30%; display: inline-block; padding-top: 40px;">
-			<a href="index.php?page=change&schueler=<?php
-				
+				<a href="index.php?page=change&schueler=<?php
 				echo $schueler->get_id();
-				?>" class="links">Ändere die Daten</a>
+				?>" class="links">Ändere die Daten</a><br><br><br><br><br>
+				<a href="index.php?page=delete&schueler=1&delete=<?php
+				echo $schueler->get_id();
+				?>" class="links" onclick="return warn('Willst du den Schüler wirklich löschen? Sämtliche Informationen, wie die Zeit und sein Nachhilfepaar gehen dabei verloren')">Löschen</a>
 		</div>
 	</div>
 </fieldset>
@@ -186,7 +230,11 @@ if (isset($user) && $user->runscript()) {
 	}
 	if (isset($_GET['paare']) && $_GET['paare'] == 1) {
 		require 'includes/class_paar.php';
-		$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = '" . get_current_year() . "';");
+		if(isset($_GET['filter'])) {
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.id = :id", get_current_year(), $_GET['filter']);
+		}else{
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = '" . get_current_year() . "';");
+		}
 		$i = 0;
 		if ($return) {
 			$paar = $return->fetch();
@@ -208,7 +256,7 @@ if (isset($user) && $user->runscript()) {
 				echo "<br>Zeitpunkt: " . get_name_of_tag($npaar->tag) . " von " . $npaar->anfang . " Uhr bis " . $npaar->ende . " Uhr";
 				echo "<br><br>Im Zimmer: " . $npaar->raum . "<br><br>";
 				if (strlen($npaar->lehrer_dokument) > 0) {
-					echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links\">Vermittlungsdokument für Lehrer ansehen</a><br><br>";
+					echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links\">Vermittlungsdokument für Lehrer ansehen</a><br><br><br>";
 				}else {
 					echo "Vermittlungsdokument für Lehrer ist noch nicht vorhanden";
 					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a><br><br><br>";
@@ -220,6 +268,7 @@ if (isset($user) && $user->runscript()) {
 					echo "Vermittlungsdokument für Schüler ist noch nicht vorhanden";
 					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a>";
 				}
+				echo "<a href=\"index.php?page=delete&paar=1&delete=$npaar->paarid\" class=\"links\" onclick=\"return warn('Willst du das Paar wirklich löschen?' Dabei gehen die Daten über das Nachhilfepaar unwiederuflich verloren, allerdings bleiben die Daten über den Schüler und Lehrer erhalten)\">Löschen</a><br><br>";
 				echo "</fieldset>";
 				$paar = $return->fetch();
 				$i++;

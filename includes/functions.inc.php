@@ -94,7 +94,7 @@ function query_db($statement, ...$params) {
 	$stat_ex = explode(' ', $statement);
 	$i = 0;
 	// var_dump(debug_backtrace());
-	// var_dump($params);
+//var_dump($params);
 	// var_dump($stat_ex);
 	// baue assoziativen Array für prepared-Statement
 	$parameter = array();
@@ -135,6 +135,24 @@ function query_db($statement, ...$params) {
 		}else {
 			return $ret_prep;
 		}
+	}
+}
+
+function set_view($view) {
+	if($view == "table") {
+		$_SESSION['view'] = "table";
+	}else if($view == "list") {
+		$_SESSION['view'] = "list";
+	}else{
+		$_SESSION['view'] = "";
+	}
+}
+
+function get_view() {
+	if(isset($_SESSION['view'])) {
+		return $_SESSION['view'];
+	}else {
+		return "list";
 	}
 }
 

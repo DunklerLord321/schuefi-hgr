@@ -36,8 +36,9 @@ if (isset($user) && $user->runscript()) {
 			for ($i = 0; $i < count($tables); $i++) {
 				$result = query_db("DELETE FROM `" . $tables[$i] . "`;");
 			}
-			if (!$pdo->exec($content)) {
-				$user->log(user::LEVEL_ERROR, "DB-FEHLER:" . $pdo - errorInfo());
+			echo $content;
+			if ($pdo->exec($content) === false) {
+				$user->log(user::LEVEL_ERROR, "DB-FEHLER:" . implode("-", $pdo->errorInfo()));
 			}
 			$pdo->exec("SET foreign_key_checks = 1");
 			// PDF-Dateien müssen noch wiederhergestellt werden

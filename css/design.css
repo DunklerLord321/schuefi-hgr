@@ -74,7 +74,7 @@ button {
 	overflow: auto;
 	position: absolute;
 	top: 75px;
-	width: 80%;
+	width: 95%;
 	background-color: rgba(27,37,135,1);
 	border-radius: 15px;
 	z-index:  1;
@@ -406,11 +406,11 @@ button {
 	background-color: rgba(27,37,135,1);
 	border-radius: 15px;
 }
-
+/*
 #nav_div:HOVER .nav_seite{
 	width: 80%;
 	display: block;
-}
+}*/
 
 #nav_div{
 	width: 100%;
@@ -421,7 +421,7 @@ button {
 		display: block;
 	}
 	.content {
-		margin-left: 22%;
+		margin-left: 7%;
 		margin-top: 80px;
 		margin-bottom: 50px;
 		border: 0.5px solid;
@@ -434,7 +434,12 @@ button {
 	}
 	
 	#nav_button {
-		display: none;
+		display: block;
+		width: 5%;
+		top: 100px;
+		position: fixed;
+		height: 50%;
+		padding-left: 1%;
 	}
 	.dropdown{
 		float: left;
@@ -468,11 +473,12 @@ button {
 	}
 	.nav_seite {
 		position: fixed;
-		display: block;	
-		width: 20%;
+		display: none;	
+		width: 5%;
 		top: 100px;
 	}
-	#nav_div:HOVER .nav_seite{
+/*	#nav_div:HOVER .nav_seite{
 		width: 20%;
-	}
+		display: block;
+	}*/
 }

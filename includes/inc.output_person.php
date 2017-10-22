@@ -1,12 +1,28 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Ausgabe</h2>";
+	?>
+	<script type="text/javascript">
+function warn(string) {
+	if(confirm(string) == true) {
+		return true;
+	}
+	return false;
+}
+</script>
+	<?php
 	if (isset($_GET['filter'])) {
 		echo "Ansicht: <a href=\"index.php?page=output_person&filter=".$_GET['filter']."&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output_person&filter=".$_GET['filter']."&layout=table\" class=\"links2\">Tabelle</a><br><br>";
-		$return = query_db("Select * FROM `person` WHERE id = :id ORDER BY `person`.`nname` ASC", $_GET['filter']);
+		$return = query_db("Select * FROM `person` WHERE id = :id  AND aktiv = 1 ORDER BY `person`.`nname` ASC", $_GET['filter']);
 	}else {
 		echo "Ansicht: <a href=\"index.php?page=output_person&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output_person&layout=table\" class=\"links2\">Tabelle</a><br><br>";
-		$return = query_db("SELECT * FROM `person` ORDER BY `person`.`nname` ASC");
+		$return = query_db("SELECT * FROM `person` WHERE aktiv = 1 ORDER BY `person`.`nname` ASC");
+	}
+	if (isset($_GET['layout']) && $_GET['layout'] == 'table') {
+		set_view("table");
+	}
+	if (isset($_GET['layout']) && $_GET['layout'] == 'list') {
+		set_view("list");
 	}
 	$result = $return->fetch();
 	require 'includes/class_person.php';
@@ -14,12 +30,12 @@ if (isset($user) && $user->runscript()) {
 	require 'includes/class_schueler.php';
 	$person = new person();
 	if ($result !== false) {
-		if(isset($_GET['layout']) && $_GET['layout'] == 'table') {
-			echo "<table class=\"table1\"><tr><th>Vorname</th><th>Nachname</th><th>E-Mail-Adresse</th><th>Telefon</th><th>Geburtstag</th><th>Nachhilfeschüler</th><th>Nachhilfelehrer</th><th></th></tr>";
+		if (get_view() == "table") {
+			echo "<table class=\"table1\"><tr><th>Vorname</th><th>Nachname</th><th>E-Mail-Adresse</th><th>Telefon</th><th>Geburtstag</th><th>Nachhilfeschüler</th><th>Nachhilfelehrer</th><th></th><th></th></tr>";
 		}
 		while ($result) {
 			$person->load_person($result['id']);
-			if(isset($_GET['layout']) && $_GET['layout'] == 'table') {
+			if (get_view() == "table") {
 				echo "<tr><td>$person->vname</td><td>$person->nname</td><td>$person->email</td><td>$person->telefon</td><td>$person->geburtstag</td>";
 				$schueler_lehrer = $person->search_lehrer_schueler();
 				if (is_array($schueler_lehrer['schueler'])) {
@@ -34,6 +50,7 @@ if (isset($user) && $user->runscript()) {
 				}
 				if ($user->isuserallowed('k')) {
 					echo "<td><a href=\"index.php?page=change&person=$person->id\" class=\"links2\">Ändern</a></td>";
+					echo "<td><a href=\"index.php?page=delete&person=1&delete=$person->id\" class=\"links2\" onclick=\"return warn('Willst du die Person wirklich löschen?')\">Löschen</a></td>";
 				}
 				echo "</tr>";
 			}else{
@@ -76,7 +93,8 @@ if (isset($user) && $user->runscript()) {
 			if ($user->isuserallowed('k')) {
 				?>
 		<div style="width: 30%;">
-			<a href="index.php?page=change&person=<?php echo $person->id;?>" class="links">Ändere die Daten</a>
+			<a href="index.php?page=change&person=<?php echo $person->id;?>" class="links">Ändere die Daten</a><br><br><br>
+			<a href="index.php?page=delete&person=1&delete=<?php echo $person->id;?>" class="links" onclick="return warn('Willst du die Person wirklich löschen?')">Löschen</a>
 		</div>	
 		<?php }?>
 		</div>

@@ -295,4 +295,34 @@ class lehrer {
 		}
 		return false;
 	}
+	
+	function delete() {
+		$fehler = 0;
+		//Löschen sämtlicher Zeiten
+		for ($i = 0; $i < count($this->zeit); $i++) {
+			if (!$this->remove_time($this->zeit[$i]['id'])) {
+				$fehler++;
+			}
+		}
+		for ($i = 0; $i < count($this->faecher); $i++) {
+			if (!$this->remove_angebot_fach($this->faecher[$i]['fid'])) {
+				$fehler++;
+			}
+		}
+		$return = query_db("DELETE FROM `unterricht` WHERE lid = :lid", $this->id);
+		if (!$return) {
+			$fehler++;
+		}
+		$return = query_db("DELETE FROM `lehrer` WHERE id = :id", $this->id);
+		if (!$return) {
+			$fehler++;
+		}
+		if ($fehler > 0) {
+			echo "Es traten beim Löschen $fehler Fehler auf";
+		}else{
+			echo "Daten erfolgreich gelöscht";
+		}
+		
+		
+	}
 }

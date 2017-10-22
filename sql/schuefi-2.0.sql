@@ -38,7 +38,8 @@ CREATE TABLE `users` (
   `account` enum('k','f','v','w') COLLATE utf8_german2_ci NOT NULL DEFAULT 'w',
   `createt_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `count_login` int(11) DEFAULT 0
+  `count_login` int(11) DEFAULT 0,
+  `aktiv` tinyint(4) DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `person`;
@@ -49,7 +50,8 @@ CREATE TABLE `person` (
 	`email` varchar(50) COLLATE utf8_german2_ci DEFAULT NULL,
 	`telefon` varchar(50) COLLATE utf8_german2_ci DEFAULT NULL,
 	`geburtstag` date DEFAULT NULL,
-	`hinzugefuegt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP	
+	`hinzugefuegt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`aktiv` tinyint(4) DEFAULT '1'
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `faecher`;

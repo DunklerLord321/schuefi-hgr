@@ -214,6 +214,45 @@ if (isset($_GET['page'])) {
 		</ul>
 		</div>
 	</nav>
+				<script type="text/javascript">
+
+$(function() {
+	console.log($(window).width());
+	$('#nav_button').click(toggle_mobile);
+	$('#nav_button').mouseenter(shownav);
+	function toggle_mobile() {
+		if($(window).width() < 1240 && $('#nav_seite').css('opacity') > 0) {
+			$('#nav_seite').fadeToggle(200);
+			$('#nav').fadeToggle(200);
+		}
+	}
+	function shownav() {
+		if($(window).width() > 1240) {
+			console.log("test");
+			$('#content').animate({marginLeft: '22%'}, 200);
+			$('#nav_seite').animate({width: '20%'}, 200);
+			$('#nav_seite').fadeIn(200);
+		}else{
+			console.log("test2");
+			$('#nav_seite').fadeIn(200);
+			$('#nav').fadeOut(200);
+		}
+	}
+	function hidenav() {
+		if($(window).width() > 1240) {
+			$('#nav_seite').fadeOut(200);		
+			$('#nav_seite').animate({width: '5%'}, 200);
+			$('#content').animate({marginLeft: '7%'}, 200);
+		}else{
+			$('#nav_seite').fadeOut(200);		
+			$('#nav').fadeIn(200);		
+
+		}
+	}
+	$('#nav_seite').mouseleave(hidenav);
+	$('#content').mouseenter(hidenav);
+});
+</script>
 		
 		
 		<nav class="nav" id="nav">
@@ -259,7 +298,7 @@ if (isset($_GET['page'])) {
 		</div>
 		</nav>
 	<!-- - div endet in letzter Zeile   -->
-	<div class="content">
+	<div class="content" id="content">
 	<?php
 		require 'includes/functions.inc.php';
 		$ret_prep = query_db("SELECT * FROM navigation WHERE kuerzel = :kuerzel", $_GET['page']);

@@ -195,4 +195,19 @@ class person {
 			}
 		}
 	}
+	
+	function delete() {
+		$schueler_lehrer = $this->search_lehrer_schueler();
+		if (is_array($schueler_lehrer['lehrer']) || is_array($schueler_lehrer['schueler'])) {
+			echo "Die Person konnte nicht gelöscht werden.<br><br>Zu der Person gibt es noch einen Schüler oder Lehrer. Lösche bitte zuerst diese.";
+			return false;
+		}
+		$return = query_db("UPDATE `person` SET `aktiv` = 0 WHERE id = :id", $this->id);
+		if (!$return) {
+			echo "Es trat beim Löschen ein Fehler auf";
+		}else{
+			echo "Die Person wurde erfolgreich gelöscht";
+		}
+		
+	}
 }

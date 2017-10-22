@@ -106,6 +106,7 @@ class schueler {
 			if (!isset($params_arr['klassenstufe']) || $params_arr['klassenstufe'] < 5 || $params_arr['klassenstufe'] > 12 || strlen($params_arr['klassenstufe']) == 0) {
 				$error = $error . "<br><br>Bitte gib eine korrekte Klassenstufe an.";
 			}
+			$params_arr['klasse'] = strtolower($params_arr['klasse']);
 			if (!isset($params_arr['klasse']) || strlen($params_arr['klasse']) < 1 || strlen($params_arr['klasse']) > 2 || array_search($params_arr['klasse'], $GLOBAL_CONFIG['klassen']) === false) {
 				$error = $error . "<br><br>Bitte gib eine korrekte Klasse/Kurs an.";
 			}
@@ -279,10 +280,32 @@ class schueler {
 		}
 	}
 	function delete() {
-		/*
-		 * In Planung
-		 *
-		 */
+		$fehler = 0;
+		//Löschen sämtlicher Zeiten
+		for ($i = 0; $i < count($this->zeit); $i++) {
+			if (!$this->remove_time($this->zeit[$i]['id'])) {
+				$fehler++;
+			}
+		}
+		for ($i = 0; $i < count($this->faecher); $i++) {
+			if (!$this->remove_nachfrage_fach($this->faecher[$i]['fid'])) {
+				$fehler++;
+			}
+		}
+		$return = query_db("DELETE FROM `unterricht` WHERE sid = :sid", $this->id);
+		if (!$return) {
+			$fehler++;
+		}
+		$return = query_db("DELETE FROM `schueler` WHERE id = :id", $this->id);
+		if (!$return) {
+			$fehler++;
+		}
+		if ($fehler > 0) {
+			echo "Es traten beim Löschen $fehler Fehler auf";
+		}else{
+			echo "Daten erfolgreich gelöscht";
+		}
+		
 	}
 	function get_nachfrage_faecher() {
 		$return = query_db("SELECT * FROM `fragt_nach` WHERE sid = :sid", $this->id);
@@ -314,7 +337,7 @@ class schueler {
 				if ($return) {
 					$lehrer = $return->fetch();
 					// echo "PID des Lehrers:".$lehrer['pid'];
-					if ($lehrer['klassenstufe'] > $this->klassenstufe) {
+					if ($lehrer['klassenstufe'] >= $this->klassenstufe) {
 						// hole Sprechzeiten des Lehrers
 						$return = query_db("SELECT * FROM `zeit` WHERE lid = :lid", $lehrer['id']);
 						if ($return) {
@@ -426,12 +449,12 @@ class schueler {
 			if (count($matching_lehrer) == 0) {
 				echo "<br>Es wurde leider kein passender Lehrer gefunden<br>";
 			}
+			echo "<br>Folgende Lehrer kämen in Frage:";
 			for ($i = 0; $i < count($matching_lehrer); $i++) {
-				echo "<br>Folgende Lehrer kämen in Frage:<br>";
 				$return = query_db("SELECT * FROM `person` WHERE id = :pid", $matching_lehrer[$i]['pid']);
 				if ($return) {
 					$return = $return->fetch();
-					echo $return['vname'] . " " . $return['nname'] . ", Klasse: " . format_klassenstufe_kurs($matching_lehrer[$i]['klassenstufe'], $matching_lehrer[$i]['klasse']);
+					echo "<br><br>" . $return['vname'] . " " . $return['nname'] . ", Klasse: " . format_klassenstufe_kurs($matching_lehrer[$i]['klassenstufe'], $matching_lehrer[$i]['klasse']);
 					echo "<br>Der Unterricht würde immer " . get_name_of_tag($matching_lehrer[$i]['unterricht']['tag']);
 					echo " von " . $matching_lehrer[$i]['unterricht']['anfang']->format("H:i");
 					echo " Uhr bis " . $matching_lehrer[$i]['unterricht']['ende']->format("H:i") . " Uhr stattfinden";
@@ -440,11 +463,12 @@ class schueler {
 						$unterricht = $ret->fetchAll();
 						$anzahl = count($unterricht);
 						if ($anzahl > 0) {
-							echo "Der Lehrer hat schon $anzahl Nachhilfeschüler";
+							echo "<br>Der Lehrer hat schon $anzahl Nachhilfeschüler";
 						}
 					}
-					echo "<a href=\"index.php?page=input_paar&control_paar=1&sid=$this->id&lid=" . $matching_lehrer[$i]['id'] . "&fid=$fid&tag=" . $matching_lehrer[$i]['unterricht']['tag'] . "&anfang=" . $matching_lehrer[$i]['unterricht']['anfang']->format("H:i") . "&ende=" . $matching_lehrer[$i]['unterricht']['ende']->format("H:i") . "\" class=\"links\">Weiter</a>";
+					echo "<br><br><a href=\"index.php?page=input_paar&control_paar=1&sid=$this->id&lid=" . $matching_lehrer[$i]['id'] . "&fid=$fid&tag=" . $matching_lehrer[$i]['unterricht']['tag'] . "&anfang=" . $matching_lehrer[$i]['unterricht']['anfang']->format("H:i") . "&ende=" . $matching_lehrer[$i]['unterricht']['ende']->format("H:i") . "\" class=\"links\">Vermittlen</a>";
 				}
+				echo "<br><br><hr>";
 			}
 		}else {
 			echo "Ein Fehler ist aufgetreten";
