@@ -17,10 +17,12 @@ function warn(string) {
 	if (isset($_GET['lehrer']) && $_GET['lehrer'] == 1) {
 		if (isset($_GET['filter'])) {
 			echo "Ansicht: <a href=\"index.php?page=output&lehrer=1&filter=".$_GET['filter']."&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&lehrer=1&filter=".$_GET['filter']."&layout=table\" class=\"links2\">Tabelle</a><br><br>";
-			$return = query_db("SELECT * FROM `lehrer` WHERE `schuljahr` = :schuljahr AND `pid` = :pid", get_current_year(), $_GET['filter']);
+			$return = query_db("SELECT lehrer.*, u.zahl_schueler FROM `lehrer` LEFT JOIN (SELECT unterricht.lid, COUNT(unterricht.lid) AS zahl_schueler FROM unterricht
+        						GROUP BY unterricht.lid) AS u ON u.lid = lehrer.id WHERE `schuljahr` = :schuljahr AND `pid` = :pid", get_current_year(), $_GET['filter']);
 		}else {
 			echo "Ansicht: <a href=\"index.php?page=output&lehrer=1&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&lehrer=1&layout=table\" class=\"links2\">Tabelle</a><br><br>";
-			$return = query_db("SELECT `lehrer`.*, `person`.`nname` FROM `lehrer` LEFT JOIN `person` ON `person`.`id` = `lehrer`.`pid` WHERE `schuljahr` = :schuljahr GROUP BY `person`.`nname`, `lehrer`.`id` ASC ", get_current_year());
+			$return = query_db("SELECT `lehrer`.*, `person`.`nname`, u.zahl_schueler FROM `lehrer` LEFT JOIN `person` ON `person`.`id` = `lehrer`.`pid` LEFT JOIN (SELECT unterricht.lid, COUNT(unterricht.lid) AS zahl_schueler FROM unterricht
+        						GROUP BY unterricht.lid) AS u ON u.lid = lehrer.id WHERE `schuljahr` = '1718' GROUP BY `person`.`nname`, `lehrer`.`id` ASC  ", get_current_year());
 		}
 		if ($return === false) {
 			echo "Ein Problem";
@@ -33,14 +35,14 @@ function warn(string) {
 			set_view("list");
 		}
 		if (get_view() == "table") {
-			echo "<div style=\"overflow-x:auto\"><table class=\"table1\"><tr><th>Name</th><th>Klasse</th><th>Klassenlehrer</th><th>Fächer</th><th>Zeiten</th><th>Kommentar</th><th></th></tr>";
+			echo "<table class=\"table1\"><tr><th>Name</th><th>Klasse</th><th>Klassenlehrer</th><th>Fächer</th><th>Zeiten</th><th>Kommentar</th><th>Schüleranzahl</th><th></th></tr>";
 		}
 		$result = $return->fetch();
 		if ($result !== false) {
 			while ($result) {
 				$lehrer = new lehrer(-1, $result['id']);
 				if (get_view() == "table") {
-					echo "<td><a href=\"index.php?page=output_person&filter=" . $lehrer->person->id . "\" class=\"links2\">" . $lehrer->person->vname . ' ' . $lehrer->person->nname . "</a></td>";
+					echo "<tr><td><a href=\"index.php?page=output_person&filter=" . $lehrer->person->id . "\" class=\"links2\">" . $lehrer->person->vname . ' ' . $lehrer->person->nname . "</a></td>";
 					echo "<td>" . format_klassenstufe_kurs($lehrer->get_klassenstufe(), $lehrer->get_klasse())."</td>";
 					echo "<td>" . $lehrer->get_klassenlehrer()."</td><td>";
 					$faecher = $lehrer->get_angebot_faecher();
@@ -52,8 +54,8 @@ function warn(string) {
 						echo "<br>Vermittlungsstatus: " . $faecher[$i]['status'] . "<br>";
 					}
 					echo "</td><td>";
-					if (isset($zeit[0])) {
-						echo get_name_of_tag($zeit[0]['tag']) . " von " . date("H:i", strtotime($zeit[0]['anfang'])) . " - " . date("H:i", strtotime($zeit[0]['ende'])) . "<br>";
+					for ($i = 0; $i < count($zeit); $i++) {
+						echo get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
 					}
 					echo "</td>";
 					if (strlen($lehrer->get_comment()) > 0) {
@@ -61,7 +63,14 @@ function warn(string) {
 					}else{
 						echo "<td>Kein Kommentar</td>";
 					}
-					echo "<td><a href=\"index.php?page=change&lehrer=".$lehrer->get_id()."\" class=\"links2\">Ändere die Daten</a></td></tr>";
+					if($result['zahl_schueler'] > 0) {
+						echo "<td><a href=\"index.php?page=output&paare=1&lehrerfilter=" . $lehrer->get_id() . "\" class=\"links2\">" . $result['zahl_schueler'] . "</a></td>";
+					}else{
+						echo "<td>0</td>";
+					}
+					echo "<td><a href=\"index.php?page=change&lehrer=".$lehrer->get_id()."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Lehrers\"></a>
+						<a href=\"index.php?page=delete&lehrer=1&delete=" . $lehrer->get_id(). "\" class=\"links2\" onclick=\"return warn('Willst du den Lehrer wirklich löschen? Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Lehrers\"></a></td></tr>";
+					
 /*					if (count($zeit) > 1) {
 						for ($i = 1; $i < count($zeit); $i++) {
 							echo "<tr><td style=\"rowspan=2\">".get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br></td><td></td></tr>";
@@ -94,6 +103,9 @@ function warn(string) {
 					if (strlen($lehrer->get_comment()) > 0) {
 						echo "<br>Kommentar: " . $lehrer->get_comment();
 					}
+					if($result['zahl_schueler'] > 0) {
+						echo "<br><br><a href=\"index.php?page=output&paare=1&lehrerfilter=" . $lehrer->get_id() . "\" class=\"links2\">Der Lehrer hat schon " . $result['zahl_schueler'] . " Schüler</a>";
+					}
 					echo "</div><div style=\"width: 30%; display: inline-block; padding-top: 40px;\"><a href=\"index.php?page=change&lehrer=" . $lehrer->get_id() . "\" class=\"links\">Ändere die Daten</a>
 								<br><br><br><br><br><a href=\"index.php?page=delete&lehrer=1&delete=" . $lehrer->get_id(). "\" class=\"links\" onclick=\"return warn('Willst du den Lehrer wirklich löschen? Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\">Löschen</a>
 								</div>";
@@ -102,7 +114,8 @@ function warn(string) {
 				$result = $return->fetch();
 			}
 			if (get_view() == "table") {
-				echo "</div>";
+				echo "</table><br><br><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Lehrers ändern.";
+				echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten des Lehrers löschen.";
 			}
 		}else {
 			if (isset($_GET['filter'])) {
@@ -150,19 +163,31 @@ function warn(string) {
 		<input type="submit" value="Filtern">
 		</form>
 		</fieldset>
-		
+		<br><br>
 		
 		<?php
 		if (isset($_GET['filterstatus']) && $_GET['filterstatus'] != -1) {
+			echo "Ansicht: <a href=\"index.php?page=output&schueler=1&filterstatus=".$_GET['filterstatus']."&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&schueler=1&filterstatus=".$_GET['filterstatus']."&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 			$return = query_db("SELECT `schueler`.* FROM `schueler` LEFT JOIN `fragt_nach` ON `schueler`.`id` = `fragt_nach`.`sid` WHERE `fragt_nach`.`status` = :status AND `schueler`.`schuljahr` = :schuljahr  ORDER BY `schueler`.`id` ASC", $_GET['filterstatus'], get_current_year());
 		}else if (isset($_GET['filter'])) {
+			echo "Ansicht: <a href=\"index.php?page=output&schueler=1&filter=".$_GET['filter']."&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&schueler=1&filter=".$_GET['filter']."&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 			$return = query_db("SELECT * FROM `schueler` WHERE `schuljahr` = :schuljahr AND `pid` = :pid", get_current_year(), $_GET['filter']);
 		}else {
+			echo "Ansicht: <a href=\"index.php?page=output&schueler=1&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&schueler=1&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 			$return = query_db("SELECT `schueler`.*, `person`.`nname` FROM `schueler` LEFT JOIN `person` ON `person`.`id` = `schueler`.`pid` WHERE `schuljahr` = :schuljahr GROUP BY `person`.`nname`, `schueler`.`id` ASC ", get_current_year());
 		}
 		if ($return === false) {
 			echo "Ein Problem";
 			die();
+		}
+		if (isset($_GET['layout']) && $_GET['layout'] == "table") {
+			set_view("table");
+		}
+		if (isset($_GET['layout']) && $_GET['layout'] == 'list') {
+			set_view("list");
+		}
+		if (get_view() == "table") {
+			echo "<div style=\"overflow-x:auto\"><table class=\"table1\"><tr><th>Name</th><th>Klasse</th><th>Klassenlehrer</th><th>Fächer</th><th>Zeiten</th><th>Kommentar</th><th></th></tr>";
 		}
 		$result = $return->fetch();
 		if ($result !== false) {
@@ -171,6 +196,31 @@ function warn(string) {
 					$result = $return->fetch();
 				}
 				$schueler = new schueler(-1, $result['id']);
+				if (get_view() == "table") {
+					echo "<td><a href=\"index.php?page=output_person&filter=" . $schueler->person->id . "\" class=\"links2\">" . $schueler->person->vname . ' ' . $schueler->person->nname . "</a></td>";
+					echo "<td>" . format_klassenstufe_kurs($schueler->get_klassenstufe(), $schueler->get_klasse())."</td>";
+					echo "<td>" . $schueler->get_klassenlehrer()."</td><td>";
+						
+					$faecher = $schueler->get_nachfrage_faecher();
+					$zeit = $schueler->get_zeit();
+					for ($i = 0; $i < count($faecher); $i++) {
+						echo get_faecher_name_of_id($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
+						echo " <br> Langfristig: " . ($faecher[$i]['langfristig'] == true ? "ja" : "nein");
+						echo "<br>Vermittlungsstatus: " . ($faecher[$i]['status'] == "neu" ? "<b>neu</b>" : $faecher[$i]['status']) . "<br>";
+					}
+					echo "</td><td>";
+					for ($i = 0; $i < count($zeit); $i++) {
+						echo get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
+					}
+					echo "</td>";
+					if (strlen($schueler->get_comment()) > 0) {
+						echo "<td>" . $schueler->get_comment()."</td>";
+					}else{
+						echo "<td>Kein Kommentar</td>";
+					}
+					echo "<td><a href=\"index.php?page=change&schueler=".$schueler->get_id()."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Schülers\"></a>
+						<a href=\"index.php?page=delete&schueler=1&delete=" . $schueler->get_id(). "\" class=\"links2\" onclick=\"return warn('Willst du den Schüler wirklich löschen? Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Schülers\"></a></td></tr>";
+				}else{
 				?>
 <fieldset style="padding: 40px; width: 80%; padding-top: 10px;">
 	<legend><?php
@@ -216,7 +266,12 @@ function warn(string) {
 	</div>
 </fieldset>
 <?php
+				}
 				$result = $return->fetch();
+			}
+			if (get_view() == "table") {
+				echo "</table><br><br><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers ändern.";
+				echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers löschen.";
 			}
 		}else {
 			if (isset($_GET['filterstatus'])) {
@@ -232,13 +287,19 @@ function warn(string) {
 		require 'includes/class_paar.php';
 		if(isset($_GET['filter'])) {
 			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.id = :id", get_current_year(), $_GET['filter']);
+		}else if(isset($_GET['lehrerfilter'])) {
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.lid = :lid", get_current_year(), $_GET['lehrerfilter']);
+		}else if(isset($_GET['schuelerfilter'])) {
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.sid = :sid", get_current_year(), $_GET['schuelerfilter']);
 		}else{
 			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = '" . get_current_year() . "';");
 		}
 		$i = 0;
 		if ($return) {
 			$paar = $return->fetch();
-			if (!$paar) {
+			if (!$paar && (isset($_GET['filter']) || isset($_GET['lehrerfilter']) || isset($_GET['schuelerfilter']))) {
+				echo "Es trat ein Fehler auf. Zu dieser Suche konnte kein Paar gefunden werden";
+			}else if(!$paar){
 				echo "Es wurde noch kein Paar hinzugefügt";
 			}
 			while ($paar) {

@@ -39,18 +39,18 @@ function warn(string) {
 				echo "<tr><td>$person->vname</td><td>$person->nname</td><td>$person->email</td><td>$person->telefon</td><td>$person->geburtstag</td>";
 				$schueler_lehrer = $person->search_lehrer_schueler();
 				if (is_array($schueler_lehrer['schueler'])) {
-					echo "<td><a href=\"index.php?page=output&schueler=1&filter=" . $person->id . "\" class=\"links2 fa fa-check-square-o\"> ja</a></td>";
+					echo "<td><a href=\"index.php?page=output&schueler=1&filter=" . $person->id . "\" class=\"links2\"><img src=\"img/png_yes_12_16.png\" alt=\"ja\" style=\"width:13px;\"></a></td>";
 				}else{
-					echo "<td><span class=\"fa fa-minus-square-o\"> nein</span></td>";
+					echo "<td><img src=\"img/png_no_13_20.png\" alt=\"nein\"></td>";
 				}
 				if (is_array($schueler_lehrer['lehrer'])) {
-					echo "<td><a href=\"index.php?page=output&lehrer=1&filter=" . $person->id . "\" class=\"links2 fa fa-check-square-o\"> ja</a></td>";
+					echo "<td><a href=\"index.php?page=output&lehrer=1&filter=" . $person->id . "\" class=\"links2\"><img src=\"img/png_yes_12_16.png\" alt=\"ja\" style=\"width:13px;\"></a></td>";
 				}else{
-					echo "<td><span class=\"fa fa-minus-square-o\"> nein</span></td>";
+					echo "<td><img src=\"img/png_no_13_20.png\" alt=\"nein\"></td>";
 				}
 				if ($user->isuserallowed('k')) {
-					echo "<td><a href=\"index.php?page=change&person=$person->id\" class=\"links2\">Ändern</a></td>";
-					echo "<td><a href=\"index.php?page=delete&person=1&delete=$person->id\" class=\"links2\" onclick=\"return warn('Willst du die Person wirklich löschen?')\">Löschen</a></td>";
+					echo "<td><a href=\"index.php?page=change&person=$person->id\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern der Person\"></a></td>";
+					echo "<td><a href=\"index.php?page=delete&person=1&delete=$person->id\" class=\"links2\" onclick=\"return warn('Willst du die Person $person->vname $person->nname wirklich löschen?')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen der Person\"></a></td>";
 				}
 				echo "</tr>";
 			}else{
@@ -103,8 +103,10 @@ function warn(string) {
 			}
 			$result = $return->fetch();
 		}
-		if(isset($_GET['layout']) && $_GET['layout'] == 'list') {
-			echo "</table>";
+		if(get_view() == 'table') {
+			echo "</table><br><br><b>Hinweis:</b> Wenn du auf <img src=\"img/png_yes_12_16.png\" alt=\"ja\" style=\"width:13px;\"> klickst, kannst du dir die Schüler- oder Lehrerdaten der Person ansehen.";
+			echo "<br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten der Person ändern.";
+			echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten der Person löschen.";
 		}
 	}else {
 		echo "Es wurde noch keine Person hinzugefügt";

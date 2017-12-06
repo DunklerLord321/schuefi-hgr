@@ -8,8 +8,8 @@ if (isset($user) && $user->runscript()) {
 <h1>Ausgaben der Finanzen</h1>
 <table class="table1">
 	<tr>
-		<th>Vorname</th>
-		<th>Nachname</th>
+		<th style="text-align: left;">Vorname</th>
+		<th style="text-align: left;">Nachname</th>
 		<th>Eingabe</th>
 		<th>Ausgabe</th>
 		<th>Konto/Bar</th>
@@ -21,14 +21,14 @@ if (isset($user) && $user->runscript()) {
   <?php
 		while ($result) {
 			if ($result['pid'] == NULL) {
-				echo "<tr><td>" . $result['vname'] . "</td><td>" . $result['nname'] . "</td>";
+				echo "<tr><td  style=\"text-align: left;\">" . $result['vname'] . "</td><td style=\"text-align: left;\">" . $result['nname'] . "</td>";
 			}else {
-				echo "<tr><td>" . $result['pvname'] . "</td><td>" . $result['pnname'] . "</td>";
+				echo "<tr><td style=\"text-align: left;\">" . $result['pvname'] . "</td><td style=\"text-align: left;\">" . $result['pnname'] . "</td>";
 			}
 			if ($result['geldbetrag'] < 0) {
-				echo "<td></td><td style=\"text-align: right;\">" . abs($result['geldbetrag']) . "</td>";
+				echo "<td></td><td>" . abs($result['geldbetrag']) . "€</td>";
 			}else {
-				echo "<td style=\"text-align: right;\">" . $result['geldbetrag'] . "</td><td></td>";
+				echo "<td>" . $result['geldbetrag'] . "€</td><td></td>";
 			}
 			echo "<td>" . $result['konto_bar'] . "</td><td>" . $result['betreff'] . "</td><td>" . $result['dokument'] . "</td><td>" . $result['bemerkung'] . "</td><td>" . date('d.m.Y', strtotime($result['datum'])) . "</td></tr>";
 			$result = $return->fetch();

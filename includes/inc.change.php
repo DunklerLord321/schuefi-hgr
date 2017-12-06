@@ -29,7 +29,9 @@ if (isset($user) && $user->runscript()) {
 			// var_dump($schueler);
 			// Ändere Zeit
 			// array neu indizieren, falls Eintrag in der Mitte gelöscht wurde (element 1 und 3 existieren, aber count nur 2)
-			$_POST['zeit'] = array_values($_POST['zeit']);
+			if (isset($_POST['zeit'])) {
+				$_POST['zeit'] = array_values($_POST['zeit']);
+			}
 			if (!isset($_POST['zeit']) && count($schueler->zeit) != 0) {
 				for ($i = 0; $i < count($schueler->zeit); $i++) {
 					$schueler->remove_time($schueler->zeit[$i]['id']);
@@ -83,9 +85,11 @@ if (isset($user) && $user->runscript()) {
 					'klassenlehrer_name' => $_POST['klassenlehrer'], 
 					'comment' => $_POST['comment']
 			);
-			// array neu indizieren, falls Eintrag in der Mitte gelöscht wurde (element 1 und 3 existieren, aber count nur 2)
-			$_POST['zeit'] = array_values($_POST['zeit']);
 			$lehrer->change_lehrer($params);
+			// array neu indizieren, falls Eintrag in der Mitte gelöscht wurde (element 1 und 3 existieren, aber count nur 2)
+			if (isset($_POST['zeit'])) {
+				$_POST['zeit'] = array_values($_POST['zeit']);
+			}
 			if (!isset($_POST['zeit']) && count($lehrer->zeit) != 0) {
 				for ($i = 0; $i < count($lehrer->zeit); $i++) {
 					$lehrer->remove_time($lehrer->zeit[$i]['id']);
@@ -221,7 +225,7 @@ if (isset($user) && $user->runscript()) {
 			echo "Notenschnitt:<br><input class=\"input_text\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
 			echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
 			echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
-			echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
+			echo "<input type=\"radio\" required name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
 			echo "<select name=\"fach['+ fachzahl +'][status]\">";
 			for ($j = 0; $j < count(lehrer::stati); $j++) {
 				echo "<option value=\"" . lehrer::stati[$j] . "\">" . lehrer::stati[$j] . "</option>";
@@ -337,7 +341,7 @@ if (isset($user) && $user->runscript()) {
 			<br>
 			Klassenlehrer:
 			<br>
-			<input type="text" class="input_text" maxlength="49" name="klassenlehrer" required value="<?php echo $sl->get_klassenlehrer();?>" style="width: 40%;">
+			<input type="text" class="input_text" maxlength="49" name="klassenlehrer" value="<?php echo $sl->get_klassenlehrer();?>" style="width: 40%;">
 			<br>
 			<br>
 			<input type="button" value="Füge Fach hinzu" onclick="addfach()" class="mybuttons">

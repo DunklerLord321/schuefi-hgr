@@ -86,7 +86,7 @@ function addfach() {
 				echo "Notenschnitt:<br><input class=\"textinput input_text\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
 				echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
 				echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
-				echo "<input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
+				echo "<input type=\"radio\" required name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
 			}
 			?>
 		</div>';
@@ -189,7 +189,7 @@ $('body').on('focus','.timepickerbis', function(){
 			<br>
 			Klassenlehrer:
 			<br>
-			<input type="text" maxlength="49" name="klassenlehrer" required class="input_text" style="width: 40%;">
+			<input type="text" maxlength="49" name="klassenlehrer" class="input_text" style="width: 40%;">
 			<br>
 			<br>
 			<input type="button" value="Füge Fach hinzu" onclick="addfach()" class="mybuttons">

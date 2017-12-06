@@ -1,7 +1,7 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	
-	require 'mail/PHPMailer-master/PHPMailerAutoload.php';
+	require 'extensions/mail/PHPMailer-master/PHPMailerAutoload.php';
 	?>
 <nav>
 	<ul class="mail_steps">
@@ -77,9 +77,12 @@ if (isset($user) && $user->runscript()) {
 		// $mail->addReplyTo($email, $vorname.' '.$name);
 		if (isset($_SESSION['mail_step3']) && isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step2'])) {
 			if ($_SESSION['mail_step1']['mailart'] == 1 && isset($_SESSION['schuelermail']) && isset($_SESSION['lehrermail'])) {
-				$mail->addAddress($_SESSION['lehrermail']['empfaenger'], $_SESSION['lehrermail']['empfaenger']);
-				// $mail->addAddress("yajo10@yahoo.de", $_SESSION['lehrermail']['empfaenger']);
-				$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
+				if (isset($GLOBAL_CONFIG['mailto'])) {
+					$mail->addAddress($GLOBAL_CONFIG['mailto'], $GLOBAL_CONFIG['mailto']);
+				}else{
+					$mail->addAddress($_SESSION['lehrermail']['empfaenger'], $_SESSION['lehrermail']['empfaenger']);
+					$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
+				}
 				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
 				$mail->addAttachment("docs/nachweis_lehrer.pdf", "Lohnkarte-Lehrer.pdf");
 				$mail->addAttachment("docs/unterricht/" . $_SESSION['lehrermail']['anhang'], "Vermittlungsdokument.pdf");
@@ -93,12 +96,16 @@ if (isset($user) && $user->runscript()) {
 				}
 				$mail->clearAttachments();
 				$mail->clearAllRecipients();
-				$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
 				$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
-				// $mail->addAddress("joyajo108@gmail.com", $_SESSION['schulermail']['empfaenger']);
-				$mail->addAddress($_SESSION['schuelermail']['empfaenger'], $_SESSION['schuelermail']['empfaenger']);
-				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
+				if (isset($GLOBAL_CONFIG['mailto'])) {
+					$mail->addAddress($GLOBAL_CONFIG['mailto'], $GLOBAL_CONFIG['mailto']);
+				}else{
+					$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
+					$mail->addAddress($_SESSION['lehrermail']['empfaenger'], $_SESSION['lehrermail']['empfaenger']);
+				}
+				$mail->addAttachment("docs/AGB.pdf", "Allgemeine Geschäftsbedingungen.docx");
 				$mail->addAttachment("docs/unterricht/" . $_SESSION['schuelermail']['anhang'], "Vermittlungsdokument.pdf");
+				$mail->addAttachment("docs/kontoinfo.pdf", "Informationen über das Konto der Schülerfirma");
 				$mail->Body = $_SESSION['schuelermail']['text'];
 				$mail->Subject = $_SESSION['schuelermail']['betreff'];
 				if (!$mail->send()) {
@@ -109,14 +116,17 @@ if (isset($user) && $user->runscript()) {
 				}
 				echo "<br><b>Hinweis: Es kann vorkommen, dass trotz der Meldung \"Mail erfolgreich gesendet\" die E-Mail-Adresse falsch war.<br>Deswegen musst du unbedingt nochmal in unseren Mail-Account schauen, ob dort eine Fehlermeldung vorliegt</b>";
 			}
-			if (isset($_SESSION['serienmail']) && is_array($_SESSION['serienmail'])) {
+			if ($_SESSION['mail_step1']['mailart'] == 2 && isset($_SESSION['serienmail']) && is_array($_SESSION['serienmail'])) {
 				$successsend = 0;
 				for ($i = 0; $i < count($_SESSION['serienmail']); $i++) {
 					$mail->clearAllRecipients();
 					$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
 					$mail->addReplyTo("schuelerfirma@hgr-web.de", "Schülerfirma - Kundenbetreuung");
-					$mail->addAddress($_SESSION['serienmail'][$i]['mail'], $_SESSION['serienmail'][$i]['vname'] . " " . $_SESSION['serienmail'][$i]['nname']);
-					// $mail->addAddress("yajo10@yahoo.de", $_SESSION['serienmail'][$i]['vname']." ".$_SESSION['serienmail'][$i]['nname']);
+					if (isset($GLOBAL_CONFIG['mailto'])) {
+						$mail->addAddress($GLOBAL_CONFIG['mailto'], $GLOBAL_CONFIG['mailto']);
+					}else{	
+						$mail->addAddress($_SESSION['serienmail'][$i]['mail'], $_SESSION['serienmail'][$i]['vname'] . " " . $_SESSION['serienmail'][$i]['nname']);
+					}
 					if ($i == 0) {
 						// nur einmal an Schüfi in BCC
 						$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
@@ -504,8 +514,11 @@ if (isset($user) && $user->runscript()) {
 				// var_dump($string);
 				// var_dump($personen);
 				// var_dump($mailpersonen);
-				// $_SESSION['serienmail'] = $mailpersonen;
+				$_SESSION['serienmail'] = $mailpersonen;
 				// var_dump($_SESSION);
+			}
+			if (isset($GLOBAL_CONFIG['mailto'])) {
+				echo "<b>Achtung: Diese Mails werden momentan alle nicht an die richtige Adresse gesendet. Das momentane Ziel ist ".$GLOBAL_CONFIG['mailto']."</b>";
 			}
 		}
 		?>

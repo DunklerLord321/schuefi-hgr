@@ -37,8 +37,11 @@ INSERT INTO `navigation` (`kuerzel`, `path`, `allowed_users`, `visible`) VALUES
 ('change_passwd', 'includes/inc.change_passwd.php', 'w', 1),
 ('person', 'includes/inc.person.php', 'k', 1),
 ('imap', 'includes/inc.imapmail.php', 'v', 1),
+('filter', 'includes/inc.filter.php', 'w', 1),
 ('create_doc', 'includes/inc.create_doc.php', 'k',1),
 ('output_person' ,'includes/inc.output_person.php', 'w', 1),
 ('input_finanzen', 'includes/inc.input_finanz.php','f',1),
 ('output_finanzen', 'includes/inc.output_finanz.php', 'w', 1),
-('backup_data', 'includes/inc.backup_data.php', 'v',1);
+('backup_data', 'includes/inc.backup_data.php', 'v',1),
+('input_raum', 'includes/inc.input_raum.php', 'k', 1),
+('output_raum', 'includes/inc.output_raum.php', 'w', 1);

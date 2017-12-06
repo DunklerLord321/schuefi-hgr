@@ -260,8 +260,8 @@ class user {
 	 * Benachrichtige bei 5 falschen Anmeldeversuchen automatisch Admin(s)
 	 */
 	private function send_mail() {
-		require 'mail/class.phpmailer.php';
-		require 'mail/class.smtp.php';
+		require 'extensions/mail/class.phpmailer.php';
+		require 'extensions/mail/class.smtp.php';
 		$mail = new PHPMailer();
 		// $mail->isSMTP();
 		$mail->Host = 'mail.gmx.net';

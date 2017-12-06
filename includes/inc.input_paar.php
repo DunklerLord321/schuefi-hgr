@@ -165,13 +165,56 @@ $('body').on('focus','.timepickerbis', function(){
 	<input type="text" class="timepickerbis input_text" name="zeit[until]" value="<?php if(isset($_GET['ende'])){echo $_GET['ende'];}else{echo "14:00";}?>">
 	<br>
 	<br>
-	<label>Raum:</label>
+	<?php 
+	if(!isset($_GET['anfang']) || !isset($_GET['ende']) || !isset($_GET['tag'])) {
+		echo "<i>Keine Automatische Zimmersuche möglich!</i><br><br>";
+	}else{
+		$stunden = get_stunde_for_time($_GET['anfang'], $_GET['ende']);
+		if(is_array($stunden)) {
+			$return = query_db("SELECT raum.*, zahlnummer FROM `raum` LEFT JOIN (SELECT raum.* FROM raum WHERE stunde = :stunde AND frei = 1 AND tag = :tag) as r on r.nummer = raum.nummer
+					LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id 
+					GROUP BY raum.id, raum.nummer, raum.tag HAVING raum.tag = :tag) AS rz ON rz.nummer = raum.nummer
+					HAVING raum.stunde = :stunde2 AND raum.tag = :tag ", $_GET['tag'], $stunden[0], $_GET['tag'], $stunden[1], $_GET['tag']);
+		}else {
+			$return = query_db("SELECT raum.*, zahlnummer FROM `raum`
+					LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id
+					GROUP BY raum.id, raum.nummer, raum.tag HAVING raum.tag = :tag) AS rz
+					ON rz.nummer = raum.nummer
+					WHERE raum.tag = :tag AND raum.stunde = :stunde AND raum.frei = 1", $_GET['tag'], $_GET['tag'], $stunden);
+		}
+		if ($return !== false) {
+			echo "<select name=\"ridraum\" id=\"selectraum\"><option value=\"-1\">Bitte wählen</option>";
+			$result = $return->fetch();
+			while ($result) {
+				echo "<option value=\"" . $result['id'] . "\">Zimmer: ".$result['nummer']." -- " . $result['stunde'] .".Stunde -- ".$result['zahlnummer']."x belegt an dem Tag zu anderer Zeit. Eventuell sind Überschneidung möglich.</option>";
+				$result = $return->fetch();
+			}
+			echo "</select><br><br>";	
+		}
+	}
+	?>
+	<label id="labelraum">Raum:</label>
 	<br>
 	<input type="text" name="raum" class="input_text">
 	<p></p>
 	<input type="submit" value="Erstellen" style="float: right;" class="mybuttons">
 	<br>
 	<br>
+	<script type="text/javascript">
+$(function() {
+	$('#selectraum').change(function() {
+		if($('#selectraum').val() == -1) {
+			$('[name=raum]').show();
+			$('#labelraum').show();
+			$('[name=raum]').val('');
+		}else{
+		$('[name=raum]').hide();
+		$('#labelraum').hide();
+		$('[name=raum]').val($('#selectraum').val());
+		}
+	});
+});
+	</script>
 </form>
 <?php
 		}

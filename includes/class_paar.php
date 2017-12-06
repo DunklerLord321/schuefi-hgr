@@ -7,13 +7,14 @@ class paar {
 	public $anfang;
 	public $ende;
 	public $fid;
+	public $rid;
 	public $paarid;
 	public $erstellungstag;
 	public $lehrer_dokument;
 	public $schueler_dokument;
 	function __construct(int $paar_id, int $lid = -1, int $sid = -1) {
 		if ($lid == -1 && $sid == -1) {
-			$return = query_db("SELECT * FROM `unterricht` WHERE id = :id", $paar_id);
+			$return = query_db("SELECT unterricht.*, raum.nummer, raum.stunde FROM `unterricht` LEFT JOIN raum on raum.id = unterricht.rid WHERE unterricht.id = :id", $paar_id);
 			if ($return) {
 				$return = $return->fetch();
 				if ($return) {
@@ -26,7 +27,12 @@ class paar {
 					$this->paarid = $paar_id;
 					$this->schueler = new schueler(-1, $return['sid']);
 					$this->lehrer = new lehrer(-1, $return['lid']);
-					$this->raum = $return['treff_raum'];
+					if(isset($return['nummer']) && $return['nummer'] != '0') {
+						$this->raum = $return['nummer'];
+						$this->rid = $return['rid'];
+					}else{
+						$this->raum = $return['treff_raum'];
+					}
 					$this->fid = $return['fid'];
 					$this->anfang = date("H:i", strtotime($return['treff_zeit']));
 					$this->ende = date("H:i", strtotime($return['treff_zeit_ende']));
@@ -41,7 +47,7 @@ class paar {
 				echo "Fehler";
 			}
 		}else {
-			$return = query_db("SELECT * FROM `unterricht` WHERE lid = :lid AND sid = :sid", $lid, $sid);
+			$return = query_db("SELECT unterricht.*, raum.nummer, raum.stunde FROM `unterricht` LEFT JOIN raum on raum.id = unterricht.rid WHERE lid = :lid AND sid = :sid", $lid, $sid);
 			if ($return) {
 				$return = $return->fetch();
 				if ($return) {
@@ -50,7 +56,12 @@ class paar {
 					$this->paarid = $return['id'];
 					$this->schueler = new schueler(-1, $return['sid']);
 					$this->lehrer = new lehrer(-1, $return['lid']);
-					$this->raum = $return['treff_raum'];
+					if(isset($return['nummer']) && $return['nummer'] != '0') {
+						$this->raum = $return['nummer'];
+						$this->rid = $return['rid'];
+					}else{
+						$this->raum = $return['treff_raum'];
+					}
 					$this->fid = $return['fid'];
 					$this->anfang = $return['treff_zeit'];
 					$this->ende = $return['treff_zeit_ende'];

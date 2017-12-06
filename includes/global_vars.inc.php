@@ -43,4 +43,13 @@ $GLOBAL_CONFIG['klassen'] = array(
 		"7"
 );
 $GLOBAL_CONFIG['backup_dir'] = 'docs/backup/';
+$GLOBAL_CONFIG['doc_dir'] = 'docs/unterricht/';
+$GLOBAL_CONFIG['stundenplan'] = array();
+$GLOBAL_CONFIG['stundenplan'][5] = array('anfang' => '11:05', 'ende' => '11:50');
+$GLOBAL_CONFIG['stundenplan'][6] = array('anfang' => '12:00', 'ende' => '12:45');
+$GLOBAL_CONFIG['stundenplan'][7] = array('anfang' => '13:15', 'ende' => '14:00');
+$GLOBAL_CONFIG['stundenplan'][8] = array('anfang' => '14:00', 'ende' => '14:45');
+//Zum auslesen der XML-Dateien der Raumbelegung müssen die relevanten Stunden angegeben werden
+//bei anderen Werten als 5-8 kann es zu Problemen kommen
+$GLOBAL_CONFIG['unterrichtsstunden'] = array(5,6,7,8);
 ?>

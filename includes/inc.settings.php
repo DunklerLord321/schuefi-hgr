@@ -4,7 +4,9 @@ if (isset($user) && $user->runscript()) {
 		$file = fopen("error.log", "r");
 		$content = fread($file, filesize("error.log"));
 		$content = str_replace("\n", "<br>", $content);
+		echo "<br><br><div id=\"top\"><a href=\"#bottom\" class=\"links\">Nach Unten</a></div><br>";
 		echo $content;
+		echo "<div id=\"bottom\"><a href=\"#top\" class=\"links\">Nach Oben</a></div><br>";
 		fclose($file);
 	}else {
 		?>

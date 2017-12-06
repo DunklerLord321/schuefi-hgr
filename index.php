@@ -2,7 +2,6 @@
 //Es darf keinerlei Ausgabe vor session_name() stattfinden
 session_name("hgr-schuelerfirma");
 session_start();
-error_reporting(E_ALL);
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -15,12 +14,17 @@ error_reporting(E_ALL);
 <script type="text/javascript" src="includes/jquery/jquery-3.2.1.min.js"></script>
 <script src="includes/jquery/jquery-ui-1.12.1/jquery.js"></script>
 <script src="includes/jquery/jquery-ui-1.12.1/jquery-ui.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- -<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">--->
 </head>
 <body>
 <?php
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
+if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
+	error_reporting(E_ALL);
+}else{
+	error_reporting(E_ERROR);
+}
 try {
 	$pdo = new PDO('mysql:host=' . $GLOBAL_CONFIG['host'] . ';dbname=' . $GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
 			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
@@ -67,7 +71,7 @@ if (isset($_GET['page'])) {
 		?>
 		<nav>
 		<div id="nav_div">
-		<button id="nav_button"><i class="fa fa-bars" style="color: white;">Menu</i></button>
+		<button id="nav_button"><img src="img/png_menu_blue.png" alt="Menusymbol" style="width:40px;"><i style="color: white;">Menu</i></button>
 		<ul class="nav_seite" id="nav_seite">
 		<?php
 		
@@ -211,6 +215,29 @@ if (isset($_GET['page'])) {
 		?>>
 				<a href="index.php?page=output_finanzen">Ausgabe Finanzen</a>
 			</li>
+			<li <?php
+		if (strcmp($active, "filter") == 0) {
+			echo "class=\"active\"";
+		}
+		?>>
+				<a href="index.php?page=filter">Filtern</a>
+			</li>
+			<li <?php
+		if (strcmp($active, "output_raum") == 0) {
+			echo "class=\"active\"";
+		}
+		?>>
+				<a href="index.php?page=output_raum">Ausgeben der Räume</a>
+			</li>
+			<?php		
+		if ($user->isuserallowed('k')) {
+			echo "<li";
+			if (strcmp($active, "input_raum") == 0) {
+				echo "class=\"active\"";
+			}
+			echo "><a href=\"index.php?page=input_raum\">Eingabe Räume</a></li>";
+		}
+		?>
 		</ul>
 		</div>
 	</nav>
@@ -231,6 +258,7 @@ $(function() {
 			console.log("test");
 			$('#content').animate({marginLeft: '22%'}, 200);
 			$('#nav_seite').animate({width: '20%'}, 200);
+			$('#nav_seite').animate({top:'10px'},2);
 			$('#nav_seite').fadeIn(200);
 		}else{
 			console.log("test2");
@@ -242,6 +270,7 @@ $(function() {
 		if($(window).width() > 1240) {
 			$('#nav_seite').fadeOut(200);		
 			$('#nav_seite').animate({width: '5%'}, 200);
+			$('#nav_seite').animate({top:'100px'},2);
 			$('#content').animate({marginLeft: '7%'}, 200);
 		}else{
 			$('#nav_seite').fadeOut(200);		
@@ -278,7 +307,7 @@ $(function() {
 			}else {
 				echo "<div class=\"dropdiv";
 			}
-			echo "\"><button class=\"dropdown\">Einstellungen</button><div class=\"dropdown-content\"><a href=\"index.php?page=settings\">Log-Datei</a>
+			echo "\"><a class=\"dropdown\">Einstellungen</a><div class=\"dropdown-content\"><a href=\"index.php?page=settings\">Log-Datei</a>
 						<a href=\"index.php?page=user\">Ausgeben aller Nutzer</a>
 						<a href=\"index.php?page=backup_data\">Backups</a></div></div>";
 		}
@@ -303,10 +332,15 @@ $(function() {
 		require 'includes/functions.inc.php';
 		$ret_prep = query_db("SELECT * FROM navigation WHERE kuerzel = :kuerzel", $_GET['page']);
 		$result = $ret_prep->fetch();
+		//Testen, ob die angefragte Seite in der Datenbank hinterlegt ist
 		if ($result !== false) {
+			// Testen, ob der Nutzer Zugang zu der Seite hat
 			if ($user->isuserallowed($result['allowed_users'])) {
+				//Testen, ob die Seite momentan gesperrt ist
 				if ($result['visible'] == 1) {
+					//Testen. ob das Skript unter dem in der DB gespeicherten Pfad existiert
 					if (file_exists($result['path'])) {
+						//Nutzer erlaube, das Skript auszuführen (Schützt vor Ausführung der Skripte ohne Nutzung der Hauptseite
 						$user->allowrunscript();
 						require $result['path'];
 						$user->denyrunscript();
@@ -325,6 +359,11 @@ $(function() {
 		
 		?>
 	</div>
+	<footer>
+		<div style="width: 80%; margin-left: 20%;">
+			<noscript>Bitte Aktivieren sie JavaScript in Ihrem Browser, um diese Website zu nutzen</noscript>
+		</div>
+	</footer>
 	<?php
 	}else {
 		?>

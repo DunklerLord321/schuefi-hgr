@@ -13,6 +13,41 @@ function get_name_of_tag($kuerzel) {
 		return false;
 	}
 }
+function get_stunde_for_time($time, $time2) {
+	global $GLOBAL_CONFIG;
+	$timestamp = strtotime($time);
+	$timestamp2 = strtotime($time2);
+	if($timestamp === false || $timestamp2 === false) {
+		echo "Die Üergebene Zeit war nicht korrekt";
+	}
+	for ($i = 5; $i <= 8; $i++) {
+		if ($timestamp >= strtotime($GLOBAL_CONFIG['stundenplan'][$i]['anfang']) && $timestamp < strtotime($GLOBAL_CONFIG['stundenplan'][$i]['ende'])) {
+			if ($timestamp2 > strtotime($GLOBAL_CONFIG['stundenplan'][$i]['ende'])) {
+				if(isset($GLOBAL_CONFIG['stundenplan'][($i+1)]['ende']) && $timestamp2 > strtotime($GLOBAL_CONFIG['stundenplan'][($i+1)]['anfang'])) {
+					return array($i,($i+1));
+				}else{
+					return $i;
+				}
+			}else{
+				return $i;
+			}
+		}
+		if ($timestamp <= strtotime($GLOBAL_CONFIG['stundenplan'][$i]['anfang'])) {
+			if(isset($GLOBAL_CONFIG['stundenplan'][($i+1)]['ende']) && $timestamp2 > strtotime($GLOBAL_CONFIG['stundenplan'][($i+1)]['anfang'])) {
+				return array($i,($i+1));
+			}
+			return $i;
+		}
+	}
+	if ($timestamp < strtotime($GLOBAL_CONFIG['stundenplan'][5]['anfang'])) {
+		echo "EIn Fehler ist aufgetreten. So zeitig gibt es keinen Zimmerplan";
+		return false;
+	}
+	if ($timestamp > strtotime($GLOBAL_CONFIG['stundenplan'][8]['anfang'])) {
+		echo "Ein Fehler ist aufgetreten. So spät gibt es keinen Zimmerplan";
+		return false;
+	}
+}
 function get_faecher_all() {
 	$return = query_db("SELECT * FROM `faecher`");
 	$result = $return->fetchAll();

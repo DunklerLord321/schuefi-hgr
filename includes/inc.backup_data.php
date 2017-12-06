@@ -2,7 +2,7 @@
 if (isset($user) && $user->runscript()) {
 	echo "<h1>Backups</h1>";
 	echo "<a href=\"index.php?page=backup_data&newbackup=1\" class=\"links\">Neues Backup</a><br><br>";
-	echo "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">";
+//	echo "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">";
 	$tables = array(
 			'person', 
 			'schueler', 
@@ -19,12 +19,19 @@ if (isset($user) && $user->runscript()) {
 			$zip->open($GLOBAL_CONFIG['backup_dir'] . $_GET['restore']);
 			$zip->extractTo($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4));
 			$zip->close();
+			$allfiles = array();
 			$filename = $GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/" . substr($_GET['restore'], 0, -4) . ".sql";
+			$filename2 = $GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/docs/backup/" . substr($_GET['restore'], 0, -4) . ".sql";
 			if (!file_exists($filename)) {
-				$user->log(user::LEVEL_ERROR, "SQL-Datei existiert nicht!");
-				echo "Datei existiert nicht";
-				die();
+				if (file_exists($filename2)) {
+					$filename = $filename2;
+				}else {
+					echo "Datei existiert nicht";
+					$user->log(user::LEVEL_ERROR, "SQL-Datei existiert nicht!");
+					die();
+				}
 			}
+			$allfiles[] = $filename;
 			$sqlfile = fopen($filename, "r");
 			if (!($content = fread($sqlfile, filesize($filename)))) {
 				echo "Lesefehler";
@@ -36,12 +43,77 @@ if (isset($user) && $user->runscript()) {
 			for ($i = 0; $i < count($tables); $i++) {
 				$result = query_db("DELETE FROM `" . $tables[$i] . "`;");
 			}
-			echo $content;
-			if ($pdo->exec($content) === false) {
-				$user->log(user::LEVEL_ERROR, "DB-FEHLER:" . implode("-", $pdo->errorInfo()));
+			$code = array();
+			$code_all = array();
+			$code_all = preg_split("~(\);)~", $content, -1);
+			foreach ($code_all as $string) {
+				if (strpos($string, "VALUE;") === false && strpos($string, "INSERT INTO `faecher`") === false) {
+					$code[] = $string;
+				}
 			}
+			var_dump($code);
+			$count = 0;
+			for ($i = 0; $i < count($code); $i++) {
+				if (strlen($code[$i]) > 5) {
+					echo "<hr><br>".$code[$i]."<br><br>";
+					$result = $pdo->exec($code[$i].");");
+					if ($result === false) {
+						$user->log(user::LEVEL_ERROR, "DB-FEHLER:" . implode("-", $pdo->errorInfo()));
+						echo "<b>Ein Fehler ist beim Wiederherstellen aufgetreten:".$pdo->errorCode().print_r($pdo->errorInfo())."</b><br><br>";
+						die();
+					}else{
+						echo "$result Zeilen wurden erfolgreich geändert.";
+						$count++;
+					}
+				}
+			}
+			echo "<hr><br><br><br>";
 			$pdo->exec("SET foreign_key_checks = 1");
-			// PDF-Dateien müssen noch wiederhergestellt werden
+			$result = query_db("SELECT `lehrer_dokument`, `schueler_dokument` FROM `unterricht`");
+			if ($result) {
+				$return = $result->fetch();
+				while ($return) {
+					if (strlen($return['lehrer_dokument']) > 2) {
+						//do something
+						if (!file_exists($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'])) {
+							echo "<br>Ein Fehler beim Wiederherstellen des Dokumentes ".$return['lehrer_dokument']." ist aufgetreten.";
+							die();
+						}else{
+							if(rename($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'], $GLOBAL_CONFIG['doc_dir'].$return['lehrer_dokument'])) {
+								echo "<br>Dokument ". $return['lehrer_dokument'] ." wurde erfolgreich wiederhergestellt";
+								$allfiles[] = $GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'];
+							}else{
+								echo "<br>Ein Fehler ist beim Verschieben des Dokuments aufgetreten";
+								die();
+							}
+						}
+					}
+					if (strlen($return['schueler_dokument']) > 2) {
+						if (!file_exists($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['schueler_dokument'])) {
+							echo "<br>Ein Fehler beim Wiederherstellen des Dokumentes ".$return['schueler_dokument']." ist aufgetreten.";
+							die();
+						}else{
+							if(rename($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['schueler_dokument'], $GLOBAL_CONFIG['doc_dir'].$return['schueler_dokument'])) {
+								echo "<br>Dokument ". $return['schueler_dokument'] ." wurde erfolgreich wiederhergestellt";
+								$allfiles[] = $GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".	$return['schueler_dokument'];
+							}else{
+								echo "<br>Ein Fehler ist beim Verschieben des Dokuments aufgetreten";
+								die();
+							}
+						}
+					}
+					$return = $result->fetch();
+				}
+			}
+			if (!unlink($filename)) {
+				echo "Es ist ein Fehler beim Aufräumen und Löschen nicht benötigter Datein entstanden";
+			}
+			if (!rmdir($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4)."/backup/")) {
+				echo "Verzeichnis konnte nicht gelöscht werden";
+			}
+			if (!rmdir($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4))) {
+				echo "Verzeichnis konnte nicht gelöscht werden";
+			}
 		}else {
 			echo "Dieses Backup existiert leider nicht!<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}
@@ -152,13 +224,14 @@ if (isset($user) && $user->runscript()) {
 				$backups[] = $file_ex;
 			}
 		}
+		array_multisort($backups);
 		if (count($backups > 0)) {
 			for ($i = 0; $i < count($backups); $i++) {
-				echo "<br>" . $backups[$i][0] . ":  " . $backups[$i][3] . "." . $backups[$i][2] . "." . $backups[$i][1] . " " . $backups[$i][5] . ":" . $backups[$i][6] . ":" . $backups[$i][7] . "Uhr";
-				echo "<div class=\"tooltip\" style=\"margin-top: 10px; margin-left: 100px;\"><a href=\"index.php?page=backup_data&delete=" . $backups[$i][8] . "\" class=\"fa fa-trash links2 \" onclick=\"return warn('Willst du das Backup wirklich löschen?')\" style=\"font-style: normal; text-decoration: none;\">";
-				echo "<span class=\"tooltext\">Lösche das Backup</span></a></div>";
+				echo "<br>" . $backups[$i][0] . ":  " . $backups[$i][3] . "." . (strlen($backups[$i][2]) == 1 ? "0".$backups[$i][2] : $backups[$i][2]) . "." . $backups[$i][1] . " " . $backups[$i][5] . ":" . $backups[$i][6] . ":" . $backups[$i][7] . "Uhr";
+				echo "<div class=\"tooltip\" style=\"margin-top: 10px; margin-left: 100px;\"><a href=\"index.php?page=backup_data&delete=" . $backups[$i][8] . "\" class=\"links2 \" onclick=\"return warn('Willst du das Backup wirklich löschen?')\" style=\"font-style: normal; text-decoration: none;\">";
+				echo "<img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Backups\"><span class=\"tooltext\">Lösche das Backup</span></a></div>";
 				echo "<span style=\"margin-left: 100px;\"><a href=\"index.php?page=backup_data&restore=" . $backups[$i][8] . "\" onclick=\"return warn('Willst du das Backup wirklich wiederherstellen? Alle jetzigen Daten gehen dabei verloren...')\"class=\"links2\">Wiederherstellen</a></span>";
-				echo "<span style=\"margin-left: 100px;\"><a href=\"" . $GLOBAL_CONFIG['backup_dir'] . $backups[$i][8] . "\" class=\"links2\">Download</a></span>";
+				echo "<span style=\"margin-left: 100px;\"><a href=\"" . $GLOBAL_CONFIG['backup_dir'] . $backups[$i][8] . "\" class=\"links2\"><img src=\"img/png_save_24_24.png\" alt=\"Download\"></a></span>";
 				?>
 <script type="text/javascript">
 function warn(string) {
