@@ -2,63 +2,25 @@
 if (isset($user) && $user->runscript()) {
 	
 	require 'extensions/mail/PHPMailer-master/PHPMailerAutoload.php';
-	?>
-<nav>
-	<ul class="mail_steps">
-		<li>
-			<a href="<?php
-	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=1";
-	?>" <?php
-	
+	echo '<nav><ul class="mail_steps"><li><a href="index.php?page=mail&step=1" ';
 	if (!isset($_GET['step']) || $_GET['step'] == 1) {
 		echo "class=\"mail_steps_active\"";
 	}
-	?>>1.Schritt</a>
-		</li>
-		<li>
-			<a href="<?php
-	
-	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=2";
-	?>" <?php
-	
+	echo '>Serien-E-Mail/Vermittlungs-E-Mail</a></li><li><a href="index.php?page=mail&step=2" ';
 	if (isset($_GET['step']) && $_GET['step'] == 2) {
 		echo "class=\"mail_steps_active\"";
 	}
-	?>>2.Schritt</a>
-		</li>
-		<li>
-			<a href="<?php
-	
-	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=3";
-	?>" <?php
-	
+	echo '>Adressen festlegen</a></li><li><a href="index.php?page=mail&step=3" ';
 	if (isset($_GET['step']) && $_GET['step'] == 3) {
 		echo "class=\"mail_steps_active\"";
 	}
-	?>>3.Schritt</a>
-		</li>
-		<li>
-			<a href="<?php
-	
-	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=4";
-	?>" <?php
-	
+	echo '>E-Mail verfassen</a></li><li><a href="index.php?page=mail&step=4" ';
 	if (isset($_GET['step']) && $_GET['step'] == 4) {
 		echo "class=\"mail_steps_active\"";
 	}
-	?>>4.Schritt</a>
-		</li>
-	</ul>
-</nav>
+	echo '>Vorschau</a></li></ul></nav>';
+	echo '<h2>Sende E-Mail an Schüler</h2><a class="mybuttons links2" href="index.php?page=mail&mail_reset=1">Alle Eingaben zurücksetzen</a>';
 
-<h2>Sende E-Mail an Schüler</h2>
-<a class="mybuttons links2" href="<?php
-	
-	echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&mail_reset=1";
-	?>">Alle EIngaben zurücksetzen</a>
-
-
-<?php
 	if (isset($_GET['send'])) {
 		$mail = new PHPMailer();
 		$mail->Host = 'mail.gmx.net';
@@ -101,11 +63,11 @@ if (isset($user) && $user->runscript()) {
 					$mail->addAddress($GLOBAL_CONFIG['mailto'], $GLOBAL_CONFIG['mailto']);
 				}else{
 					$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
-					$mail->addAddress($_SESSION['lehrermail']['empfaenger'], $_SESSION['lehrermail']['empfaenger']);
+					$mail->addAddress($_SESSION['schuelermail']['empfaenger'], $_SESSION['schuelermail']['empfaenger']);
 				}
 				$mail->addAttachment("docs/AGB.pdf", "Allgemeine Geschäftsbedingungen.docx");
 				$mail->addAttachment("docs/unterricht/" . $_SESSION['schuelermail']['anhang'], "Vermittlungsdokument.pdf");
-				$mail->addAttachment("docs/kontoinfo.pdf", "Informationen über das Konto der Schülerfirma");
+				$mail->addAttachment("docs/kontoinfo.pdf", "Informationen über das Konto der Schülerfirma.pdf");
 				$mail->Body = $_SESSION['schuelermail']['text'];
 				$mail->Subject = $_SESSION['schuelermail']['betreff'];
 				if (!$mail->send()) {
@@ -307,7 +269,8 @@ if (isset($user) && $user->runscript()) {
 		// Email an Nachhilfepaar
 		if (isset($_SESSION['mail_step1']['mailart']) && $_SESSION['mail_step1']['mailart'] == 1) {
 			echo "<h3>E-Mail an Nachhilfelehrer:</h3>";
-			echo "<p>Hinweis: <i>Die AGB's werden automatisch mit an die Vermittlungsemails angehängt sowie die Lohnkarte für den Lehrer und die Kontoinformationen für den Schüler</i></p>";
+			echo "<p>Hinweis: <i>Die AGB's werden automatisch mit an die Vermittlungsemails angehängt sowie die Lohnkarte für den Lehrer und die Kontoinformationen für den Schüler<br>
+					Sämtliche Textbausteine (:vorname,:fach...) werden erst im nächsten Schritt ersetzt.</i></p>";
 			echo "<button type=\"button\" class=\"mybuttons\" onclick=\"vermittlungsmail()\">Vorlage für Vermittlungsmail</button><br>";
 			if (isset($_SESSION['mail_step3']['subject2'])) {
 				echo "<input id=\"subject2\" type=\"text\" name=\"subject2\" placeholder=\"Betreff\" value=\"" . strip_tags($_SESSION['mail_step3']['subject2']) . "style=\"width: 40%\">";

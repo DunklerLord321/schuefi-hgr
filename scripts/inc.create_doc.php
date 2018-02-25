@@ -25,7 +25,7 @@ if (isset($user) && $user->runscript()) {
 						0
 				), '', false);
 				$this->Ln(5);
-				$this->addHtmlLink("mailto:schuelerfirma.hgr@gmx.de", "E-Mail-Adresse: schuelerfirma.hgr@gmx.de", false, true, array(
+				$this->addHtmlLink("mailto:schuelerfirma@hgr-web.de", "E-Mail-Adresse: schuelerfirma@hgr-web.de", false, true, array(
 						0, 
 						0, 
 						0

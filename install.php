@@ -5,11 +5,14 @@ if ((isset($_GET['user']) && isset($_GET['passwd']) && isset($_GET['host'])) || 
 	require 'includes/db_data.php';
 	try {
 		if (isset($_GET['art'])) {
-			$pdo = new PDO('mysql:host=' . $GLOBAL_CONFIG['host'] . ';dbname=' . $GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd']);
+			$pdo = new PDO('mysql:host=' . $GLOBAL_CONFIG['host'] . ';dbname=' . $GLOBAL_CONFIG['dbname'], $GLOBAL_CONFIG['dbuser'], $GLOBAL_CONFIG['dbuser_passwd'], array(
+			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''));
 		}else if (isset($_GET['dbname'])){
-			$pdo = new PDO('mysql:dbname='.$_GET['dbname'].';host='.$_GET['host'].'', $_GET['user'], $_GET['passwd']);
+			$pdo = new PDO('mysql:dbname='.$_GET['dbname'].';host='.$_GET['host'].'', $_GET['user'], $_GET['passwd'], array(
+			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''));
 		}else{
-			$pdo = new PDO('mysql:host='.$_GET['host'].'', $_GET['user'], $_GET['passwd']);
+			$pdo = new PDO('mysql:host='.$_GET['host'].'', $_GET['user'], $_GET['passwd'], array(
+			PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''));
 		}
 	}catch (PDOException $e) {
 		echo "FEHLER " . $e;

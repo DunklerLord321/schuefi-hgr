@@ -47,6 +47,10 @@ class user {
 	function getemail() {
 		return $this->email;
 	}
+	
+	function getaccount() {
+		return $this->account;
+	}
 	/*
 	 * Testet, ob dieser Nutzer Script/Teilbereich eines Scripts ausführen darf;
 	 * In DB ist für jedes Script gespeichert, welcher Nutzertyp es ausführen darf
@@ -144,9 +148,11 @@ class user {
 	
 	// Holt alle Informationen über Nutzer aus DB, wenn angegebene E-Mail existiert
 	function setmail($m_mail) {
-		require 'includes/functions.inc.php';
+		if (!function_exists("query_db")) {
+			require 'includes/functions.inc.php';
+		}
 		$this->email = $m_mail;
-		$result = query_db("SELECT * FROM users WHERE email = :email", $this->email);
+		$result = query_db("SELECT * FROM users WHERE email = :email AND aktiv = 1", $this->email);
 		$user = $result->fetch();
 		if ($user !== false) {
 			$this->vname = $user['vname'];
@@ -157,7 +163,7 @@ class user {
 			$this->count_login_trys = intval($user['count_login']);
 			return true;
 		}else {
-			$this->error = "Ein Nutzer mit dieser E-Mail-Adresse existiert leider nicht";
+			$this->error = "Ein Nutzer mit dieser E-Mail-Adresse existiert leider nicht oder wurde deaktiviert";
 			return false;
 		}
 	}
@@ -287,6 +293,7 @@ class user {
 
 		$Body = "Lieber Admin / Liebe Admins,<br> der Schüler/in " . $this->vname . " " . $this->nname . " mit der E-Mail-Addresse $this->email hat zu oft versucht, sich mit einem flaschen Passwort anzumelden.
 		<br>Bitte überprüfe, ob es wirklich der Schüler war und nehme mit ihm Kontakt auf.
+		<br>Wenn es wirklich der Schüler war, kann er nur von einem Administrator/Vorstand wieder entsperrt werden. 
 		<br><br>Vielen Dank
 		<br>Hnweis: Dies ist automatisch gesendet!";
 		$mail->Subject = 'Schuelerfirma HGR - Anmeldefehler von ' . $this->vname . ' ' . $this->nname;

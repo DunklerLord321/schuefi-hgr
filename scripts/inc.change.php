@@ -1,7 +1,7 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Ändern der Daten</h2>";
-	if (isset($_GET['change']) && ($_GET['change'] == 1 || $_GET['change'] == 2 || $_GET['change'] == 3)) {
+	if (isset($_GET['change']) && ($_GET['change'] == 1 || $_GET['change'] == 2 || $_GET['change'] == 3 || $_GET['change'] == 4)) {
 		if ($_GET['change'] == 1) {
 			require 'includes/class_person.php';
 			$person = new person();
@@ -134,6 +134,23 @@ if (isset($user) && $user->runscript()) {
 				}
 			}
 			echo "Die Daten des Lehrers wurden erfolgreich geändert";
+		}
+		if ($_GET['change'] == 4) {
+			if (isset($_POST['ridraum']) && $_POST['ridraum'] != -1) {
+				$raum = $_POST['ridraum'];
+				query_db("UPDATE raum SET frei = 0 WHERE id = :id", $raum);
+			}else{
+				$raum = NULL;
+			}
+			$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende, 
+					treff_raum = :treff_raum, `rid` = :rid WHERE id = :pid", 
+					$_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum'], $raum,
+					$_POST['paar_id']);
+			if ($return !== false) {
+				echo "<br><a href=\"index.php?page=output&paare=1&filter=".$_POST['paar_id']."\" class=\"links2\">Daten des Paares wurden erfolgreich geändert</a>";
+			}else{
+				echo "Es ist ein Fehler beim Aktualisieren aufgetreten";
+			}
 		}
 	}
 	if (isset($_GET['person'])) {
@@ -449,6 +466,160 @@ if (isset($user) && $user->runscript()) {
 	</form>
 </div>
 <?php
+	}
+	if (isset($_GET['paar'])) {
+		require 'includes/class_paar.php';
+		$paar = new paar($_GET['paar']);
+		if (!is_object($paar)) {
+			echo "Ein Fehler beim Laden des Paares ist aufgetreten";
+			die();
+		}
+		?>
+		<script src="includes/jquery/jquery-ui-timepicker/jquery.ui.timepicker.js?v=0.3.3"></script>
+		<link rel="stylesheet" href="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/ui-lightness/jquery-ui-1.10.0.custom.min.css" type="text/css" />
+		<link rel="stylesheet" href="includes/jquery/jquery-ui-timepicker/jquery.ui.timepicker.css?v=0.3.3" type="text/css" />
+		<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.core.min.js"></script>
+		<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.widget.min.js"></script>
+		<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.tabs.min.js"></script>
+		<script type="text/javascript" src="includes/jquery/jquery-ui-timepicker/include/ui-1.10.0/jquery.ui.position.min.js"></script>
+		<script type="text/javascript">
+		$('body').on('focus','.timepickervon', function(){
+			$(this).timepicker({
+				showPeriodLabels: false,
+				hourText: "Stunden",
+				minuteText: "Minuten",
+				hours: {
+					starts: 11,
+					ends: 17,
+				},
+				minutes: {
+					starts: 0,
+					interval: 15,
+					ends: 45
+				},
+				rows: 2,
+				defaultTime: '13:00'
+			});
+		});
+		
+			$('body').on('focus','.timepickerbis', function(){
+				$(this).timepicker({
+					showPeriodLabels: false,
+					hourText: "Stunden",
+					minuteText: "Minuten",
+					hours: {
+						starts: 11,
+						ends: 17,
+					},
+					minutes: {
+						starts: 0,
+						interval: 15,
+						ends: 45
+					},
+					rows: 2,
+					defaultTime: '14:00'
+				});
+			});
+				</script>
+				<form action="index.php?page=change&change=4" method="post">
+				<input type="hidden" name="paar_id" value="<?php echo $paar->paarid?>">
+				<label>Nachhilfeschüler:</label> <?php echo $paar->schueler->person->vname." ".$paar->schueler->person->nname?>
+			<br>
+			<br>
+			<label>Nachhilfelehrer:</label> <?php echo $paar->lehrer->person->vname." ".$paar->lehrer->person->nname?>
+			<br>
+			<br>
+			<label>Zeitpunkt:</label>
+			<select name="zeit[tag]">
+			<?php
+					$tagekuerzel = array(
+							"mo", 
+							"di", 
+							"mi", 
+							"do", 
+							"fr"
+					);
+					$tage = array(
+							"Montag", 
+							"Dienstag", 
+							"Mittwoch", 
+							"Donnerstag", 
+							"Freitag"
+					);
+					for ($j = 0; $j < count($tagekuerzel); $j++) {
+						if (isset($paar->tag) && $paar->tag == $tagekuerzel[$j]) {
+							echo "<option value=\"" . $tagekuerzel[$j] . "\" selected >" . $tage[$j] . "</option>";
+						}else {
+							echo "<option value=\"" . $tagekuerzel[$j] . "\">" . $tage[$j] . "</option>";
+						}
+					}
+					?>
+			</select>
+			<br>
+			<br>
+			Von:
+			<input type="text" class="timepickervon input_text" name="zeit[from]" value="<?php if(isset($paar->anfang)){echo $paar->anfang;}else{echo "13:00";}?>">
+			Bis:
+			<input type="text" class="timepickerbis input_text" name="zeit[until]" value="<?php if(isset($paar->ende)){echo $paar->ende;}else{echo "14:00";}?>">
+			<br>
+			<br>
+			<?php 
+			if(!isset($paar->anfang) || !isset($paar->ende) || !isset($paar->tag)) {
+				echo "<i>Keine Automatische Zimmersuche möglich!</i><br><br>";
+			}else{
+				echo "Mit automatischer Zimmersuche vorgeschlagenes Zimmer:";
+				echo "<br><br><i>Achtung:</i> Das Vorgeschlagene Zimmer bezieht sich auf die nicht geänderte Uhrzeit. Um sowohl Zeit als auch Zimmer zu ändern bitte in zwei Schritten vorgehen.<br><br>";
+				$stunden = get_stunde_for_time($paar->anfang, $paar->ende);
+				if(is_array($stunden)) {
+					$return = query_db("SELECT raum.*, r.stunde as stunde1, zahlnummer FROM `raum` INNER JOIN (SELECT raum.* FROM raum WHERE stunde = :stunde AND frei = 1 AND tag = :tag) as r on r.nummer = raum.nummer
+							LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id 
+							GROUP BY raum.id, raum.nummer, raum.tag HAVING raum.tag = :tag) AS rz ON rz.nummer = raum.nummer
+							HAVING raum.stunde = :stunde2 AND raum.tag = :tag ", $stunden[0], $paar->tag, $paar->tag, $stunden[1], $paar->tag);
+				}else {
+					$return = query_db("SELECT raum.*, zahlnummer FROM `raum`
+							LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id
+							GROUP BY raum.id, raum.nummer, raum.tag HAVING raum.tag = :tag) AS rz
+							ON rz.nummer = raum.nummer
+							WHERE raum.tag = :tag AND raum.stunde = :stunde AND raum.frei = 1", $paar->tag, $paar->tag, $stunden);
+				}
+				if ($return !== false) {
+					echo "<select name=\"ridraum\" id=\"selectraum\"><option value=\"-1\">Entweder hier neuen Raum wählen oder in Eingabefeld eintragen</option>";
+					$result = $return->fetch();
+					while ($result) {
+						if (isset($paar->rid) && $paar->rid == $result['id']) {
+							echo "<option selected value=\"" . $result['id'] . "\">momentanes Zimmer: ".$result['nummer']." -- " . (isset($result['stunde1'])?$result['stunde1']."./":"") . $result['stunde'] .".Stunde, " . get_name_of_tag($paar->tag). "</option>";
+						}else{
+							echo "<option value=\"" . $result['id'] . "\">Zimmer: ".$result['nummer']." -- " . (isset($result['stunde1'])?$result['stunde1']."./":"") . $result['stunde'] .".Stunde, " . get_name_of_tag($paar->tag) .($result['zahlnummer'] != NULL ? $result['zahlnummer']."x belegt an dem Tag zu anderer Zeit. Eventuell sind Überschneidung möglich.":"")."</option>";
+						}
+						$result = $return->fetch();
+					}
+					echo "</select><br><br>";	
+				}
+			}
+			?>
+			<label id="labelraum">momentaner Raum:</label>
+			<br>
+			<input type="text" name="raum" class="input_text" value="<?php echo $paar->raum?>">
+			<p></p>
+			<input type="submit" value="Ändern" style="float: right;" class="mybuttons">
+			<br>
+			<br>
+			<script type="text/javascript">
+		$(function() {
+			$('#selectraum').change(function() {
+				if($('#selectraum').val() == -1) {
+					$('[name=raum]').show();
+					$('#labelraum').show();
+				}else{
+				$('[name=raum]').hide();
+				$('#labelraum').hide();
+				}
+			});
+		});
+			</script>
+		</form>
+		<?php
+		
 	}
 }else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";

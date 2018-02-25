@@ -8,6 +8,7 @@ if (isset($user) && $user->runscript()) {
 	if (isset($_GET['schueler']) && $_GET['schueler'] == 1 && $_GET['delete']) {
 		$schueler = new schueler(-1, $_GET['delete']);
 		$schueler->delete();
+		echo "<br><br><a href=\"index.php?page=output_person\" class=\"links2\">Zurück zur Übersicht</a>";
 	}
 	if (isset($_GET['lehrer']) && $_GET['lehrer'] == 1 && $_GET['delete']) {
 		$lehrer = new lehrer(-1, $_GET['delete']);

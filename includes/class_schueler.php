@@ -125,7 +125,7 @@ class schueler {
 					$return = query_db("SELECT * FROM `schueler` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, get_current_year());
 					$schueler = $return->fetch();
 					$this->id = $schueler['id'];
-					echo "Der Schüler wurde erfolgreich hinzugefügt";
+					echo "Der Schüler wurde erfolgreich hinzugefügt<br><br><a href=\"index.php?page=output&schueler=1&filter=" . $this->person->id . "\" class=\"links2\">Daten des Schülers ansehen und vermitteln</a>";
 					return true;
 				}else {
 					echo "Der Schüler existiert bereits in dem Schuljahr";

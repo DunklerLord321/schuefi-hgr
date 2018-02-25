@@ -13,7 +13,7 @@ function warn(string) {
 	<?php
 	if (isset($_GET['filter'])) {
 		echo "Ansicht: <a href=\"index.php?page=output_person&filter=".$_GET['filter']."&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output_person&filter=".$_GET['filter']."&layout=table\" class=\"links2\">Tabelle</a><br><br>";
-		$return = query_db("Select * FROM `person` WHERE id = :id  AND aktiv = 1 ORDER BY `person`.`nname` ASC", $_GET['filter']);
+		$return = query_db("Select * FROM `person` WHERE id = :id ORDER BY `person`.`nname` ASC", $_GET['filter']);
 	}else {
 		echo "Ansicht: <a href=\"index.php?page=output_person&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output_person&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 		$return = query_db("SELECT * FROM `person` WHERE aktiv = 1 ORDER BY `person`.`nname` ASC");
@@ -33,7 +33,9 @@ function warn(string) {
 		if (get_view() == "table") {
 			echo "<table class=\"table1\"><tr><th>Vorname</th><th>Nachname</th><th>E-Mail-Adresse</th><th>Telefon</th><th>Geburtstag</th><th>Nachhilfeschüler</th><th>Nachhilfelehrer</th><th></th><th></th></tr>";
 		}
+		$count = 0;
 		while ($result) {
+			$count++;
 			$person->load_person($result['id']);
 			if (get_view() == "table") {
 				echo "<tr><td>$person->vname</td><td>$person->nname</td><td>$person->email</td><td>$person->telefon</td><td>$person->geburtstag</td>";
@@ -48,9 +50,13 @@ function warn(string) {
 				}else{
 					echo "<td><img src=\"img/png_no_13_20.png\" alt=\"nein\"></td>";
 				}
-				if ($user->isuserallowed('k')) {
-					echo "<td><a href=\"index.php?page=change&person=$person->id\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern der Person\"></a></td>";
-					echo "<td><a href=\"index.php?page=delete&person=1&delete=$person->id\" class=\"links2\" onclick=\"return warn('Willst du die Person $person->vname $person->nname wirklich löschen?')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen der Person\"></a></td>";
+				if($person->aktiv) {
+					if ($user->isuserallowed('k')) {
+						echo "<td><a href=\"index.php?page=change&person=$person->id\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern der Person\"></a></td>";
+						echo "<td><a href=\"index.php?page=delete&person=1&delete=$person->id\" class=\"links2\" onclick=\"return warn('Willst du die Person $person->vname $person->nname wirklich löschen?')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen der Person\"></a></td>";
+					}
+				}else{
+					echo "<td>Die Person wurde bereits gelöscht und existiert nur noch, um die Daten für die Finanzabteilung zu erhalten</td><td></td>";
 				}
 				echo "</tr>";
 			}else{
@@ -70,33 +76,29 @@ function warn(string) {
 			}
 			$schueler_lehrer = $person->search_lehrer_schueler();
 			if (is_array($schueler_lehrer['lehrer'])) {
-				?>
-				<div style="padding-left: 10%;">
-				<?php
-				echo "<br><br><a href=\"index.php?page=output&lehrer=1&filter=" . $person->id . "\" class=\"links2\">$person->vname $person->nname ist als Nachhilfelehrer tätig</a>";
-				?>
-				</div>
-				<?php
+				echo "<div style=\"padding-left: 10%;\">";
+				echo "<br><br><a href=\"index.php?page=output&lehrer=1&filter=" . $person->id . "\" class=\"links2\">$person->vname $person->nname ist als Nachhilfelehrer tätig</a></div>";
 			}
 			if (is_array($schueler_lehrer['schueler'])) {
-				?>
-				<div style="padding-left: 10%;">
-				<?php
-				echo "<br><br><a href=\"index.php?page=output&schueler=1&filter=" . $person->id . "\" class=\"links2\">$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet</a>";
-				?>
-				</div>
-				<?php
+				echo "<div style=\"padding-left: 10%;\">";
+				echo "<br><br><a href=\"index.php?page=output&schueler=1&filter=" . $person->id . "\" class=\"links2\">$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet</a></div>";
 			}
 			?>
 		</div>
 		<?php
+			if($person->aktiv) {
 			if ($user->isuserallowed('k')) {
 				?>
 		<div style="width: 30%;">
 			<a href="index.php?page=change&person=<?php echo $person->id;?>" class="links">Ändere die Daten</a><br><br><br>
 			<a href="index.php?page=delete&person=1&delete=<?php echo $person->id;?>" class="links" onclick="return warn('Willst du die Person wirklich löschen?')">Löschen</a>
 		</div>	
-		<?php }?>
+		<?php }
+			}else{
+				echo "Die Person wurde bereits gelöscht und existiert nur noch, um die Daten für die Finanzabteilung zu erhalten";	
+			}
+		
+		?>
 		</div>
 </fieldset>
 <?php
@@ -104,12 +106,16 @@ function warn(string) {
 			$result = $return->fetch();
 		}
 		if(get_view() == 'table') {
-			echo "</table><br><br><b>Hinweis:</b> Wenn du auf <img src=\"img/png_yes_12_16.png\" alt=\"ja\" style=\"width:13px;\"> klickst, kannst du dir die Schüler- oder Lehrerdaten der Person ansehen.";
+			echo "</table><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b> Wenn du auf <img src=\"img/png_yes_12_16.png\" alt=\"ja\" style=\"width:13px;\"> klickst, kannst du dir die Schüler- oder Lehrerdaten der Person ansehen.";
 			echo "<br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten der Person ändern.";
 			echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten der Person löschen.";
 		}
 	}else {
-		echo "Es wurde noch keine Person hinzugefügt";
+		if(isset($_GET['filter'])) {
+			echo "Diese Person konnte nicht mehr gefunden werden. Entweder wurde sie schon gelöscht oder hat noch nie existiert.";
+		}else{
+			echo "<br>Es wurde noch keine Person hinzugefügt";
+		}
 	}
 }else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";

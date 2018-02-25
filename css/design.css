@@ -90,7 +90,7 @@ button {
 	text-align: center;
 	text-decoration: none;
 	color: white;
-	padding: 20px 20px;
+	padding: 17px 20px;
 }
 
 .navigation_li{
@@ -197,7 +197,7 @@ button {
 
 .mail_steps {
 	display: inline-block;
-	background-color: white;
+	background-color: #e7e7e7;
 	list-style-type: none;
 	margin: 0;
 	padding: 0;
@@ -218,17 +218,16 @@ button {
 	padding: 10px 2px;
 	cursor: not-allowed;
 	pointer-events: none;
+	color: #0b1162;
 }
 
 .mail_steps_active {
-	background-color: #848484;;
-}
-.mail_steps li a:HOVER:NOT(.mail_steps_active) {
-	background-color: #858585;
+	background-color: rgba(27,37,135,1);
+	color: white;
 }
 .mail_steps li a:VISITED {
 	text-decoration: none;
-	color: black;
+	color: #e91e63;
 }
 
 #textarea1{
@@ -258,10 +257,6 @@ button {
 }
 .detail p {
 	cursor: auto;
-}
-.mail_steps a:LINK {
-	text-decoration: none;
-	color: black;
 }
 .links2 {
 	padding: 2px;

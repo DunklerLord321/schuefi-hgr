@@ -17,10 +17,14 @@ session_start();
 <!-- -<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">--->
 </head>
 <body>
+<div id="topdiv" style="top: 0;"></div>
 <?php
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
+require 'includes/functions.inc.php';
+setlocale(LC_TIME, 'de_DE', 'de_DE.UTF-8');
 if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
+//	$xml = init_settings_xml();
 	error_reporting(E_ALL);
 }else{
 	error_reporting(E_ERROR);
@@ -43,7 +47,8 @@ if (isset($_GET['reset'])) {
 	$user->reset();
 }
 if (isset($_GET['page'])) {
-	if ($_GET['page'] == 'logout' || ($GLOBAL_CONFIG['bauarbeiten'] == true && $user->getemail() != "yajo10@yahoo.de")) {
+//	if ($_GET['page'] == 'logout' || ($xml->bauarbeiten['enabled'] == "true" && $user->getemail() != "yajo10@yahoo.de")) {
+	if ($_GET['page'] == 'logout' || ($GLOBAL_CONFIG['bauarbeiten'] == "true" && $user->getemail() != "yajo10@yahoo.de")) {
 		$user->logout();
 		?>
 	<nav>
@@ -175,25 +180,19 @@ if (isset($_GET['page'])) {
 				<a href="index.php?page=output" style="text-align: right;"> Ändern eines Lehrers</a>
 			</li><?php
 		}
-		?>
-			<li <?php
-		
 		if (strcmp($active, "output") == 0 && strpos($_SERVER['QUERY_STRING'], "paare=1") !== false) {
-			echo "class=\"active\"";
+			echo "<li class=\"active\">";
+		}else{
+			echo "<li>";
 		}
-		?>>
-				<a href="index.php?page=output&paare=1"> Ausgeben der Paare</a>
-			</li>
-			<li <?php
-		
-		if (strcmp($active, "mail") == 0) {
-			echo "class=\"active\"";
-		}
-		?>>
-				<a href="index.php?page=mail&step=1"> Sende E-Mail</a>
-			</li>
-			<?php
-		
+		echo "<a href=\"index.php?page=output&paare=1\"> Ausgeben der Paare</a></li>";
+		if ($user->isuserallowed('kf')) {
+			echo "<li";
+			if (strcmp($active, "mail") == 0) {
+				echo "class=\"active\"";
+			}
+			echo '><a href="index.php?page=mail&step=1"> Sende E-Mail</a></li>';
+		}		
 		if ($user->isuserallowed('f')) {
 			?>
 			<li <?php
@@ -242,9 +241,8 @@ if (isset($_GET['page'])) {
 		</div>
 	</nav>
 				<script type="text/javascript">
-
+var account = '<?php echo $user->getaccount()?>';
 $(function() {
-	console.log($(window).width());
 	$('#nav_button').click(toggle_mobile);
 	$('#nav_button').mouseenter(shownav);
 	function toggle_mobile() {
@@ -255,13 +253,15 @@ $(function() {
 	}
 	function shownav() {
 		if($(window).width() > 1240) {
-			console.log("test");
 			$('#content').animate({marginLeft: '22%'}, 200);
 			$('#nav_seite').animate({width: '20%'}, 200);
-			$('#nav_seite').animate({top:'10px'},2);
+			if(account == 'w') {
+					$('#nav_seite').animate({top:'100px'},2);
+			}else{
+				$('#nav_seite').animate({top:'10px'},2);
+			} 
 			$('#nav_seite').fadeIn(200);
 		}else{
-			console.log("test2");
 			$('#nav_seite').fadeIn(200);
 			$('#nav').fadeOut(200);
 		}
@@ -329,7 +329,6 @@ $(function() {
 	<!-- - div endet in letzter Zeile   -->
 	<div class="content" id="content">
 	<?php
-		require 'includes/functions.inc.php';
 		$ret_prep = query_db("SELECT * FROM navigation WHERE kuerzel = :kuerzel", $_GET['page']);
 		$result = $ret_prep->fetch();
 		//Testen, ob die angefragte Seite in der Datenbank hinterlegt ist
@@ -390,13 +389,13 @@ $(function() {
 	<nav>
 		<div class="navigation">
 			<!-- -- <li class="navigation_li"><a href="index">Login</a></li> -->
-			<a class="navigation_li" href="index.php?login=1">Du bist nicht angemeldet. Anmelden</a>
+			<a id="login" class="navigation_li" href="index.php?login=1">Du bist nicht angemeldet. Anmelden</a>
 		</div>
 	</nav>
 	<div class="content">
 		<?php
 	$user->allowrunscript();
-	include 'includes/inc.login.php';
+	include 'scripts/inc.login.php';
 	$user->denyrunscript();
 	?>
 	</div>

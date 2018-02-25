@@ -13,13 +13,19 @@ if (isset($user) && $user->runscript()) {
 		if ($lehrer_ex[1] != $schueler_ex[1]) {
 			echo "Unterschiedliche Fächer wurden gewählt!";
 		}
+		if (isset($_POST['ridraum']) && $_POST['ridraum'] != -1) {
+			$raum = $_POST['ridraum'];
+			query_db("UPDATE raum SET frei = 0 WHERE id = :id", $raum);
+		}else{
+			$raum = NULL;
+		}
 		$return = query_db("SELECT * FROM `unterricht` WHERE `lid` = :lid AND `sid` = :sid AND `fid` = :fid", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1]);
 		$result = $return->fetch();
 		if ($result !== false) {
 			echo "Das Paar existiert schon!";
 		}else {
 			$return = query_db("UPDATE `fragt_nach` SET `status` = 'vermittelt' WHERE sid = :sid AND fid = :fid", $schueler_ex[0], $schueler_ex[1]);
-			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, tag, treff_zeit, treff_zeit_ende, treff_raum) VALUES (:lid, :sid, :fid, :tag, :treff_zeit, :treff_zeit_ende, :treff_raum)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], intval($_POST['raum']));
+			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, tag, treff_zeit, treff_zeit_ende, treff_raum, rid) VALUES (:lid, :sid, :fid, :tag, :treff_zeit, :treff_zeit_ende, :treff_raum, :rid)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], intval($_POST['raum']), $_POST['ridraum']);
 			if ($return !== false) {
 				$return = query_db("SELECT unterricht.id FROM unterricht WHERE unterricht.lid = :lid AND unterricht.fid = :fid AND unterricht.sid = :sid ", $lehrer_ex[0], $schueler_ex[1], $schueler_ex[0]);
 				$result = $return->fetch();
@@ -171,10 +177,10 @@ $('body').on('focus','.timepickerbis', function(){
 	}else{
 		$stunden = get_stunde_for_time($_GET['anfang'], $_GET['ende']);
 		if(is_array($stunden)) {
-			$return = query_db("SELECT raum.*, zahlnummer FROM `raum` LEFT JOIN (SELECT raum.* FROM raum WHERE stunde = :stunde AND frei = 1 AND tag = :tag) as r on r.nummer = raum.nummer
+			$return = query_db("SELECT raum.*, r.stunde as stunde1, zahlnummer FROM `raum` INNER JOIN (SELECT raum.* FROM raum WHERE stunde = :stunde AND frei = 1 AND tag = :tag) as r on r.nummer = raum.nummer
 					LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id 
 					GROUP BY raum.id, raum.nummer, raum.tag HAVING raum.tag = :tag) AS rz ON rz.nummer = raum.nummer
-					HAVING raum.stunde = :stunde2 AND raum.tag = :tag ", $_GET['tag'], $stunden[0], $_GET['tag'], $stunden[1], $_GET['tag']);
+					HAVING raum.stunde = :stunde2 AND raum.tag = :tag ", $stunden[0], $_GET['tag'], $_GET['tag'], $stunden[1], $_GET['tag']);
 		}else {
 			$return = query_db("SELECT raum.*, zahlnummer FROM `raum`
 					LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id
@@ -183,17 +189,17 @@ $('body').on('focus','.timepickerbis', function(){
 					WHERE raum.tag = :tag AND raum.stunde = :stunde AND raum.frei = 1", $_GET['tag'], $_GET['tag'], $stunden);
 		}
 		if ($return !== false) {
-			echo "<select name=\"ridraum\" id=\"selectraum\"><option value=\"-1\">Bitte wählen</option>";
 			$result = $return->fetch();
+			echo "<label>automatische Zimmersuche:</label><br><select name=\"ridraum\" id=\"selectraum\"><option value=\"-1\">Bitte wählen</option>";
 			while ($result) {
-				echo "<option value=\"" . $result['id'] . "\">Zimmer: ".$result['nummer']." -- " . $result['stunde'] .".Stunde -- ".$result['zahlnummer']."x belegt an dem Tag zu anderer Zeit. Eventuell sind Überschneidung möglich.</option>";
+				echo "<option value=\"" . $result['id'] . "\">Zimmer: ".$result['nummer']." -- " .(isset($result['stunde1'])?$result['stunde1']."./":"") . $result['stunde'] .".Stunde -- ".($result['zahlnummer']==NULL?"nicht belegt an dem Tag von der Schülerfirma":$result['zahlnummer']."x belegt an dem Tag zu anderer Zeit. Eventuell sind Überschneidung möglich").".</option>";
 				$result = $return->fetch();
 			}
 			echo "</select><br><br>";	
 		}
 	}
 	?>
-	<label id="labelraum">Raum:</label>
+	<label id="labelraum">manuelle Zimmereingabe:</label>
 	<br>
 	<input type="text" name="raum" class="input_text">
 	<p></p>
@@ -206,11 +212,9 @@ $(function() {
 		if($('#selectraum').val() == -1) {
 			$('[name=raum]').show();
 			$('#labelraum').show();
-			$('[name=raum]').val('');
 		}else{
 		$('[name=raum]').hide();
 		$('#labelraum').hide();
-		$('[name=raum]').val($('#selectraum').val());
 		}
 	});
 });

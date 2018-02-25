@@ -6,6 +6,8 @@ class person {
 	public $nname;
 	public $telefon;
 	public $geburtstag;
+	public $aktiv;
+	
 	function __construct() {
 		$this->id = null;
 		$this->vname = '';
@@ -13,8 +15,26 @@ class person {
 		$this->email = '';
 		$this->telefon = '';
 		$this->geburtstag = '';
+		$this->aktiv = true;
 	}
 	function load_person_name($vname, $nname) {
+		global $pdo;
+		$return = query_db("SELECT * FROM `person` WHERE vname = :vname AND nname = :nname", $vname, $nname);
+		$result = $return->fetch();
+		if($result === false) {
+			return false;
+		}
+		$this->id = $result['id'];
+		$this->vname = $result['vname'];
+		$this->nname = $result['nname'];
+		$this->email = $result['email'];
+		$this->telefon = $result['telefon'];
+		$this->aktiv = $result['aktiv'];
+		if (strlen($result['geburtstag']) > 0) {
+			$time = strtotime($result['geburtstag']);
+			$this->geburtstag = date('d.m.Y', $time);
+		}
+		return true;
 	}
 	function load_person($pid) {
 		global $pdo;
@@ -31,12 +51,14 @@ class person {
 		$this->nname = $result['nname'];
 		$this->email = $result['email'];
 		$this->telefon = $result['telefon'];
+		$this->aktiv = $result['aktiv'];
 		if (strlen($result['geburtstag']) > 0) {
 			$time = strtotime($result['geburtstag']);
 			$this->geburtstag = date('d.m.Y', $time);
 		}
 		return true;
-	}
+	}	
+	
 	function addperson($vname, $nname, $email, $telefon, $geburtstag) {
 		global $pdo;
 		$vname = strip_tags($vname);
@@ -133,7 +155,7 @@ class person {
 	}
 	function change_person($vname, $nname, $email, $telefon, $geburtstag) {
 		global $pdo;
-		if (!isset($this->id) || $this->id == NULL) {
+		if (!isset($this->id) || $this->id == NULL || $this->aktiv == false) {
 			return false;
 		}
 		$vname = strip_tags($vname);
@@ -197,6 +219,9 @@ class person {
 	}
 	
 	function delete() {
+		if($this->aktiv == false) {
+			echo "Die Person wurde bereits gelöscht. Die Daten bleiben weiterhin erhalten, um Probleme mit der Finanztabelle zu vermeiden";
+		}
 		$schueler_lehrer = $this->search_lehrer_schueler();
 		if (is_array($schueler_lehrer['lehrer']) || is_array($schueler_lehrer['schueler'])) {
 			echo "Die Person konnte nicht gelöscht werden.<br><br>Zu der Person gibt es noch einen Schüler oder Lehrer. Lösche bitte zuerst diese.";

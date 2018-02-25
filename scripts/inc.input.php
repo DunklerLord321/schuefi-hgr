@@ -72,48 +72,37 @@ if (isset($user) && $user->runscript()) {
 var fachzahl = 0;
 var zeitzahl = 0;
 
-function addfach() {
-	fachzahl++;
-	var doc = document.createDocumentFragment();
-	var element = document.createElement('div');
-	element.innerHTML = '<div style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;">\
-		<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
-		<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
-		</select><br><br>Fachlehrer:<br><input type="text" class="input_text" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]" style="width: 95%;"><br>\
-		<?php
-			
-			if ($show_formular_lehrer) {
-				echo "Notenschnitt:<br><input class=\"textinput input_text\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
-				echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
-				echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
-				echo "<input type=\"radio\" required name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
-			}
-			?>
-		</div>';
-	while(element.firstChild) {
-		doc.appendChild(element.firstChild);
-	}
-	document.getElementById("insertfach").appendChild(doc);	
-}
-		
-function addtime() {
-	var doc = document.createDocumentFragment();
-	var element = document.createElement('div');
-	zeitzahl++;
-	element.innerHTML = '<select name="zeit['+ zeitzahl + '][tag]"><option value="mo">Montag</option><option value="di">Dienstag</option>\
-	<option value="mi">Mittwoch</option><option value="do">Donnerstag</option>\
-	<option value="fr">Freitag</option>\
-	</select><br>\
-	<br>Von: \
-	<input type="text" class="timepickervon input_text" name="zeit['+zeitzahl + '][from]" value="13:00">\
-	     Bis: \
- 	<input type="text" class="timepickerbis input_text" name="zeit['+zeitzahl + '][until]" value="14:00">\
-	<br><br><br><br>';
-	while(element.firstChild) {
-		doc.appendChild(element.firstChild);
-	}
-	document.getElementById("insertzeit").appendChild(doc);
-}
+$( function() {
+	$('#add-subject').click(function() {
+		fachzahl++;
+		$('#insert-subject').append('<div style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey; margin-top: 10px;">\
+				<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
+				<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
+				</select><br><br>Fachlehrer:<br><input type="text" class="input_text" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]" style="width: 95%;"><br>\
+				<?php
+					if ($show_formular_lehrer) {
+						echo "Notenschnitt:<br><input class=\"textinput input_text\" type=\"text\" name=\"fach['+ fachzahl +'][notenschnitt]\">";
+						echo "<br>Empfehlungsschreiben vom Fachlehrer vorhanden?";
+						echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
+						echo "<input type=\"radio\" required name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
+					}
+					?>
+				</div>');
+	});
+	$('#add-time').click(function() {
+		zeitzahl++;
+		$('#insert-time').append('<select name="zeit['+ zeitzahl + '][tag]"><option value="mo">Montag</option><option value="di">Dienstag</option>\
+				<option value="mi">Mittwoch</option><option value="do">Donnerstag</option>\
+				<option value="fr">Freitag</option>\
+				</select><br>\
+				<br>Von: \
+				<input type="text" class="timepickervon input_text" name="zeit['+zeitzahl + '][from]" value="13:00">\
+				     Bis: \
+			 	<input type="text" class="timepickerbis input_text" name="zeit['+zeitzahl + '][until]" value="14:00">\
+				<br><br><br><br>');
+	});
+});
+
 /*
 $("form").submit(function (event) {
 	if( typeof 
@@ -157,6 +146,17 @@ $('body').on('focus','.timepickerbis', function(){
     });
 });
 
+$( function() {
+    $("#vorlage").click(function() {
+        $('input[name=klassenstufe]').val("10");
+		$('[name=klasse]').val("c");
+		$('[name=klassenlehrer]').val("Herr Loitsch");
+		$('[name=fach[1][fachlehrer]]').val("max.mustermann@yahoo.de");
+		$("#telefon").val("03528778899");
+    });
+  } );
+
+
 </script>
 <div class="formular_class">
 	<form action="?page=input&input=<?php if($show_formular_schueler){echo "1";}if($show_formular_lehrer){echo "2";}?>" method="POST">
@@ -164,6 +164,12 @@ $('body').on('focus','.timepickerbis', function(){
 			<legend>
 				<b><?php if($show_formular_schueler){echo "Nachhilfeschüler";}if($show_formular_lehrer){echo "Nachhilfelehrer";}?></b>
 			</legend>
+			<?php
+			if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
+					echo '<button type="button" id="vorlage" class="mybuttons">Vorlage</button><br><br>';
+			}
+			?>
+			<br>
 			<select name="person">
 			<?php
 			$person_db = $return->fetch();
@@ -192,17 +198,17 @@ $('body').on('focus','.timepickerbis', function(){
 			<input type="text" maxlength="49" name="klassenlehrer" class="input_text" style="width: 40%;">
 			<br>
 			<br>
-			<input type="button" value="Füge Fach hinzu" onclick="addfach()" class="mybuttons">
-			<div id="insertfach">
+			<input type="button" value="Füge Fach hinzu" id="add-subject" class="mybuttons">
+			<div id="insert-subject">
 				<br>
 			</div>
 			<br>
 			<br>
 			<h3>Zeit:</h3>
-			<input type="button" value="Füge Zeit hinzu" onclick="addtime()" class="mybuttons">
+			<input type="button" value="Füge Zeit hinzu" id="add-time" class="mybuttons">
 			<br>
 			<br>
-			<div id="insertzeit"></div>
+			<div id="insert-time"></div>
 			<br>
 			Kommentar:
 			<textarea rows="4" name="comment" style="width: 100%; margin-top: 10px;"></textarea>

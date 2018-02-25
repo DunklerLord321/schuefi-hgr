@@ -1,7 +1,6 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h1>Backups</h1>";
-	echo "<a href=\"index.php?page=backup_data&newbackup=1\" class=\"links\">Neues Backup</a><br><br>";
 //	echo "<link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css\">";
 	$tables = array(
 			'person', 
@@ -11,9 +10,11 @@ if (isset($user) && $user->runscript()) {
 			'bietet_an', 
 			'fragt_nach', 
 			'unterricht', 
-			'finanzuebersicht'
+			'finanzuebersicht',
+			'raum'
 	);
 	if (isset($_GET['restore'])) {
+		//Gefahrenpotential
 		if (file_exists($GLOBAL_CONFIG['backup_dir'] . $_GET['restore'])) {
 			$zip = new ZipArchive();
 			$zip->open($GLOBAL_CONFIG['backup_dir'] . $_GET['restore']);
@@ -40,6 +41,18 @@ if (isset($user) && $user->runscript()) {
 			global $pdo;
 			$pdo->exec("SET foreign_key_checks = 0");
 			$user->log(user::LEVEL_WARNING, "Backup wird wiederhergestellt");
+			if (!strstr($content, "INSERT INTO `raum`")) {
+				$user->log(user::LEVEL_WARNING, 'Tabelle raum wird nicht geändert, da in einzuspielendem Backup darüber keine Daten vorliegen');
+				echo 'Tabelle raum wird nicht geändert, da in einzuspielendem Backup darüber keine Daten vorliegen';
+				//Entferne Tabelle raum -> aktuelle Daten der Tabelle werden nicht gelöscht
+				$tables = array_slice($tables, 0, -1, true);
+				if (!$tables) {
+					$user->log(user::LEVEL_ERROR, 'Beim Misachten der Tabelle Raum ist ein Fehler aufgetreten. Backup abgebrochen');
+					echo "Beim Misachten der Tabelle Raum ist ein Fehler aufgetreten. Backup abgebrochen";
+					die();
+				}
+			}
+			var_dump($tables);
 			for ($i = 0; $i < count($tables); $i++) {
 				$result = query_db("DELETE FROM `" . $tables[$i] . "`;");
 			}
@@ -114,6 +127,7 @@ if (isset($user) && $user->runscript()) {
 			if (!rmdir($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4))) {
 				echo "Verzeichnis konnte nicht gelöscht werden";
 			}
+			echo "><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}else {
 			echo "Dieses Backup existiert leider nicht!<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}
@@ -124,6 +138,7 @@ if (isset($user) && $user->runscript()) {
 			$result = query_db("DELETE FROM `" . $tables[$i] . "`;");
 		}
 		$pdo->exec("SET foreign_key_checks = 1");
+		echo "><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 	}else if (isset($_GET['delete'])) {
 		if (file_exists($GLOBAL_CONFIG['backup_dir'] . $_GET['delete'])) {
 			if (unlink($GLOBAL_CONFIG['backup_dir'] . $_GET['delete'])) {
@@ -209,6 +224,7 @@ if (isset($user) && $user->runscript()) {
 		unlink($GLOBAL_CONFIG['backup_dir'] . "Backup-$filename.sql");
 		echo "Backup wurde erfolgreich erstellt";
 	}else {
+		echo "<a href=\"index.php?page=backup_data&newbackup=1\" class=\"links\">Neues Backup</a><br><br>";
 		$backups = array();
 		$dir = opendir($GLOBAL_CONFIG['backup_dir']);
 		if ($dir === false) {

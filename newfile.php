@@ -11,6 +11,50 @@ echo password_hash("schuefionline123", PASSWORD_DEFAULT);
  if($ret == false) {
  echo "FAILURE";
  }*******************/
+
+//
+// A very simple PHP example that sends a HTTP POST to a remote site
+//
+$data = "fid=$id";
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL,"localhost/schuefi/ajax_get_name_of_subject.php");
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS,
+		$data);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$server_output = curl_exec ($ch);
+curl_close ($ch);
+var_dump($server_output);
+die();
+$data = array(
+		'vname' => "test",
+		'zeit' => array(),
+		'fid' => 3
+);
+$data['vname'] = "test";
+$data['nname'] = "tetsgsdjkjksd";
+$data['zeit'] = array('tag'=>'mo','from'=>"13:00");
+$url = http_build_query($data);
+
+$ch = curl_init();
+var_dump($url);
+var_dump($data);
+curl_setopt($ch, CURLOPT_URL,"localhost/schuefi/ajax_new_person.php");
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS,
+		$url);
+
+// in real life you should use something like:
+// curl_setopt($ch, CURLOPT_POSTFIELDS,
+//          http_build_query(array('postvar1' => 'value1')));
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$server_output = curl_exec ($ch);
+
+curl_close ($ch);
+var_dump($server_output);
+exit();
 require_once 'includes/functions.inc.php';
 $input = file ( "Nachhilfepaare-2.csv" );
 for($i = 0; $i < count ( $input ); $i ++) {

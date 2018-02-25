@@ -129,7 +129,7 @@ CREATE TABLE `finanzuebersicht` (
   `id` int(11) NOT NULL,
   `pid` int(11),
   `uid` int(11),
-  `geldbetrag` int(11) NOT NULL,
+  `geldbetrag` float(11),
   `konto_bar` enum('bar', 'konto') COLLATE utf8_german2_ci DEFAULT NULL,
   `betreff` enum('schueler','lehrer','sonstiges') COLLATE utf8_german2_ci DEFAULT NULL,
   `bemerkung` text COLLATE utf8_german2_ci,
@@ -217,9 +217,10 @@ CREATE TABLE `navigation`(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- w - Alle dürfen auf Seite zugreifen
--- k - BLoß Kundenbetreuer
--- f - Bloß Finanzler
+-- k - BLoß Kundenbetreuer+Vorstand
+-- f - Bloß Finanzler+Vorstand
 -- v - bloß der Vorstand
+-- fk/kf - Finanzler und Kundenbetreuer
 
 
 --
@@ -232,34 +233,40 @@ CREATE TABLE `navigation`(
 ALTER TABLE `navigation`
 	ADD PRIMARY KEY (`kuerzel`);
 
+	-- -- wenn Pfad der inc.login.php geändert wird, muss Pfad in index.php ebenfalls geändert werden
+	
 INSERT INTO `navigation` (`kuerzel`, `path`, `allowed_users`, `visible`) VALUES
-('change', 'includes/inc.change.php', 'k', 1),
-('content', 'includes/inc.content.php', 'w', 1),
-('input', 'includes/inc.input.php', 'k', 1),
-('input_paar', 'includes/inc.input_paar.php', 'k', 1),
-('mail', 'includes/inc.mail.php', 'kf', 1),
-('output', 'includes/inc.output.php', 'w', 1),
-('registrate', 'includes/inc.registrate.php', 'v', 1),
-('settings', 'includes/inc.settings.php', 'kf', 1),
-('user', 'includes/inc.user.php', 'v', 1),
-('change_passwd', 'includes/inc.change_passwd.php', 'w', 1),
-('person', 'includes/inc.person.php', 'k', 1),
-('imap', 'includes/inc.imapmail.php', 'v', 1),
-('filter', 'includes/inc.filter.php', 'w', 1),
-('create_doc', 'includes/inc.create_doc.php', 'k',1),
-('output_person' ,'includes/inc.output_person.php', 'w', 1),
-('input_finanzen', 'includes/inc.input_finanz.php','f',1),
-('output_finanzen', 'includes/inc.output_finanz.php', 'w', 1),
-('backup_data', 'includes/inc.backup_data.php', 'v',1),
-('input_raum', 'includes/inc.input_raum.php', 'k', 1),
-('output_raum', 'includes/inc.output_raum.php', 'w', 1);
+('change', 'scripts/inc.change.php', 'k', 1),
+('content', 'scripts/inc.content.php', 'w', 1),
+('input', 'scripts/inc.input.php', 'k', 1),
+('input_paar', 'scripts/inc.input_paar.php', 'k', 1),
+('mail', 'scripts/inc.mail.php', 'kf', 1),
+('output', 'scripts/inc.output.php', 'w', 1),
+('delete', 'scripts/inc.delete.php', 'k', 1),
+('registrate', 'scripts/inc.registrate.php', 'v', 1),
+('settings', 'scripts/inc.settings.php', 'kf', 1),
+('user', 'scripts/inc.user.php', 'v', 1),
+('change_passwd', 'scripts/inc.change_passwd.php', 'w', 1),
+('person', 'scripts/inc.person.php', 'k', 1),
+('imap', 'scripts/inc.imapmail.php', 'v', 0),
+('info', 'includes/info.php', 'v', 0),
+('filter', 'scripts/inc.filter.php', 'w', 1),
+('create_doc', 'scripts/inc.create_doc.php', 'k',1),
+('output_person' ,'scripts/inc.output_person.php', 'w', 1),
+('input_finanzen', 'scripts/inc.input_finanz.php','f',1),
+('output_finanzen', 'scripts/inc.output_finanz.php', 'w', 1),
+('export_finanzen', 'scripts/inc.export_finanz.php', 'f', 1),
+('backup_data', 'scripts/inc.backup_data.php', 'v',1),
+('input_raum', 'scripts/inc.input_raum.php', 'k', 1),
+('output_raum', 'scripts/inc.output_raum.php', 'w', 1);
 
 
-INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwort`, `account`, `createt_time`, `update_time`, `count_login`) VALUES
-(8, 'Vorstand', 'Schülerfirma', 'schuelerfirma.hgr@gmx.de', '$2y$10$GPNqeeX7XGZx0mmydSMWpupnEYCEVstwzvDvJZNbAiZdT0bJG1I2q', 'v', '2017-08-06 16:42:15', '2017-08-06 16:42:15', 0),
-(9, 'Finanzvorstand', 'Schülerfirma', 'schuelerfirma.hgr.finanzen@test.de', '$2y$10$DVmbZkojvWRGKdbl3hbA2u1dB4nSrgHrrL/Lvyu0YyAY6jSswTqvW', 'f', '2017-08-06 16:45:35', '2017-08-06 16:45:35', 0),
-(10, 'Kundenbetreuer', 'Schülerfirma', 'schuelerfirma.hgr.kunden@test.de', '$2y$10$.kmQ9xuJRUvvTC18ZharVOBI2I.rwoQGv5JCe6W93xWnNapO4wJIm', 'k', '2017-08-06 16:49:03', '2017-08-06 16:49:03', 0),
-(11, 'Yannik', 'Weber', 'yajo10@yahoo.de', '$2y$10$i5rueGBkBTwMKMhPUmSk5uxtoxMg5LNEpgrsDytjF9yyxqfA7L5Gi', 'v', '2017-08-06 16:50:05', '2017-08-06 16:50:05', 0);
+INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwort`, `account`, `createt_time`, `update_time`, `count_login`, `aktiv`) VALUES
+(6,	'Extern',	'Systemaufgaben',	'system@system.de',	'$2y$10$bFI39TeqDc.6LpF777nHc.f1wOWYDx9fhqBk3tBXgD4z3Mcou5fJW',	'k',	'2018-02-21 09:46:43',	'2018-02-21 09:46:43',	0,	1),
+(8, 'Vorstand', 'Schülerfirma', 'schuelerfirma.hgr@gmx.de', '$2y$10$GPNqeeX7XGZx0mmydSMWpupnEYCEVstwzvDvJZNbAiZdT0bJG1I2q', 'v', '2017-08-06 16:42:15', '2017-08-06 16:42:15', 0, 1),
+(9, 'Finanzvorstand', 'Schülerfirma', 'schuelerfirma.hgr.finanzen@test.de', '$2y$10$DVmbZkojvWRGKdbl3hbA2u1dB4nSrgHrrL/Lvyu0YyAY6jSswTqvW', 'f', '2017-08-06 16:45:35', '2017-08-06 16:45:35', 0, 1),
+(10, 'Kundenbetreuer', 'Schülerfirma', 'schuelerfirma.hgr.kunden@test.de', '$2y$10$.kmQ9xuJRUvvTC18ZharVOBI2I.rwoQGv5JCe6W93xWnNapO4wJIm', 'k', '2017-08-06 16:49:03', '2017-08-06 16:49:03', 0, 1),
+(11, 'Yannik', 'Weber', 'yajo10@yahoo.de', '$2y$10$i5rueGBkBTwMKMhPUmSk5uxtoxMg5LNEpgrsDytjF9yyxqfA7L5Gi', 'v', '2017-08-06 16:50:05', '2017-08-06 16:50:05', 0, 1);
 
 
 INSERT INTO `faecher` (`id`, `kuerzel`, `name`) VALUES

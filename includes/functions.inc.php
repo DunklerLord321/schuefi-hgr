@@ -118,6 +118,12 @@ function format_klassenstufe_kurs($klassenstufe, $klasse) {
 }
 
 // Bei Fehler wird false zurückgegeben
+/*
+ * Syntax: ("UPDATE tabelle SET row1 = :row1, row2 = :row2.....")
+ * Wichtig: Leerzeichen zwischen :row1, und row2. Ansonsten funktioniert Funktion nicht!!!!!!!!!!
+ * 
+ * 
+ */
 function query_db($statement, ...$params) {
 	global $exit_on_db_failure;
 	global $pdo;
@@ -190,5 +196,12 @@ function get_view() {
 		return "list";
 	}
 }
+
+function init_settings_xml() {
+	global $GLOBAL_CONFIG;
+	$xml = simplexml_load_file($GLOBAL_CONFIG['settings_file']);
+	return $xml;	
+}
+
 
 ?>

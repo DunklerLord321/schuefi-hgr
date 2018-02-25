@@ -34,12 +34,14 @@ function warn(string) {
 		if (isset($_GET['layout']) && $_GET['layout'] == 'list') {
 			set_view("list");
 		}
-		if (get_view() == "table") {
-			echo "<table class=\"table1\"><tr><th>Name</th><th>Klasse</th><th>Klassenlehrer</th><th>Fächer</th><th>Zeiten</th><th>Kommentar</th><th>Schüleranzahl</th><th></th></tr>";
-		}
 		$result = $return->fetch();
 		if ($result !== false) {
+			if (get_view() == "table") {
+				echo "<table class=\"table1\"><tr><th>Name</th><th>Klasse</th><th>Klassenlehrer</th><th>Fächer</th><th>Zeiten</th><th>Kommentar</th><th>Schüleranzahl</th><th></th></tr>";
+			}
+			$count = 0;
 			while ($result) {
+				$count ++;
 				$lehrer = new lehrer(-1, $result['id']);
 				if (get_view() == "table") {
 					echo "<tr><td><a href=\"index.php?page=output_person&filter=" . $lehrer->person->id . "\" class=\"links2\">" . $lehrer->person->vname . ' ' . $lehrer->person->nname . "</a></td>";
@@ -114,7 +116,7 @@ function warn(string) {
 				$result = $return->fetch();
 			}
 			if (get_view() == "table") {
-				echo "</table><br><br><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Lehrers ändern.";
+				echo "</table><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Lehrers ändern.";
 				echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten des Lehrers löschen.";
 			}
 		}else {
@@ -186,12 +188,14 @@ function warn(string) {
 		if (isset($_GET['layout']) && $_GET['layout'] == 'list') {
 			set_view("list");
 		}
-		if (get_view() == "table") {
-			echo "<div style=\"overflow-x:auto\"><table class=\"table1\"><tr><th>Name</th><th>Klasse</th><th>Klassenlehrer</th><th>Fächer</th><th>Zeiten</th><th>Kommentar</th><th></th></tr>";
-		}
 		$result = $return->fetch();
 		if ($result !== false) {
+			if (get_view() == "table") {
+				echo "<div style=\"overflow-x:auto\"><table class=\"table1\"><tr><th>Name</th><th>Klasse</th><th>Klassenlehrer</th><th>Fächer</th><th>Zeiten</th><th>Kommentar</th><th></th></tr>";
+			}
+			$count = 0;
 			while ($result) {
+				$count++;
 				if (isset($schueler) && $schueler->get_id() == $result['id']) {
 					$result = $return->fetch();
 				}
@@ -204,13 +208,16 @@ function warn(string) {
 					$faecher = $schueler->get_nachfrage_faecher();
 					$zeit = $schueler->get_zeit();
 					for ($i = 0; $i < count($faecher); $i++) {
-						echo get_faecher_name_of_id($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
+						echo get_faecher_name_of_id($faecher[$i]['fid']) .(strlen($faecher[$i]['fachlehrer']) > 0 ? "<br>":"") . $faecher[$i]['fachlehrer'];
 						echo " <br> Langfristig: " . ($faecher[$i]['langfristig'] == true ? "ja" : "nein");
 						echo "<br>Vermittlungsstatus: " . ($faecher[$i]['status'] == "neu" ? "<b>neu</b>" : $faecher[$i]['status']) . "<br>";
+						if($faecher[$i]['status'] != "vermittelt") {
+							echo "<a href=\"index.php?page=input_paar&schueler=" . $schueler->get_id() . "&fid=" . $faecher[$i]['fid'] . "\" class=\"links2\">Suche nach Lehrer</a><br>";
+						}
 					}
 					echo "</td><td>";
 					for ($i = 0; $i < count($zeit); $i++) {
-						echo get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
+						echo $zeit[$i]['tag'] . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
 					}
 					echo "</td>";
 					if (strlen($schueler->get_comment()) > 0) {
@@ -270,7 +277,7 @@ function warn(string) {
 				$result = $return->fetch();
 			}
 			if (get_view() == "table") {
-				echo "</table><br><br><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers ändern.";
+				echo "</table><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers ändern.";
 				echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers löschen.";
 			}
 		}else {
@@ -285,16 +292,28 @@ function warn(string) {
 	}
 	if (isset($_GET['paare']) && $_GET['paare'] == 1) {
 		require 'includes/class_paar.php';
-		if(isset($_GET['filter'])) {
+		echo "Ansicht: <a href=\"index.php?page=output&paare=1&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&paare=1&layout=table\" class=\"links2\">Tabelle</a><br><br>";
+			if(isset($_GET['filter'])) {
 			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.id = :id", get_current_year(), $_GET['filter']);
+			echo "<a href=\"index.php?page=output&paare=1\" class=\"links2\">Ausgabe aller Paare ohne Filterung</a><br><br>";
+		}else if (isset($_GET['raumfilter'])) {
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.rid = :rid", get_current_year(), $_GET['raumfilter']);
+			echo "<a href=\"index.php?page=output&paare=1\" class=\"links2\">Ausgabe aller Paare ohne Filterung</a><br><br>";
 		}else if(isset($_GET['lehrerfilter'])) {
 			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.lid = :lid", get_current_year(), $_GET['lehrerfilter']);
+			echo "<a href=\"index.php?page=output&paare=1\" class=\"links2\">Ausgabe aller Paare ohne Filterung</a><br><br>";
 		}else if(isset($_GET['schuelerfilter'])) {
 			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.sid = :sid", get_current_year(), $_GET['schuelerfilter']);
+			echo "<a href=\"index.php?page=output&paare=1\" class=\"links2\">Ausgabe aller Paare ohne Filterung</a><br><br> ";
 		}else{
 			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = '" . get_current_year() . "';");
 		}
-		$i = 0;
+		if (isset($_GET['layout']) && $_GET['layout'] == "table") {
+			set_view("table");
+		}
+		if (isset($_GET['layout']) && $_GET['layout'] == 'list') {
+			set_view("list");
+		}
 		if ($return) {
 			$paar = $return->fetch();
 			if (!$paar && (isset($_GET['filter']) || isset($_GET['lehrerfilter']) || isset($_GET['schuelerfilter']))) {
@@ -302,37 +321,63 @@ function warn(string) {
 			}else if(!$paar){
 				echo "Es wurde noch kein Paar hinzugefügt";
 			}
+			if (get_view() == "table") {
+				echo "<div style=\"overflow-x:auto\"><table class=\"table1\"><tr><th>Nachhilfelehrer</th><th>Nachhilfeschüler</th><th>Fach</th><th>Zeitpunkt</th><th>Zimmer</th><th>Vermittlungsdokumente</th><th></th><th></th></tr>";
+			}
+			$count = 0;
 			while ($paar) {
 				$npaar = new paar($paar['id']);
-				echo "<fieldset>";
-				echo "<legend>Nachhilfepaar</legend>";
-				echo "<p>Im Fach " . get_faecher_name_of_id($npaar->fid) . "</p><details class=\"detail\"><summary>Lehrer: <a href=\"index.php?page=output&lehrer=1&filter=" . $npaar->lehrer->person->id . "\" class=\"links2\">" . $npaar->lehrer->person->vname . " " . $npaar->lehrer->person->nname . "</a></summary><p>";
-				echo "Klasse: " . format_klassenstufe_kurs($npaar->lehrer->get_klassenstufe(), $npaar->lehrer->get_klasse());
-				echo "<br>Klassenlehrer/in: " . $npaar->lehrer->get_klassenlehrer();
-				echo "</p></details><br>";
-				echo "<details class=\"detail\"><summary>Schüler: <a href=\"index.php?page=output&schueler=1&filter=" . $npaar->schueler->person->id . "\" class=\"links2\">" . $npaar->schueler->person->vname . " " . $npaar->schueler->person->nname . "</a></summary><p>";
-				echo "Klasse: " . format_klassenstufe_kurs($npaar->schueler->get_klassenstufe(), $npaar->schueler->get_klasse());
-				echo "<br>Klassenlehrer/in: " . $npaar->schueler->get_klassenlehrer();
-				echo "</p></details>";
-				echo "<br>Zeitpunkt: " . get_name_of_tag($npaar->tag) . " von " . $npaar->anfang . " Uhr bis " . $npaar->ende . " Uhr";
-				echo "<br><br>Im Zimmer: " . $npaar->raum . "<br><br>";
-				if (strlen($npaar->lehrer_dokument) > 0) {
-					echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links\">Vermittlungsdokument für Lehrer ansehen</a><br><br><br>";
-				}else {
-					echo "Vermittlungsdokument für Lehrer ist noch nicht vorhanden";
-					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a><br><br><br>";
+				if (get_view() == "table") {
+					echo "<tr><td><a href=\"index.php?page=output&lehrer=1&filter=" . $npaar->lehrer->person->id . "\" class=\"links2\">" . $npaar->lehrer->person->vname . " " . $npaar->lehrer->person->nname . "</a></td>";
+					echo "<td><a href=\"index.php?page=output&schueler=1&filter=" . $npaar->schueler->person->id . "\" class=\"links2\">" . $npaar->schueler->person->vname . " " . $npaar->schueler->person->nname . "</a></td>";
+					echo "<td>". get_faecher_name_of_id($npaar->fid) . "</td><td>" . get_name_of_tag($npaar->tag) . " von " . $npaar->anfang . " Uhr bis " . $npaar->ende . " Uhr</td>";
+					echo "<td>" . $npaar->raum . "</td><td>";
+					if (strlen($npaar->lehrer_dokument) > 0) {
+						echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links2\">Lehrer</a>";
+						echo "<a style=\"float: right; margin-right: 20%;\" href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links2\"><img src=\"img/png_refresh_24_24.png\" alt=\"erneut erstellen\" ></a>";
+					}else {
+						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links2\">Dokumente für Lehrer und Schüler erstellen</a>";
+					}
+					if (strlen($npaar->schueler_dokument) > 0) {
+						echo "<br><a href=\"docs/unterricht/" . $npaar->schueler_dokument . "\" class=\"links2\">Schüler</a>";
+					}else {
+						echo "<br><a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a>";
+					}
+					echo "</td><td><a href=\"index.php?page=delete&paar=1&delete=$npaar->paarid\" class=\"links2\" onclick=\"return warn('Willst du das Paar wirklich löschen?' Dabei gehen die Daten über das Nachhilfepaar unwiederuflich verloren, allerdings bleiben die Daten über den Schüler und Lehrer erhalten)\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" ></a></td>";
+					echo "<td><a href=\"index.php?page=change&paar=$npaar->paarid\" class=\"links2\" ><img src=\"img/png_change_20_24.png\" alt=\"Ändern\" ></a></td>";
+				}else{
+					echo "<fieldset>";
+					echo "<legend>Nachhilfepaar</legend>";
+					echo "<p>Im Fach " . get_faecher_name_of_id($npaar->fid) . "</p>Lehrer: <a href=\"index.php?page=output&lehrer=1&filter=" . $npaar->lehrer->person->id . "\" class=\"links2\">" . $npaar->lehrer->person->vname . " " . $npaar->lehrer->person->nname . "</a><p>";
+					echo "Schüler: <a href=\"index.php?page=output&schueler=1&filter=" . $npaar->schueler->person->id . "\" class=\"links2\">" . $npaar->schueler->person->vname . " " . $npaar->schueler->person->nname . "</a><br>";
+					echo "<br>Zeitpunkt: " . get_name_of_tag($npaar->tag) . " von " . $npaar->anfang . " Uhr bis " . $npaar->ende . " Uhr";
+					echo "<br><br>Im Zimmer: " . $npaar->raum . "<br><br>";
+					if (strlen($npaar->lehrer_dokument) > 0) {
+						echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links\">Vermittlungsdokument für Lehrer ansehen</a><br><br><br>";
+					}else {
+						echo "Vermittlungsdokument für Lehrer ist noch nicht vorhanden";
+						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a><br><br><br>";
+					}
+					if (strlen($npaar->schueler_dokument) > 0) {
+						echo "<a href=\"docs/unterricht/" . $npaar->schueler_dokument . "\" class=\"links\">Vermittlungsdokument für Schüler ansehen</a><br><br><br>";
+						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erneut erstellen</a><br><br><br>";
+					}else {
+						echo "Vermittlungsdokument für Schüler ist noch nicht vorhanden";
+						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a>";
+					}
+					echo "<a href=\"index.php?page=delete&paar=1&delete=$npaar->paarid\" class=\"links\" onclick=\"return warn('Willst du das Paar wirklich löschen?' Dabei gehen die Daten über das Nachhilfepaar unwiederuflich verloren, allerdings bleiben die Daten über den Schüler und Lehrer erhalten)\">Löschen</a>";
+					echo "<a href=\"index.php?page=change&paar=$npaar->paarid\" class=\"links\" >Ändern der Daten</a><br><br>";
+					echo "</fieldset>";
 				}
-				if (strlen($npaar->schueler_dokument) > 0) {
-					echo "<a href=\"docs/unterricht/" . $npaar->schueler_dokument . "\" class=\"links\">Vermittlungsdokument für Schüler ansehen</a><br><br><br>";
-					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erneut erstellen</a><br><br><br>";
-				}else {
-					echo "Vermittlungsdokument für Schüler ist noch nicht vorhanden";
-					echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a>";
-				}
-				echo "<a href=\"index.php?page=delete&paar=1&delete=$npaar->paarid\" class=\"links\" onclick=\"return warn('Willst du das Paar wirklich löschen?' Dabei gehen die Daten über das Nachhilfepaar unwiederuflich verloren, allerdings bleiben die Daten über den Schüler und Lehrer erhalten)\">Löschen</a><br><br>";
-				echo "</fieldset>";
 				$paar = $return->fetch();
-				$i++;
+				$count++;
+			}
+			if (get_view() == "table") {
+				echo "</table><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers ändern.";
+				echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers löschen.";
+				echo "<br>Wenn du auf <img src=\"img/png_refresh_24_24.png\" alt=\"Erneut erstellen\" style=\"width:13px;\"> klickst, kannst du das Vermittlungsdokument erneut erstellen, falls sich Daten geändert haben sollten.";
+			}else{
+				echo "<br><br><span style=\"float:right;\">$count Datensätze</span><br><br>";
 			}
 		}
 	}

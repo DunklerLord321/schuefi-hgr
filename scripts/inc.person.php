@@ -20,6 +20,11 @@ if (isset($user) && $user->runscript()) {
 			<legend>
 				<b>Person</b>
 			</legend>
+			<?php
+			if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
+					echo '<button type="button" id="vorlage" class="mybuttons">Vorlage</button><br><br>';
+			}
+			?>
 			<br>
 			Vorname:
 			<span style="float: right; width: 50%;">Nachname:</span>
@@ -37,6 +42,13 @@ if (isset($user) && $user->runscript()) {
         changeYear: true,
         yearRange: "1995:2010",
 	    });
+    $("#vorlage").click(function() {
+        $("#vname").val("Max");
+		$("#nname").val("Mustermann");
+		$("#datepicker").val("01.04.2002");
+		$("#email").val("max.mustermann@yahoo.de");
+		$("#telefon").val("03528778899");
+    });
   } );
   </script>
 

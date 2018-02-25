@@ -1,6 +1,6 @@
 <?php
 if (isset($user) && $user->runscript()) {
-	echo "<h2>Profil ändern</h2>";
+	echo "<h2>Passwort ändern</h2>";
 	$show_formular = true;
 	if (isset($_GET['change']) && $_GET['change'] == 1) {
 		if ($user->neuespassword($_POST['passwort_alt'], $_POST['passwort_neu1'], $_POST['passwort_neu2'])) {
