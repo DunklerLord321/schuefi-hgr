@@ -30,9 +30,11 @@ if (isset($user) && $user->runscript()) {
 			echo "<table class=\"table1\"><tr><th>Zimmer</th><th>Tag</th><th>Stunde</th><th>Status</th><th></th><th></th></tr>";
 		}
 		while ($result){
-			echo "<tr><td>".$result['nummer']."</td><td>".get_name_of_tag($result['tag'])."</td><td>".$result['stunde']."</td><td>".($result['frei'] == 1 ? "frei" : "<a href=\"index.php?page=output&paare=1&raumfilter=".$result['id']."\" class=\"links2\">belegt durch Nachhilfepaar</a>")."</td><td>
-					<a href=\"index.php?page=output_raum&toggle=" . $result['id']. "&status=".($result['frei'] == 1 ? "0" : "1")."\" class=\"links2\" onclick=\"return warn('Willst du den Belegungssstatus wirklich per Hand ändern?')\">Ändere Status</a></td>";
-			echo "<td><a href=\"index.php?page=output_raum&delete=". $result['id']."\" class=\"links2\" onclick=\"return warn('Willst du die Information über die Belegung des Zimmers für diesen Tag für diese eine Stunde wirklich löschen?')\"><img alt=\"Löschen\" src=\"img/png_delete_24_24.png\"></a></td></tr>";
+			echo "<tr><td>".$result['nummer']."</td><td>".get_name_of_tag($result['tag'])."</td><td>".$result['stunde']."</td><td>".($result['frei'] == 1 ? "frei" : "<a href=\"index.php?page=output&paare=1&raumfilter=".$result['id']."\" class=\"links2\">belegt durch Nachhilfepaar</a>")."</td><td>";
+			if($user->isuserallowed('fk')) {
+				echo "<a href=\"index.php?page=output_raum&toggle=" . $result['id']. "&status=".($result['frei'] == 1 ? "0" : "1")."\" class=\"links2\" onclick=\"return warn('Willst du den Belegungssstatus wirklich per Hand ändern?')\">Ändere Status</a></td>";
+				echo "<td><a href=\"index.php?page=output_raum&delete=". $result['id']."\" class=\"links2\" onclick=\"return warn('Willst du die Information über die Belegung des Zimmers für diesen Tag für diese eine Stunde wirklich löschen?')\"><img alt=\"Löschen\" src=\"img/png_delete_24_24.png\"></a></td></tr>";
+			}
 			$result = $return->fetch();
 		}
 		echo "</table><br><br><b>Hinweis:</b> <br>Der Status frei oder belegt gibt nur an, ob das Zimmer schon von einem Nachhilfepaar genutzt wird oder nicht. In allen gelisteten Zimmern findet kein Unterricht zu den gelisteten Zeiten statt.";

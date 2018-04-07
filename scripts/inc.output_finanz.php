@@ -74,8 +74,8 @@ if (isset($user) && $user->runscript()) {
 			}else {
 				echo "<td>" . (strlen($result['geldbetrag']) > 0 ? $result['geldbetrag']:'0') . "€</td><td></td>";
 			}
-			echo "<td>" . $result['konto_bar'] . "</td><td>" . $result['betreff'] . "</td><td>" . $result['dokument'] . "</td><td>" . $result['bemerkung'] . "</td><td>" . date('d.m.Y', strtotime($result['datum'])) . "</td>
-					<td><a href=\"index.php?page=input_finanzen&change=".$result['id']."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Finanzeintrags\"></a></td></tr>";
+			echo "<td>" . $result['konto_bar'] . "</td><td>" . $result['betreff'] . "</td><td>" . $result['dokument'] . "</td><td>" . $result['bemerkung'] . "</td><td>" . date('d.m.Y', strtotime($result['datum'])) . "</td>";
+			echo ($user->isuserallowed('f') ?"<td><a href=\"index.php?page=input_finanzen&change=".$result['id']."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Finanzeintrags\"></a></td></tr>":"");
 			if ($result['konto_bar'] == "konto") {
 				$sum_konto += $result['geldbetrag'];
 			}else if ($result['konto_bar'] == "bar") {

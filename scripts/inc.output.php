@@ -70,9 +70,12 @@ function warn(string) {
 					}else{
 						echo "<td>0</td>";
 					}
-					echo "<td><a href=\"index.php?page=change&lehrer=".$lehrer->get_id()."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Lehrers\"></a>
-						<a href=\"index.php?page=delete&lehrer=1&delete=" . $lehrer->get_id(). "\" class=\"links2\" onclick=\"return warn('Willst du den Lehrer wirklich löschen? Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Lehrers\"></a></td></tr>";
-					
+					if($user->isuserallowed('k')) {
+						echo "<td><a href=\"index.php?page=change&lehrer=".$lehrer->get_id()."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Lehrers\"></a>
+							<a href=\"index.php?page=delete&lehrer=1&delete=" . $lehrer->get_id(). "\" class=\"links2\" onclick=\"return warn('Willst du den Lehrer wirklich löschen?
+								Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Lehrers\"></a></td>";
+					}
+					echo "</tr>";
 /*					if (count($zeit) > 1) {
 						for ($i = 1; $i < count($zeit); $i++) {
 							echo "<tr><td style=\"rowspan=2\">".get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br></td><td></td></tr>";
@@ -108,9 +111,12 @@ function warn(string) {
 					if($result['zahl_schueler'] > 0) {
 						echo "<br><br><a href=\"index.php?page=output&paare=1&lehrerfilter=" . $lehrer->get_id() . "\" class=\"links2\">Der Lehrer hat schon " . $result['zahl_schueler'] . " Schüler</a>";
 					}
-					echo "</div><div style=\"width: 30%; display: inline-block; padding-top: 40px;\"><a href=\"index.php?page=change&lehrer=" . $lehrer->get_id() . "\" class=\"links\">Ändere die Daten</a>
+					echo "</div>";
+					if($user->isuserallowed('k')) {
+						echo "<div style=\"width: 30%; display: inline-block; padding-top: 40px;\"><a href=\"index.php?page=change&lehrer=" . $lehrer->get_id() . "\" class=\"links\">Ändere die Daten</a>
 								<br><br><br><br><br><a href=\"index.php?page=delete&lehrer=1&delete=" . $lehrer->get_id(). "\" class=\"links\" onclick=\"return warn('Willst du den Lehrer wirklich löschen? Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\">Löschen</a>
 								</div>";
+					}
 					echo "</div></fieldset>";
 				}
 				$result = $return->fetch();
@@ -227,8 +233,11 @@ function warn(string) {
 					}else{
 						echo "<td>Kein Kommentar</td>";
 					}
-					echo "<td><a href=\"index.php?page=change&schueler=".$schueler->get_id()."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Schülers\"></a>
-						<a href=\"index.php?page=delete&schueler=1&delete=" . $schueler->get_id(). "\" class=\"links2\" onclick=\"return warn('Willst du den Schüler wirklich löschen? Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Schülers\"></a></td></tr>";
+					if($user->isuserallowed('k')) {
+						echo "<td><a href=\"index.php?page=change&schueler=".$schueler->get_id()."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Schülers\"></a>
+							<a href=\"index.php?page=delete&schueler=1&delete=" . $schueler->get_id(). "\" class=\"links2\" onclick=\"return warn('Willst du den Schüler wirklich löschen? Sämtliche Informationen wie z.B. die Zeiten oder der Nachhilfeunterricht gehen dabei verloren')\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Schülers\"></a></td>";
+					}
+					echo "</tr>";
 				}else{
 				?>
 <fieldset style="padding: 40px; width: 80%; padding-top: 10px;">
@@ -262,19 +271,13 @@ function warn(string) {
 				if (strlen($schueler->get_comment()) > 0) {
 					echo "<br>Kommentar: " . $schueler->get_comment();
 				}
-				?>
-				</div>
-		<div style="width: 30%; display: inline-block; padding-top: 40px;">
-				<a href="index.php?page=change&schueler=<?php
-				echo $schueler->get_id();
-				?>" class="links">Ändere die Daten</a><br><br><br><br><br>
-				<a href="index.php?page=delete&schueler=1&delete=<?php
-				echo $schueler->get_id();
-				?>" class="links" onclick="return warn('Willst du den Schüler wirklich löschen? Sämtliche Informationen, wie die Zeit und sein Nachhilfepaar gehen dabei verloren')">Löschen</a>
-		</div>
-	</div>
-</fieldset>
-<?php
+				echo "</div>";
+				if($user->isuserallowed('k')) {
+					echo 	'<div style="width: 30%; display: inline-block; padding-top: 40px;"><a href="index.php?page=change&schueler='.$schueler->get_id().'" class="links">Ändere die Daten</a>
+					<br><br><br><br><br><a href="index.php?page=delete&schueler=1&delete='.$schueler->get_id().'" class="links" onclick="return warn(\'Willst du den Schüler wirklich löschen? 
+					Sämtliche Informationen, wie die Zeit und sein Nachhilfepaar gehen dabei verloren\')">Löschen</a></div>';
+				}
+				echo "</div></fieldset>";
 				}
 				$result = $return->fetch();
 			}
@@ -338,17 +341,22 @@ function warn(string) {
 					echo "<td>" . $npaar->raum . "</td><td>";
 					if (strlen($npaar->lehrer_dokument) > 0) {
 						echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links2\">Lehrer</a>";
-						echo "<a style=\"float: right; margin-right: 20%;\" href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links2\"><img src=\"img/png_refresh_24_24.png\" alt=\"erneut erstellen\" ></a>";
-					}else {
+						if($user->isuserallowed('k')) {
+							echo "<a style=\"float: right; margin-right: 20%;\" href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links2\"><img src=\"img/png_refresh_24_24.png\" alt=\"erneut erstellen\" ></a>";
+						}
+					}
+					if($user->isuserallowed('k') && (strlen($npaar->schueler_dokument) <= 0 || strlen($npaar->lehrer_dokument) <= 0)) {
 						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links2\">Dokumente für Lehrer und Schüler erstellen</a>";
 					}
 					if (strlen($npaar->schueler_dokument) > 0) {
 						echo "<br><a href=\"docs/unterricht/" . $npaar->schueler_dokument . "\" class=\"links2\">Schüler</a>";
-					}else {
-						echo "<br><a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a>";
 					}
-					echo "</td><td><a href=\"index.php?page=delete&paar=1&delete=$npaar->paarid\" class=\"links2\" onclick=\"return warn('Willst du das Paar wirklich löschen?' Dabei gehen die Daten über das Nachhilfepaar unwiederuflich verloren, allerdings bleiben die Daten über den Schüler und Lehrer erhalten)\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" ></a></td>";
-					echo "<td><a href=\"index.php?page=change&paar=$npaar->paarid\" class=\"links2\" ><img src=\"img/png_change_20_24.png\" alt=\"Ändern\" ></a></td>";
+					echo "</td>";
+					if($user->isuserallowed('k')) {
+						echo "<td><a href=\"index.php?page=delete&paar=1&delete=$npaar->paarid\" class=\"links2\" onclick=\"return warn('Willst du das Paar wirklich löschen?' Dabei gehen die Daten über das Nachhilfepaar unwiederuflich verloren, allerdings bleiben die Daten über den Schüler und Lehrer erhalten)\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" ></a></td>";
+						echo "<td><a href=\"index.php?page=change&paar=$npaar->paarid\" class=\"links2\" ><img src=\"img/png_change_20_24.png\" alt=\"Ändern\" ></a></td>";
+					}
+					echo "</tr>";
 				}else{
 					echo "<fieldset>";
 					echo "<legend>Nachhilfepaar</legend>";
@@ -359,18 +367,21 @@ function warn(string) {
 					if (strlen($npaar->lehrer_dokument) > 0) {
 						echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links\">Vermittlungsdokument für Lehrer ansehen</a><br><br><br>";
 					}else {
-						echo "Vermittlungsdokument für Lehrer ist noch nicht vorhanden";
-						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a><br><br><br>";
+						echo "Vermittlungsdokument für Lehrer ist noch nicht vorhanden<br><br>";
 					}
 					if (strlen($npaar->schueler_dokument) > 0) {
 						echo "<a href=\"docs/unterricht/" . $npaar->schueler_dokument . "\" class=\"links\">Vermittlungsdokument für Schüler ansehen</a><br><br><br>";
-						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erneut erstellen</a><br><br><br>";
+						echo ($user->isuserallowed('k') ?"<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erneut erstellen</a><br><br><br>":"");
 					}else {
-						echo "Vermittlungsdokument für Schüler ist noch nicht vorhanden";
-						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a>";
+						echo "Vermittlungsdokument für Schüler ist noch nicht vorhanden<br><br>";
 					}
-					echo "<a href=\"index.php?page=delete&paar=1&delete=$npaar->paarid\" class=\"links\" onclick=\"return warn('Willst du das Paar wirklich löschen?' Dabei gehen die Daten über das Nachhilfepaar unwiederuflich verloren, allerdings bleiben die Daten über den Schüler und Lehrer erhalten)\">Löschen</a>";
-					echo "<a href=\"index.php?page=change&paar=$npaar->paarid\" class=\"links\" >Ändern der Daten</a><br><br>";
+					if($user->isuserallowed('k') && (strlen($npaar->schueler_dokument) <= 0 || strlen($npaar->lehrer_dokument) <= 0)) {
+						echo "<a href=\"index.php?page=create_doc&createdoc_paar=$npaar->paarid\" class=\"links\">Dokumente für Lehrer und Schüler erstellen</a><br><br><br>";
+					}
+					if($user->isuserallowed('k')) {
+						echo "<a href=\"index.php?page=delete&paar=1&delete=$npaar->paarid\" class=\"links\" onclick=\"return warn('Willst du das Paar wirklich löschen?' Dabei gehen die Daten über das Nachhilfepaar unwiederuflich verloren, allerdings bleiben die Daten über den Schüler und Lehrer erhalten)\">Löschen</a>";
+						echo "<a href=\"index.php?page=change&paar=$npaar->paarid\" class=\"links\" >Ändern der Daten</a><br><br>";
+					}
 					echo "</fieldset>";
 				}
 				$paar = $return->fetch();
