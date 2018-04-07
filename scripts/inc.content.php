@@ -1,17 +1,19 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Hauptseite</h2>";
-	echo "<h3>Dokumentation</h3>";
-	echo "Folgendes ist zu beachten:<br>Wenn du einen neuen Schüler oder Lehrer hinzufügen willst, musst du zuerst eine neue Person hinzufügen. Danach kannst du der Person eine Rolle als Lehrer oder/und Schüler geben. Die Schüler/Lehrer sind für nur ein Schuljahr aktiviert, die Personen allerdings so lange, bis sie deaktiviert werden";
-	echo "<br><br><b>Alle E-Mails landen jetzt bei den angegeben Adressen und als CC bei schuelerfirma@hgr-web.de</b>";
-	echo "<h3>Vorlagen der Vermittlungsdokumente</h3>";
+	echo "<h3>Anleitung/Dokumentationen</h3>";
+	echo "<h3>Kundenbetreuer</h3>";
+	echo "<a href=\"docs/Anleitung-kunden.pdf\"class=\"links2\">Anleitung für Kundenbetreuer</a><br>";
+	echo "<h4>Vorlagen der Vermittlungsdokumente:</h4>";
 	echo "<a href=\"docs/formulare/Anmeldeformular_Lehrer.pdf\" class=\"links2\">Anmeldeformular Lehrer</a><br>";
 	echo "<a href=\"docs/formulare/Anmeldeformular_Schueler.pdf\" class=\"links2\">Anmeldeformular Schüler</a><br>";
 	echo "<a href=\"docs/formulare/Wiederanmeldeformular_Lehrer.pdf\" class=\"links2\">Wiederanmeldeformular Lehrer</a><br>";
 	echo "<a href=\"docs/formulare/Wiederanmeldeformular_Schueler.pdf\" class=\"links2\">Wiederanmeldeformular Schüler</a><br>";
 	echo "<a href=\"docs/formulare/Nachweis_fuer_Nachhilfelehrer_bei_Anmeldung_per_Mail.pdf\" class=\"links2\">Nachweis für Lehrer bei Anmeldung per Mail</a><br>	";
-	echo "<br><br><h3>Anleitung/Dokumentationen</h3>";
-	echo "<a href=\"docs/Anleitung-kunden.pdf\"class=\"links2\">Anleitung für Kundenbetreuer</a><br>";
+	echo "<h4>Finanzabteilung</h4>";
+	echo "<a href=\"docs/Vorlage_Kassenbuch.pdf\" class=\"links2\">Muster Kassenbuch</a><br>";
+	echo "<a href=\"docs/Vorlage_Bankbuch.pdf\" class=\"links2\">Muster Banbuch</a><br>";
+	echo "<a href=\"docs/nachweis_lehrer.pdf\" class=\"links2\">Nachweisdokument für Nachhilfelehrer</a>";
 	echo "<br><br><h3>Wettbewerbe</h3>";
 	echo "<b>LEX-Lausitzer Existenzgründer Wettbewerb - Schülerwettbewerb</b><br><br>";
 	echo "<a href=\"docs/Schuelerwettbewerb Infomaterial.pdf\" class=\"links2\">Infomaterial</a><br><a href=\"docs/Teilnehmererklaerung Schueler.pdf\" class=\"links2\">Teilnehmererklärung Schüler</a> ";

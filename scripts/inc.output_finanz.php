@@ -36,7 +36,7 @@ if (isset($user) && $user->runscript()) {
 	$aktiv_filter = "";
 	for($i = 0; $i < count($filter); $i++) {
 		if(isset($_GET['filter']) && isset($_GET['row']) && isset($_GET['property']) && $_GET['row'] == $filter[$i]['row'] && $_GET['property'] == $filter[$i]['property']) {
-			$aktiv_filter .= "<a href=\"index.php?page=output_finanzen&filter=1&row=".$filter[$i]['row']."&property=". $filter[$i]['property'] ."\" class=\"links2\">".$filter[$i]['label']."</a><br>";
+			$aktiv_filter .= "<a href=\"index.php?page=output_finanzen&filter=1&row=".$filter[$i]['row']."&property=". $filter[$i]['property'] ."\" class=\"links2\"><img src=\"img/png_cross_24_24.png\" style=\"width:18px;heigth:18px;\">".$filter[$i]['label']."</a><br>";
 		}else{
 			echo "<br><a href=\"index.php?page=output_finanzen&filter=1&row=".$filter[$i]['row']."&property=". $filter[$i]['property'] ."\" class=\"links2\">".$filter[$i]['label']."</a>";
 		}

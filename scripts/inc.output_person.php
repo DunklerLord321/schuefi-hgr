@@ -14,10 +14,15 @@ function warn(string) {
 	if (isset($_GET['filter'])) {
 		echo "Ansicht: <a href=\"index.php?page=output_person&filter=".$_GET['filter']."&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output_person&filter=".$_GET['filter']."&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 		$return = query_db("Select * FROM `person` WHERE id = :id ORDER BY `person`.`nname` ASC", $_GET['filter']);
+	}else if(isset($_GET['filteractive']) && $_GET['filteractive'] == 'false') {
+		echo "Ansicht: <a href=\"index.php?page=output&lehrer=1&filteractive=".$_GET['filteractive']."&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&lehrer=1&filteractive=".$_GET['filteractive']."&layout=table\" class=\"links2\">Tabelle</a><br><br>";
+		$return = query_db("Select * FROM `person` WHERE aktiv is not TRUE ORDER BY `person`.`nname` ASC");
 	}else {
 		echo "Ansicht: <a href=\"index.php?page=output_person&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output_person&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 		$return = query_db("SELECT * FROM `person` WHERE aktiv = 1 ORDER BY `person`.`nname` ASC");
 	}
+	echo "<br><a href=\"index.php?page=output_person&filteractive=false\" class=\"links2\">Nur gelöschte Personen anzeigen</a><br><br><a href=\"index.php?page=output_person\"
+				class=\"links2\">Alle aktiven Personen anzeigen</a><br><br>";
 	if (isset($_GET['layout']) && $_GET['layout'] == 'table') {
 		set_view("table");
 	}
@@ -109,6 +114,8 @@ function warn(string) {
 			echo "</table><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b> Wenn du auf <img src=\"img/png_yes_12_16.png\" alt=\"ja\" style=\"width:13px;\"> klickst, kannst du dir die Schüler- oder Lehrerdaten der Person ansehen.";
 			echo "<br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten der Person ändern.";
 			echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten der Person löschen.";
+		}else{
+			echo "<br><br><span style=\"float:right;\">$count Datensätze</span><br>";
 		}
 	}else {
 		if(isset($_GET['filter'])) {

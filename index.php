@@ -6,7 +6,7 @@ session_start();
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Verwaltung der Daten der Schülerfirma</title>
 <meta name="description" content="Verwalte die Daten der Schülerfirma 'Schüler helfen Schülern' einfach und automatisiert.">
 <link href="css/design.css" rel="stylesheet">
@@ -22,7 +22,7 @@ session_start();
 require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
 require 'includes/functions.inc.php';
-setlocale(LC_TIME, 'de_DE', 'de_DE.UTF-8');
+setlocale(LC_TIME, 'de_DE.UTF-8');
 if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
 //	$xml = init_settings_xml();
 	error_reporting(E_ALL);

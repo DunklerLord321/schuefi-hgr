@@ -100,7 +100,7 @@ $('body').on('focus','.timepickerbis', function(){
 				$schueler = new schueler(-1, $schueler['id']);
 				$faecher = $schueler->get_nachfrage_faecher();
 				for ($i = 0; $i < count($faecher); $i++) {
-					if (isset($_GET['control_paar']) && isset($_GET['sid']) && $_GET['sid'] == $schueler->get_id()) {
+					if (isset($_GET['control_paar']) && isset($_GET['sid']) && $_GET['sid'] == $schueler->get_id() && $_GET['fid'] == $faecher[$i]['fid'] ) {
 						echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\" selected>" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
 					}else {
 						echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
@@ -124,7 +124,7 @@ $('body').on('focus','.timepickerbis', function(){
 					$faecher = $lehrer->get_angebot_faecher();
 					// var_dump($lehrer);
 					for ($i = 0; $i < count($faecher); $i++) {
-						if (isset($_GET['control_paar']) && isset($_GET['lid']) && $_GET['lid'] == $lehrer->get_id()) {
+						if (isset($_GET['control_paar']) && isset($_GET['lid']) && $_GET['lid'] == $lehrer->get_id() && $_GET['fid'] == $faecher[$i]['fid']) {
 							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\" selected >" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
 						}else {
 							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";

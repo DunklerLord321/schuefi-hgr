@@ -30,7 +30,7 @@ CREATE TABLE `person` (
 	`telefon` varchar(50) COLLATE utf8_german2_ci DEFAULT NULL,
 	`geburtstag` date DEFAULT NULL,
 	`hinzugefuegt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	`aktiv` tinyint(4) DEFAULT '1'
+	`aktiv` tinyint(1) DEFAULT 1
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `faecher`;
