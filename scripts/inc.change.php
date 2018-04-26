@@ -133,7 +133,7 @@ if (isset($user) && $user->runscript()) {
 					}
 				}
 			}
-			echo "Die Daten des Lehrers wurden erfolgreich geändert";
+			echo "Die Daten des Lehrers wurden erfolgreich geändert.";
 		}
 		if ($_GET['change'] == 4) {
 			if (isset($_POST['ridraum']) && $_POST['ridraum'] != -1) {
@@ -152,6 +152,7 @@ if (isset($user) && $user->runscript()) {
 				echo "Es ist ein Fehler beim Aktualisieren aufgetreten";
 			}
 		}
+		echo "<br> Nach erfolgreichen Änderungen müssen die Vermittlungsdokumnte aktualisiert und dem Paar erneut zugeschickt werden";
 	}
 	if (isset($_GET['person'])) {
 		require 'includes/class_person.php';

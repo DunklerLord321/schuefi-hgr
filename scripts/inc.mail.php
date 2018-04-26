@@ -45,9 +45,9 @@ if (isset($user) && $user->runscript()) {
 					$mail->addAddress($_SESSION['lehrermail']['empfaenger'], $_SESSION['lehrermail']['empfaenger']);
 					$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
 				}
-				$mail->addAttachment("docs/AGB.docx", "Allgemeine Geschäftsbedingungen.docx");
-				$mail->addAttachment("docs/nachweis_lehrer.pdf", "Lohnkarte-Lehrer.pdf");
-				$mail->addAttachment("docs/unterricht/" . $_SESSION['lehrermail']['anhang'], "Vermittlungsdokument.pdf");
+				$mail->addAttachment($GLOBAL_CONFIG['agb_file'], $GLOBAL_CONFIG['agb_displayed_name']);
+				$mail->addAttachment($GLOBAL_CONFIG['lehrernachweis_file'], $GLOBAL_CONFIG['lehrernachweis_displayed_name']);
+				$mail->addAttachment($GLOBAL_CONFIG['doc_dir'] . $_SESSION['lehrermail']['anhang'], "Vermittlungsdokument.pdf");
 				$mail->Body = $_SESSION['lehrermail']['text'];
 				$mail->Subject = $_SESSION['lehrermail']['betreff'];
 				if (!$mail->send()) {

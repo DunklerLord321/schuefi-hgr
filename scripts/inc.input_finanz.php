@@ -61,7 +61,7 @@ if (isset($user) && $user->runscript()) {
 			}
 			$return = query_db("UPDATE `finanzuebersicht` SET `pid` = :pid, `uid` = :uid, `geldbetrag` = :geldbetrag, `betreff` = :betreff, `bemerkung` = :bemerkung, `konto_bar` = :konto_bar, `datum` = :datum WHERE id = :id", $_POST['pid'], $_POST['uid'], $betrag, $_POST['betreff'], $_POST['bemerkung'], $_POST['typ'], $datum, $_GET['finanzaenderung']);
 			if ($return) {
-				echo "Erfolgreich hinzugefügt";
+				echo "Erfolgreich geändert";
 			}else {
 				echo "Ein Fehler ist aufgetreten";
 			}
@@ -203,8 +203,8 @@ $(function() {
 	$('#eingabe').change(inputswitch);
 	$('#ausgabe').change(inputswitch);
 	function inputswitch() {
-		console.log('test');
-			if($('#eingabe').val().length < 0) {
+		console.log('test'+$('#eingabe').val().length);
+			if($('#eingabe').val().length <= 0) {
 				$('#ausgabe').attr("disabled", false);
 				$('#ausgabe').css('cursor', 'default');
 			}
@@ -212,7 +212,7 @@ $(function() {
 				$('#ausgabe').attr("disabled", true);
 				$('#ausgabe').css('cursor', 'not-allowed');
 			}
-			if($('#ausgabe').val().length < 0 ) {
+			if($('#ausgabe').val().length <= 0 ) {
 				$('#eingabe').css('cursor', 'default');
 				$('#eingabe').attr("disabled", false);
 			}

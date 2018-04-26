@@ -23,7 +23,15 @@ $GLOBAL_CONFIG['backup_dir'] = 'docs/backup/';
 $GLOBAL_CONFIG['doc_dir'] = 'docs/unterricht/';
 $GLOBAL_CONFIG['settings_file'] = "docs/settings.xml";
 
+//Anhänge E-Mails
+$GLOBAL_CONFIG['agb_file'] = "docs/AGB.docx";
+$GLOBAL_CONFIG['agb_displayed_name'] = "Allgemeine Geschäftsbedingungen.docx";
+$GLOBAL_CONFIG['lehrernachweis_file'] = "docs/nachweis_lehrer.pdf";
+$GLOBAL_CONFIG['lehrernachweis_displayed_name'] = "Lohnkarte-Lehrer.pdf";
 
+//Mail-Adressen und Homepage für Vermittlungsdokumente
+$GLOBAL_CONFIG['schuefimail'] = "schuelerfirma@hgr-web.de";
+$GLOBAL_CONFIG['schuefiweb'] = "www.hgr-web.de/schuelerfirma";
 
 $GLOBAL_CONFIG['klassen'] = array(
 		"a", 

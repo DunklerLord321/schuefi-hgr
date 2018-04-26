@@ -7,8 +7,9 @@ if (isset($user) && $user->runscript()) {
 		echo "<h2>Erstelle Vermittlungsdokumente</h2>";
 		class MYPDF extends TCPDF {
 			public function Header() {
+				global $GLOBAL_CONFIG;
 				$image_file = 'img/logo.jpg';
-				$this->Image($image_file, 10, 5, 25, '', 'JPG', 'www.hgr-web.de/schuelerfirma', 'T', false, 300, '', false, false, 0, false, false, false);
+				$this->Image($image_file, 10, 5, 25, '', 'JPG', $GLOBAL_CONFIG['schuefiweb'], 'T', false, 300, '', false, false, 0, false, false, false);
 				$this->SetFont('helvetica', 'B', 20);
 				$this->Ln(10);
 				$this->Cell(0, 15, 'Vermittlungsdokument', 0, false, 'C', 0, '', 0, false, 'M', 'M');
@@ -17,15 +18,16 @@ if (isset($user) && $user->runscript()) {
 				$this->Cell(0, 15, 'Schülerfirma \'Schüler helfen Schülern\'', 0, false, 'C', 0, '', 0, false, 'M', 'M');
 			}
 			public function Footer() {
+				global $GLOBAL_CONFIG;
 				$this->SetY(-15);
 				$this->SetFont('helvetica', '', 8);
-				$this->addHtmlLink('www.hgr-web.de/schuelerfirma', "Website: www.hgr-web.de/schuelerfirma", false, true, array(
+				$this->addHtmlLink($GLOBAL_CONFIG['schuefiweb'], "Website: ".$GLOBAL_CONFIG['schuefiweb'], false, true, array(
 						0, 
 						0, 
 						0
 				), '', false);
 				$this->Ln(5);
-				$this->addHtmlLink("mailto:schuelerfirma@hgr-web.de", "E-Mail-Adresse: schuelerfirma@hgr-web.de", false, true, array(
+				$this->addHtmlLink("mailto:".$GLOBAL_CONFIG['schuefimail'], "E-Mail-Adresse: ".$GLOBAL_CONFIG['schuefimail'], false, true, array(
 						0, 
 						0, 
 						0
@@ -42,6 +44,8 @@ if (isset($user) && $user->runscript()) {
 			}
 			$file = str_replace("::namelehrer", $paar->lehrer->person->vname . " " . $paar->lehrer->person->nname, $file);
 			$file = str_replace("::nameschueler", $paar->schueler->person->vname . " " . $paar->schueler->person->nname, $file);
+			$file = str_replace("::schuefimail", $GLOBAL_CONFIG['schuefimail'], $file);
+			$file = str_replace("::schuefiweb", $GLOBAL_CONFIG['schuefiweb'], $file);
 			$file = str_replace("::tag", get_name_of_tag($paar->tag), $file);
 			$file = str_replace("::raum", $paar->raum, $file);
 			$file = str_replace("::zeit", $paar->anfang, $file);

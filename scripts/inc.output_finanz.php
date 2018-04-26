@@ -83,7 +83,7 @@ if (isset($user) && $user->runscript()) {
 	}
 //	var_dump($params);
 	echo "<br><hr><br>aktive Filter:$aktiv_filter<br><a href=\"index.php?page=output_finanzen\" class=\"links2\">kein Filter</a>";
-	if(isset($_GET['filter']) ) {
+	if(isset($_GET['filter']) && strlen($params) > 0) {
 		$return = query_db("SELECT finanzuebersicht.*, users.vname, users.nname, person.vname AS pvname, person.nname AS pnname FROM `finanzuebersicht`
 			LEFT JOIN `users` ON finanzuebersicht.uid = users.id LEFT JOIN `person` ON finanzuebersicht.pid = person.id  WHERE $params ORDER BY finanzuebersicht.datum ASC;");
 	}else{
