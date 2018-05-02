@@ -89,11 +89,21 @@ class paar {
 	}
 	
 	function delete() {
+		$index = -1;
+		for ($i=0; $i < count($this->schueler->faecher); $i++) {
+			if(isset($this->schueler->faecher[$i]['fid']) && $this->schueler->faecher[$i]['fid'] == $this->fid) {
+				$index = $i;
+			}
+		}
+		if ($index > -1) {
+			$this->schueler->remove_nachfrage_fach($this->fid);
+			$this->schueler->add_nachfrage_fach($this->fid, $this->schueler->faecher[$index]['langfristig'], $this->schueler->faecher[$index]['fachlehrer'], 'neu');
+		}
 		$return = query_db("DELETE FROM `unterricht` WHERE lid = :lid AND sid = :sid AND fid = :fid", $this->lehrer->get_id(), $this->schueler->get_id(), $this->fid);
 		if (!$return) {
 			echo "Es ist ein Fehler aufgetreten. Das Paar konnte nicht gelöscht werden";
 		}else{
-			echo "Das Paar wurde erfolgreich gelöscht";
+			echo "Das Paar wurde erfolgreich gelöscht.";
 		}
 		
 	}
