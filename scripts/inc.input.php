@@ -24,11 +24,15 @@ if (isset($user) && $user->runscript()) {
 		if (!$schueler->add_schueler($schueler_array)) {
 			die();
 		}
-		for ($i = 1; $i <= count($_POST['fach']); $i++) {
-			$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], 'neu');
+		if (isset($_POST['fach'])) {
+			for ($i = 1; $i <= count($_POST['fach']); $i++) {
+				$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], 'neu');
+			}
 		}
-		for ($i = 1; $i <= count($_POST['zeit']); $i++) {
-			$schueler->add_time($_POST['zeit'][$i]);
+		if (isset($_POST['zeit'])) {
+			for ($i = 1; $i <= count($_POST['zeit']); $i++) {
+				$schueler->add_time($_POST['zeit'][$i]);
+			}
 		}
 		$show_formular_schueler = false;
 	}

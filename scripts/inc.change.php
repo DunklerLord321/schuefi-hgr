@@ -152,7 +152,7 @@ if (isset($user) && $user->runscript()) {
 				echo "Es ist ein Fehler beim Aktualisieren aufgetreten";
 			}
 		}
-		echo "<br> Nach erfolgreichen Änderungen müssen die Vermittlungsdokumnte aktualisiert und dem Paar erneut zugeschickt werden";
+		echo "<br> Nach erfolgreichen Änderungen müssen die Vermittlungsdokumente eventuell aktualisiert und dem Paar erneut zugeschickt werden";
 	}
 	if (isset($_GET['person'])) {
 		require 'includes/class_person.php';
