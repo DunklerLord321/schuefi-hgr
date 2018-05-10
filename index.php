@@ -23,8 +23,8 @@ require 'includes/global_vars.inc.php';
 require 'includes/class_user.php';
 require 'includes/functions.inc.php';
 setlocale(LC_TIME, 'de_DE.UTF-8');
+$xml = init_settings_xml();
 if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
-//	$xml = init_settings_xml();
 	error_reporting(E_ALL);
 }else{
 	error_reporting(E_ERROR);

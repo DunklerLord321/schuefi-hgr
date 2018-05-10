@@ -197,8 +197,65 @@ function get_view() {
 	}
 }
 
+function get_xml($key) {
+	global $xml;
+	foreach ($xml->children() as $child) {
+		if($child->getName() == $key) {
+			return (string)$child;
+		}else if($child->count() > 0) {
+			echo "second depth";
+			foreach ($child->children() as $child_of_child) {
+				if($child->getName()."/".$child_of_child->getName() == $key) {
+					return (string)$child_of_child;
+				}else if($child_of_child->count() > 0 ) {
+					foreach ($child_of_child->children() as $cofcofc) {
+						if( $child->getName()."/".$child_of_child->getName()."/".$cofcofc->getName() == $key) {
+							return (string)$cofcofc;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+}
+
+function set_xml($key, $value) {
+	global $xml;
+	foreach ($xml->children() as $child) {
+		if($child->getName() == $key) {
+			$child[0] = $value;
+		}else if($child->count() > 0) {
+			echo "second depth";
+			foreach ($child->children() as $child_of_child) {
+				if($child->getName()."/".$child_of_child->getName() == $key) {
+					$child_of_child[0] = $value;
+				}else if($child_of_child->count() > 0 ) {
+					foreach ($child_of_child->children() as $cofcofc) {
+						if( $child->getName()."/".$child_of_child->getName()."/".$cofcofc->getName() == $key) {
+							$cofcofc[0] = $value;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function write_xml() {
+	global $xml,$GLOBAL_CONFIG;
+	$ret = $xml->asXML($GLOBAL_CONFIG['settings_file']);
+	if ($ret != true) {
+		echo "Ein schwerwiegender Fehler ist aufgetreten!!";
+		die();
+	}else {
+		return true;
+	}
+}
+
+
 function init_settings_xml() {
-	global $GLOBAL_CONFIG;
+	global $GLOBAL_CONFIG,$xml;
 	$xml = simplexml_load_file($GLOBAL_CONFIG['settings_file']);
 	return $xml;	
 }
