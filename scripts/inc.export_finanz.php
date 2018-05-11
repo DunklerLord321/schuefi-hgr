@@ -124,7 +124,7 @@ if (isset($user) && $user->runscript()) {
 				public function Header() {
 					global $GLOBAL_CONFIG;
 					$image_file = 'img/logo.jpg';
-					$this->Image($image_file, 10, 5, 25, '', 'JPG', $GLOBAL_CONFIG['schuefiweb'], 'T', false, 300, '', false, false, 0, false, false, false);
+					$this->Image($image_file, 10, 5, 25, '', 'JPG', get_xml("contact/homepage","value"), 'T', false, 300, '', false, false, 0, false, false, false);
 					$this->SetFont('helvetica', 'B', 20);
 					$this->Ln(10);
 					$this->Cell(0, 15, 'Finanzexport', 0, false, 'C', 0, '', 0, false, 'M', 'M');
@@ -136,13 +136,13 @@ if (isset($user) && $user->runscript()) {
 					global $GLOBAL_CONFIG;
 					$this->SetY(-15);
 					$this->SetFont('helvetica', '', 8);
-					$this->addHtmlLink($GLOBAL_CONFIG['schuefiweb'], "Website: ".$GLOBAL_CONFIG['schuefiweb'], false, true, array(
+					$this->addHtmlLink(get_xml("contact/homepage","value"), "Website: ".get_xml("contact/homepage","value"), false, true, array(
 							0,
 							0,
 							0
 					), '', false);
 					$this->Ln(5);
-					$this->addHtmlLink("mailto:".$GLOBAL_CONFIG['schuefimail'], "E-Mail-Adresse: ".$GLOBAL_CONFIG['schuefimail'], false, true, array(
+					$this->addHtmlLink("mailto:".get_xml("contact/email","value"), "E-Mail-Adresse: ".get_xml("contact/email","value"), false, true, array(
 							0,
 							0,
 							0

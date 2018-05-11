@@ -15,14 +15,14 @@ if (isset($user) && $user->runscript()) {
 	);
 	if (isset($_GET['restore'])) {
 		//Gefahrenpotential
-		if (file_exists($GLOBAL_CONFIG['backup_dir'] . $_GET['restore'])) {
+		if (file_exists(get_xml("dirs/backup","value") . $_GET['restore'])) {
 			$zip = new ZipArchive();
-			$zip->open($GLOBAL_CONFIG['backup_dir'] . $_GET['restore']);
-			$zip->extractTo($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4));
+			$zip->open(get_xml("dirs/backup","value") . $_GET['restore']);
+			$zip->extractTo(get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4));
 			$zip->close();
 			$allfiles = array();
-			$filename = $GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/" . substr($_GET['restore'], 0, -4) . ".sql";
-			$filename2 = $GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/docs/backup/" . substr($_GET['restore'], 0, -4) . ".sql";
+			$filename = get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4) . "/backup/" . substr($_GET['restore'], 0, -4) . ".sql";
+			$filename2 = get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4) . "/docs/backup/" . substr($_GET['restore'], 0, -4) . ".sql";
 			if (!file_exists($filename)) {
 				if (file_exists($filename2)) {
 					$filename = $filename2;
@@ -52,7 +52,7 @@ if (isset($user) && $user->runscript()) {
 					die();
 				}
 			}
-			var_dump($tables);
+//			var_dump($tables);
 			for ($i = 0; $i < count($tables); $i++) {
 				$result = query_db("DELETE FROM `" . $tables[$i] . "`;");
 			}
@@ -64,7 +64,7 @@ if (isset($user) && $user->runscript()) {
 					$code[] = $string;
 				}
 			}
-			var_dump($code);
+//			var_dump($code);
 			$count = 0;
 			for ($i = 0; $i < count($code); $i++) {
 				if (strlen($code[$i]) > 5) {
@@ -88,13 +88,13 @@ if (isset($user) && $user->runscript()) {
 				while ($return) {
 					if (strlen($return['lehrer_dokument']) > 2) {
 						//do something
-						if (!file_exists($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'])) {
+						if (!file_exists(get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'])) {
 							echo "<br>Ein Fehler beim Wiederherstellen des Dokumentes ".$return['lehrer_dokument']." ist aufgetreten.";
 							die();
 						}else{
-							if(rename($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'], $GLOBAL_CONFIG['doc_dir'].$return['lehrer_dokument'])) {
+							if(rename(get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'], get_xml("dirs/doc","value").$return['lehrer_dokument'])) {
 								echo "<br>Dokument ". $return['lehrer_dokument'] ." wurde erfolgreich wiederhergestellt";
-								$allfiles[] = $GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'];
+								$allfiles[] = get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4) . "/backup/".$return['lehrer_dokument'];
 							}else{
 								echo "<br>Ein Fehler ist beim Verschieben des Dokuments aufgetreten";
 								die();
@@ -102,13 +102,13 @@ if (isset($user) && $user->runscript()) {
 						}
 					}
 					if (strlen($return['schueler_dokument']) > 2) {
-						if (!file_exists($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['schueler_dokument'])) {
+						if (!file_exists(get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4) . "/backup/".$return['schueler_dokument'])) {
 							echo "<br>Ein Fehler beim Wiederherstellen des Dokumentes ".$return['schueler_dokument']." ist aufgetreten.";
 							die();
 						}else{
-							if(rename($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".$return['schueler_dokument'], $GLOBAL_CONFIG['doc_dir'].$return['schueler_dokument'])) {
+							if(rename(get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4) . "/backup/".$return['schueler_dokument'], get_xml("dirs/doc","value").$return['schueler_dokument'])) {
 								echo "<br>Dokument ". $return['schueler_dokument'] ." wurde erfolgreich wiederhergestellt";
-								$allfiles[] = $GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4) . "/backup/".	$return['schueler_dokument'];
+								$allfiles[] = get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4) . "/backup/".	$return['schueler_dokument'];
 							}else{
 								echo "<br>Ein Fehler ist beim Verschieben des Dokuments aufgetreten";
 								die();
@@ -121,13 +121,13 @@ if (isset($user) && $user->runscript()) {
 			if (!unlink($filename)) {
 				echo "Es ist ein Fehler beim Aufräumen und Löschen nicht benötigter Datein entstanden";
 			}
-			if (!rmdir($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4)."/backup/")) {
+			if (!rmdir(get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4)."/backup/")) {
 				echo "Verzeichnis konnte nicht gelöscht werden";
 			}
-			if (!rmdir($GLOBAL_CONFIG['backup_dir'] . substr($_GET['restore'], 0, -4))) {
+			if (!rmdir(get_xml("dirs/backup","value") . substr($_GET['restore'], 0, -4))) {
 				echo "Verzeichnis konnte nicht gelöscht werden";
 			}
-			echo "><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
+			echo "<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}else {
 			echo "Dieses Backup existiert leider nicht!<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}
@@ -140,8 +140,8 @@ if (isset($user) && $user->runscript()) {
 		$pdo->exec("SET foreign_key_checks = 1");
 		echo "><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 	}else if (isset($_GET['delete'])) {
-		if (file_exists($GLOBAL_CONFIG['backup_dir'] . $_GET['delete'])) {
-			if (unlink($GLOBAL_CONFIG['backup_dir'] . $_GET['delete'])) {
+		if (file_exists(get_xml("dirs/backup","value") . $_GET['delete'])) {
+			if (unlink(get_xml("dirs/backup","value") . $_GET['delete'])) {
 				echo "Backup wurde erfolgreich gelöscht.<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 				$user->log(user::LEVEL_NOTICE, $_GET['delete'] . " wurde gelöscht");
 			}else {
@@ -202,15 +202,15 @@ if (isset($user) && $user->runscript()) {
 			// var_dump($dokumente);
 		}
 		$filename = date("y-n-d--H-i-s", time());
-		$sqlfile = fopen($GLOBAL_CONFIG['backup_dir'] . "Backup-$filename.sql", "x");
+		$sqlfile = fopen(get_xml("dirs/backup","value") . "Backup-$filename.sql", "x");
 		fwrite($sqlfile, $content, strlen($content));
 		fclose($sqlfile);
 		$zip = new ZipArchive();
-		if ($zip->open($GLOBAL_CONFIG['backup_dir'] . "Backup-$filename.zip", ZipArchive::CREATE) !== TRUE) {
+		if ($zip->open(get_xml("dirs/backup","value") . "Backup-$filename.zip", ZipArchive::CREATE) !== TRUE) {
 			$user->log(user::LEVEL_ERROR, "Zip-Datei konnte nicht erstellt werden!");
 			die();
 		}
-		if ($zip->addFile($GLOBAL_CONFIG['backup_dir'] . "Backup-$filename.sql", "backup/Backup-$filename.sql") !== TRUE) {
+		if ($zip->addFile(get_xml("dirs/backup","value") . "Backup-$filename.sql", "backup/Backup-$filename.sql") !== TRUE) {
 			$user->log(user::LEVEL_ERROR, "Backup-SQL konnte nicht zum ZIP hinzugefügt werden!");
 			die();
 		}
@@ -221,17 +221,17 @@ if (isset($user) && $user->runscript()) {
 			}
 		}
 		$zip->close();
-		unlink($GLOBAL_CONFIG['backup_dir'] . "Backup-$filename.sql");
+		unlink(get_xml("dirs/backup","value") . "Backup-$filename.sql");
 		echo "Backup wurde erfolgreich erstellt";
 	}else {
 		echo "<a href=\"index.php?page=backup_data&newbackup=1\" class=\"links\">Neues Backup</a><br><br>";
 		$backups = array();
-		$dir = opendir($GLOBAL_CONFIG['backup_dir']);
+		$dir = opendir(get_xml("dirs/backup","value"));
 		if ($dir === false) {
 			$user->log(user::LEVEL_ERROR, "Backup-Directory konnte nicht geöffnet werden");
 			die();
 		}
-		$files = scandir($GLOBAL_CONFIG['backup_dir'], SCANDIR_SORT_DESCENDING);
+		$files = scandir(get_xml("dirs/backup","value"), SCANDIR_SORT_DESCENDING);
 		for ($i = 0; $i < count($files); $i++) {
 			if (strstr($files[$i], "Backup") !== false && strstr($files[$i], ".zip") !== false) {
 				$file_ex = (explode("-", $files[$i]));
@@ -245,9 +245,9 @@ if (isset($user) && $user->runscript()) {
 			for ($i = 0; $i < count($backups); $i++) {
 				echo "<br>" . $backups[$i][0] . ":  " . $backups[$i][3] . "." . (strlen($backups[$i][2]) == 1 ? "0".$backups[$i][2] : $backups[$i][2]) . "." . $backups[$i][1] . " " . $backups[$i][5] . ":" . $backups[$i][6] . ":" . $backups[$i][7] . "Uhr";
 				echo "<div class=\"tooltip\" style=\"margin-top: 10px; margin-left: 100px;\"><a href=\"index.php?page=backup_data&delete=" . $backups[$i][8] . "\" class=\"links2 \" onclick=\"return warn('Willst du das Backup wirklich löschen?')\" style=\"font-style: normal; text-decoration: none;\">";
-				echo "<img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Backups\"><span class=\"tooltext\">Lösche das Backup</span></a></div>";
+				echo "<img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Backups\" style=\"position:relative;z-index:-1;\"><span class=\"tooltext\">Lösche das Backup</span></a></div>";
 				echo "<span style=\"margin-left: 100px;\"><a href=\"index.php?page=backup_data&restore=" . $backups[$i][8] . "\" onclick=\"return warn('Willst du das Backup wirklich wiederherstellen? Alle jetzigen Daten gehen dabei verloren...')\"class=\"links2\">Wiederherstellen</a></span>";
-				echo "<span style=\"margin-left: 100px;\"><a href=\"" . $GLOBAL_CONFIG['backup_dir'] . $backups[$i][8] . "\" class=\"links2\"><img src=\"img/png_save_24_24.png\" alt=\"Download\"></a></span>";
+				echo "<span style=\"margin-left: 100px;\"><a href=\"" . get_xml("dirs/backup","value") . $backups[$i][8] . "\" class=\"links2\"><img src=\"img/png_save_24_24.png\" alt=\"Download\"></a></span>";
 				?>
 <script type="text/javascript">
 function warn(string) {

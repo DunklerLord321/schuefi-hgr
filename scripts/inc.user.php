@@ -25,9 +25,9 @@ if (isset($user) && $user->runscript()) {
 			echo "Ein Fehler ist beim Aktivieren aufgetreten";
 		}
 	}else if(isset($_GET['reset_passwd'])) {
-		$result = query_db("UPDATE `users` SET passwort = :passwort WHERE id = :id", password_hash($GLOBAL_CONFIG['reset_passwd'], PASSWORD_DEFAULT), $_GET['reset_passwd']);
+		$result = query_db("UPDATE `users` SET passwort = :passwort WHERE id = :id", password_hash(get_xml("defaultpasswd","value"), PASSWORD_DEFAULT), $_GET['reset_passwd']);
 		if ($result !== false) {
-			echo "Erfolgreich das Passwort zurückgesetzt. Das Passwort lautet nun ".$GLOBAL_CONFIG['reset_passwd'];
+			echo "Erfolgreich das Passwort zurückgesetzt. Das Passwort lautet nun ".get_xml("defaultpasswd","value");
 			echo "<br><a href=\"index.php?page=user\" class=\"links2\">Zurück zur Übersicht</a>";
 		}else {
 			echo "Ein Fehler ist beim Aktivieren aufgetreten";

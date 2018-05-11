@@ -169,8 +169,8 @@ $( function() {
 				<b><?php if($show_formular_schueler){echo "Nachhilfeschüler";}if($show_formular_lehrer){echo "Nachhilfelehrer";}?></b>
 			</legend>
 			<?php
-			if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
-					echo '<button type="button" id="vorlage" class="mybuttons">Vorlage</button><br><br>';
+			if (get_xml("livesystem","value") !== null && get_xml("livesystem","value") != 'true') {
+				echo '<button type="button" id="vorlage" class="mybuttons">Vorlage</button><br><br>';
 			}
 			?>
 			<br>

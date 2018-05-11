@@ -125,7 +125,6 @@ function format_klassenstufe_kurs($klassenstufe, $klasse) {
  * 
  */
 function query_db($statement, ...$params) {
-	global $exit_on_db_failure;
 	global $pdo;
 	global $user;
 	if(!isset($pdo) || $pdo == null) {
@@ -163,7 +162,7 @@ function query_db($statement, ...$params) {
 		$user->log(user::LEVEL_ERROR, "DB-Fehler ist aufgetreten!" . $ret_prep->errorInfo());
 		var_dump($ret_prep->errorInfo());
 		var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
-		$exit_on_db_failure == 0 ?: die();
+		get_xml("exit_on_db_failure","value") == 'true' ?: die();
 		return false;
 	}else {
 		$return = $ret_prep->execute($parameter);
@@ -171,7 +170,7 @@ function query_db($statement, ...$params) {
 			echo "Ein DB-Fehler ist aufgtreten";
 			$user->log(user::LEVEL_ERROR, "DB-Fehler ist aufgetreten!" . implode("-", $ret_prep->errorInfo()));
 			var_dump($ret_prep->errorInfo());
-			$exit_on_db_failure == 0 ?: die();
+			get_xml("exit_on_db_failure","value") == 'true' ?: die();
 			return false;
 		}else {
 			return $ret_prep;
@@ -197,8 +196,109 @@ function get_view() {
 	}
 }
 
+function get_xml($key, $param = "none") {
+	global $xml;
+	$child =  $xml->xpath($key);
+	if($child == false) {
+		echo "Ein grober Fehler trat auf beim Lesen von XML-Werten: $key ist nicht existent!";
+		return false;
+	}
+//	var_dump($child);
+	switch ($param) {
+		case "value":
+			return ( string ) $child[0];
+		case "key":
+			return ( string ) $child[0]->getName();
+		case "name":
+			return ( string ) $child[0]->attributes()['name'];
+		case "type":
+			return ( string ) $child[0]->attributes()['type'];
+		default:
+			return array(
+					'key' => $child[0]->getName(), 
+					'value' => ( string ) $child[0], 
+					'name' => ( string ) $child[0]->attributes()['name'], 
+					'type' => ( string ) $child[0]->attributes()['type']
+			);	
+	}
+}
+
+function get_children($child) {
+	global $ret;
+	var_dump($child);
+//	$ret = array();
+	if ($child->count() == 0) {
+		echo "test";
+		return array('key' => $child->getName(), 'value' => (string)$child, 'name' => (string)$child->attributes()['name'], 'type' => (string)$child->attributes()['type']);
+	}else{
+		echo "tetssd";
+		var_dump($child->children());
+		foreach ($child->children() as $cofc) {
+			$ret[] = get_children($cofc);
+		}
+	}
+	var_dump($ret);
+//	return $ret;
+}
+
+
+function getall_xml_keys() {
+	global $xml;
+//	var_dump($xml);
+	$all_keys = array();
+//	$ret = array();
+//	var_dump(get_children($xml));
+	foreach ($xml->children() as $child) {
+//		var_dump($child->count());
+//		var_dump($child->getName());
+		if($child->count() == 0) {
+			$all_keys[] = array('key' => $child->getName(), 'value' => (string)$child, 'name' => (string)$child->attributes()['name'], 'type' => (string)$child->attributes()['type']);
+//			var_dump($all_keys);
+		}else if($child->count() > 0) {
+			$all_keys[] = array('key' => $child->getName(), 'value' => (string)$child, 'name' => (string)$child->attributes()['name'], 'type' => (string)$child->attributes()['type']);
+			foreach ($child->children() as $child_of_child) {
+//				var_dump($child_of_child);
+				if($child_of_child->count() == 0) {
+					$all_keys[] = array('key' => $child->getName()."/".$child_of_child->getName(), 'value' => (string)$child_of_child, 'name' => (string)$child_of_child->attributes()['name'],'type' => (string)$child_of_child->attributes()['type']);
+				}else if($child_of_child->count() > 0 ) {
+					$all_keys[] = array('key' => $child->getName()."/".$child_of_child->getName(), 'value' => (string)$child_of_child, 'name' => (string)$child_of_child->attributes()['name'],'type' => (string)$child_of_child->attributes()['type']);
+					foreach ($child_of_child->children() as $cofcofc) {
+						if($cofcofc->count() == 0) {
+							$all_keys[] = array('key' => $child->getName()."/".$child_of_child->getName()."/".$cofcofc->getName(), 'value' => (string)$cofcofc, 'name' => (string)$cofcofc->attributes()['name'], 'type' => (string)$cofcofc->attributes()['type']);
+						}
+					}
+				}
+			}
+		}
+	}
+	return $all_keys;
+}
+
+function set_xml($key, $value) {
+	global $xml;
+	$object =  $xml->xpath($key);
+	if($object === false) {
+		echo "Ein grober Fehler trat auf beim ändern von XML-Werten!";
+		return false;
+	}else{
+		$object[0][0] = $value;
+	}
+}
+
+function write_xml() {
+	global $xml,$GLOBAL_CONFIG;
+	$ret = $xml->asXML($GLOBAL_CONFIG['settings_file']);
+	if ($ret != true) {
+		echo "Ein schwerwiegender Fehler ist aufgetreten!!";
+		die();
+	}else {
+		return true;
+	}
+}
+
+
 function init_settings_xml() {
-	global $GLOBAL_CONFIG;
+	global $GLOBAL_CONFIG,$xml;
 	$xml = simplexml_load_file($GLOBAL_CONFIG['settings_file']);
 	return $xml;	
 }
