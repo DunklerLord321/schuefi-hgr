@@ -39,15 +39,16 @@ if (isset($user) && $user->runscript()) {
 		// $mail->addReplyTo($email, $vorname.' '.$name);
 		if (isset($_SESSION['mail_step3']) && isset($_SESSION['mail_step1']) && isset($_SESSION['mail_step2'])) {
 			if ($_SESSION['mail_step1']['mailart'] == 1 && isset($_SESSION['schuelermail']) && isset($_SESSION['lehrermail'])) {
-				if (isset($GLOBAL_CONFIG['mailto'])) {
-					$mail->addAddress($GLOBAL_CONFIG['mailto'], $GLOBAL_CONFIG['mailto']);
+				if (get_xml("livesystem","value") !== null && get_xml("livesystem","value") != 'true' && get_xml("testmail","value") !== null) {
+					$mail->addAddress(get_xml("testmail", "value"), get_xml("testmail", "value"));
 				}else{
 					$mail->addAddress($_SESSION['lehrermail']['empfaenger'], $_SESSION['lehrermail']['empfaenger']);
 					$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
 				}
-				$mail->addAttachment($GLOBAL_CONFIG['agb_file'], $GLOBAL_CONFIG['agb_displayed_name']);
-				$mail->addAttachment($GLOBAL_CONFIG['lehrernachweis_file'], $GLOBAL_CONFIG['lehrernachweis_displayed_name']);
-				$mail->addAttachment($GLOBAL_CONFIG['doc_dir'] . $_SESSION['lehrermail']['anhang'], "Vermittlungsdokument.pdf");
+				$mail->addAttachment(get_xml("attachement/agb/path","value"), get_xml("attachement/agb/displayed-name","value"));
+				$mail->addAttachment(get_xml("attachement/lehrernachweis/path","value"), get_xml("attachement/lehrernachweis/displayed-name","value"));
+				$mail->addAttachment(get_xml("dirs/doc","value") . $_SESSION['lehrermail']['anhang'], "Vermittlungsdokument.pdf");
+				echo get_xml("dirs/doc","value") . $_SESSION['lehrermail']['anhang'];
 				$mail->Body = $_SESSION['lehrermail']['text'];
 				$mail->Subject = $_SESSION['lehrermail']['betreff'];
 				if (!$mail->send()) {
@@ -59,8 +60,8 @@ if (isset($user) && $user->runscript()) {
 				$mail->clearAttachments();
 				$mail->clearAllRecipients();
 				$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
-				if (isset($GLOBAL_CONFIG['mailto'])) {
-					$mail->addAddress($GLOBAL_CONFIG['mailto'], $GLOBAL_CONFIG['mailto']);
+				if (get_xml("livesystem","value") !== null && get_xml("livesystem","value") != 'true' && get_xml("testmail","value") !== null) {
+					$mail->addAddress(get_xml("testmail", "value"), get_xml("testmail", "value"));
 				}else{
 					$mail->addBCC("schuelerfirma@hgr-web.de", "Schülerfirma");
 					$mail->addAddress($_SESSION['schuelermail']['empfaenger'], $_SESSION['schuelermail']['empfaenger']);
@@ -84,8 +85,8 @@ if (isset($user) && $user->runscript()) {
 					$mail->clearAllRecipients();
 					$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
 					$mail->addReplyTo("schuelerfirma@hgr-web.de", "Schülerfirma - Kundenbetreuung");
-					if (isset($GLOBAL_CONFIG['mailto'])) {
-						$mail->addAddress($GLOBAL_CONFIG['mailto'], $GLOBAL_CONFIG['mailto']);
+					if (get_xml("livesystem","value") !== null && get_xml("livesystem","value") != 'true' && get_xml("testmail","value") !== null) {
+						$mail->addAddress(get_xml("testmail", "value"), get_xml("testmail", "value"));
 					}else{	
 						$mail->addAddress($_SESSION['serienmail'][$i]['mail'], $_SESSION['serienmail'][$i]['vname'] . " " . $_SESSION['serienmail'][$i]['nname']);
 					}
@@ -480,8 +481,8 @@ if (isset($user) && $user->runscript()) {
 				$_SESSION['serienmail'] = $mailpersonen;
 				// var_dump($_SESSION);
 			}
-			if (isset($GLOBAL_CONFIG['mailto'])) {
-				echo "<b>Achtung: Diese Mails werden momentan alle nicht an die richtige Adresse gesendet. Das momentane Ziel ist ".$GLOBAL_CONFIG['mailto']."</b>";
+			if (get_xml("livesystem","value") !== null && get_xml("livesystem","value") != 'true' && get_xml("testmail","value") !== null) {
+				echo "<b>Achtung: Diese Mails werden momentan alle nicht an die richtige Adresse gesendet. Das momentane Ziel ist ".get_xml("testmail","value")."</b>";
 			}
 		}
 		?>

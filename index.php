@@ -24,7 +24,7 @@ require 'includes/class_user.php';
 require 'includes/functions.inc.php';
 setlocale(LC_TIME, 'de_DE.UTF-8');
 $xml = init_settings_xml();
-if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
+if (null !== get_xml("livesystem","value") && get_xml("livesystem","value") != 'true') {
 	error_reporting(E_ALL);
 }else{
 	error_reporting(E_ERROR);
@@ -47,8 +47,7 @@ if (isset($_GET['reset'])) {
 	$user->reset();
 }
 if (isset($_GET['page'])) {
-//	if ($_GET['page'] == 'logout' || ($xml->bauarbeiten['enabled'] == "true" && $user->getemail() != "yajo10@yahoo.de")) {
-	if ($_GET['page'] == 'logout' || ($GLOBAL_CONFIG['bauarbeiten'] == "true" && $user->getemail() != "yajo10@yahoo.de")) {
+	if ($_GET['page'] == 'logout' || (get_xml("bauarbeiten","value") == "true" && strstr( get_xml("admin", "value"), $user->getemail() ) == false)) {
 		$user->logout();
 		?>
 	<nav>
@@ -61,7 +60,7 @@ if (isset($_GET['page'])) {
 		<br>
 		<?php
 		
-		if ($GLOBAL_CONFIG['bauarbeiten']) {
+		if (get_xml("bauarbeiten","value") == "true") {
 			echo "Es finden gerade Bauarbeiten am System statt. Bitte versuche es später nochmal.<br><br>";
 		}
 		?>
@@ -307,7 +306,7 @@ $(function() {
 			}else {
 				echo "<div class=\"dropdiv";
 			}
-			echo "\"><a class=\"dropdown\">Einstellungen</a><div class=\"dropdown-content\"><a href=\"index.php?page=settings\">Log-Datei</a>
+			echo "\"><a class=\"dropdown\">Einstellungen</a><div class=\"dropdown-content\"><a href=\"index.php?page=settings\">Einstellungen</a>
 						<a href=\"index.php?page=user\">Ausgeben aller Nutzer</a>
 						<a href=\"index.php?page=backup_data\">Backups</a></div></div>";
 		}

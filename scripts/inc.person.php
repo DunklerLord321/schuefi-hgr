@@ -21,7 +21,7 @@ if (isset($user) && $user->runscript()) {
 				<b>Person</b>
 			</legend>
 			<?php
-			if (isset($GLOBAL_CONFIG['system']) && $GLOBAL_CONFIG['system'] = "test") {
+			if (get_xml("livesystem","value") !== null && get_xml("livesystem","value") != 'true') {
 					echo '<button type="button" id="vorlage" class="mybuttons">Vorlage</button><br><br>';
 			}
 			?>
