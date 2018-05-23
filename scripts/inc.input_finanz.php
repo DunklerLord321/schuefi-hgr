@@ -65,7 +65,15 @@ if (isset($user) && $user->runscript()) {
 			}else {
 				echo "Ein Fehler ist aufgetreten";
 			}
-			echo "<br><br><a href=\"index.php?page=input_finanzen\" class=\"links2\">Einen weiteren Posten eingeben</a><br><br><a href=\"index.php?page=output_finanzen\" class=\"links2\">Zur Ausgabeseite der Finanzposten</a>";
+			echo "<br><br><a href=\"index.php?page=input_finanzen\" class=\"links2\">Einen weiteren Posten ändern</a><br><br><a href=\"index.php?page=output_finanzen\" class=\"links2\">Zur Ausgabeseite der Finanzposten</a>";
+		}else if (isset($_GET['finanzloeschen'])) {
+			$return = query_db("DELETE FROM `finanzuebersicht` WHERE id = :id", $_GET['finanzloeschen']);
+			if ($return) {
+				echo "Erfolgreich gelöscht";
+			}else {
+				echo "Ein Fehler ist aufgetreten";
+			}
+			echo "<br><br><a href=\"index.php?page=output_finanzen\" class=\"links2\">Zur Ausgabeseite der Finanzposten</a>";
 		}else {
 			if(isset($_GET['change'])) {
 				$return = query_db("SELECT * FROM `finanzuebersicht` WHERE id = :fid", $_GET['change']);
@@ -226,7 +234,7 @@ $(function() {
 
 $( "#tooltip" ).tooltip();
 </script>
-		
+
 
 <?php
 	}

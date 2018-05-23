@@ -20,9 +20,9 @@ if (isset($user) && $user->runscript()) {
 			require 'includes/class_schueler.php';
 			$schueler = new schueler(-1, $_POST['id']);
 			$params = array(
-					'klasse' => $_POST['klasse'], 
-					'klassenstufe' => $_POST['klassenstufe'], 
-					'klassenlehrer_name' => $_POST['klassenlehrer'], 
+					'klasse' => $_POST['klasse'],
+					'klassenstufe' => $_POST['klassenstufe'],
+					'klassenlehrer_name' => $_POST['klassenlehrer'],
 					'comment' => $_POST['comment']
 			);
 			$schueler->change_schueler($params);
@@ -47,14 +47,14 @@ if (isset($user) && $user->runscript()) {
 				for ($i = 0; $i <= count($_POST['zeit']); $i++) {
 					if (isset($_POST['zeit'][$i])) {
 						$schueler->add_time(array(
-								'tag' => $_POST['zeit'][$i]['tag'], 
-								'from' => $_POST['zeit'][$i]['from'], 
+								'tag' => $_POST['zeit'][$i]['tag'],
+								'from' => $_POST['zeit'][$i]['from'],
 								'until' => $_POST['zeit'][$i]['until']
 						));
 					}
 				}
 			}
-			
+
 			// Ändere Fächer
 			$_POST['fach'] = array_values($_POST['fach']);
 			if (!isset($_POST['fach']) && count($schueler->faecher) != 0) {
@@ -80,9 +80,9 @@ if (isset($user) && $user->runscript()) {
 			require 'includes/class_lehrer.php';
 			$lehrer = new lehrer(-1, $_POST['id']);
 			$params = array(
-					'klasse' => $_POST['klasse'], 
-					'klassenstufe' => $_POST['klassenstufe'], 
-					'klassenlehrer_name' => $_POST['klassenlehrer'], 
+					'klasse' => $_POST['klasse'],
+					'klassenstufe' => $_POST['klassenstufe'],
+					'klassenlehrer_name' => $_POST['klassenlehrer'],
 					'comment' => $_POST['comment']
 			);
 			$lehrer->change_lehrer($params);
@@ -105,14 +105,14 @@ if (isset($user) && $user->runscript()) {
 				for ($i = 0; $i <= count($_POST['zeit']); $i++) {
 					if (isset($_POST['zeit'][$i])) {
 						$lehrer->add_time(array(
-								'tag' => $_POST['zeit'][$i]['tag'], 
-								'from' => $_POST['zeit'][$i]['from'], 
+								'tag' => $_POST['zeit'][$i]['tag'],
+								'from' => $_POST['zeit'][$i]['from'],
 								'until' => $_POST['zeit'][$i]['until']
 						));
 					}
 				}
 			}
-			
+
 			// Ändere Fächer
 			$_POST['fach'] = array_values($_POST['fach']);
 			if (!isset($_POST['fach']) && count($lehrer->faecher) != 0) {
@@ -142,8 +142,8 @@ if (isset($user) && $user->runscript()) {
 			}else{
 				$raum = NULL;
 			}
-			$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende, 
-					treff_raum = :treff_raum, `rid` = :rid WHERE id = :pid", 
+			$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende,
+					treff_raum = :treff_raum, `rid` = :rid WHERE id = :pid",
 					$_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum'], $raum,
 					$_POST['paar_id']);
 			if ($return !== false) {
@@ -229,7 +229,7 @@ if (isset($user) && $user->runscript()) {
 <script type="text/javascript">
 		var fachzahl = <?php echo count($sl->faecher);?>;
 		var zeitzahl = <?php echo count($sl->zeit);?>;
-		
+
 		function addfach() {
 			fachzahl++;
 			var doc = document.createDocumentFragment();
@@ -274,7 +274,7 @@ if (isset($user) && $user->runscript()) {
 			document.getElementById(id).parentNode.removeChild(document.getElementById(id));
 			zeitzahl--;
 		}
-		
+
 		function addtime() {
 			var doc = document.createDocumentFragment();
 			var element = document.createElement('div');
@@ -317,7 +317,7 @@ if (isset($user) && $user->runscript()) {
 				defaultTime: '13:00'
 			});
 		});
-		
+
 			$('body').on('focus','.timepickerbis', function(){
 				$(this).timepicker({
 					showPeriodLabels: false,
@@ -336,7 +336,7 @@ if (isset($user) && $user->runscript()) {
 					defaultTime: '14:00'
 				});
 			});
-		
+
 				</script>
 <div class="formular_class">
 	<form action="?page=change&change=<?php if(isset($_GET['schueler'])){echo "2";}if(isset($_GET['lehrer'])){echo "3";}?>" method="POST">
@@ -353,7 +353,7 @@ if (isset($user) && $user->runscript()) {
 			<span style="float: right; width: 50%;">Klasse/Kurs (a, b, c, d, L, L1, L2):</span>
 			<br>
 			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;" value="<?php echo $sl->get_klassenstufe();?>" class="input_text">
-			<input type="text" pattern="([ABCDabcdlL123456]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" value="<?php echo $sl->get_klasse();?>"
+			<input type="text" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" value="<?php echo $sl->get_klasse();?>"
 				class="input_text">
 			<br>
 			<br>
@@ -425,17 +425,17 @@ if (isset($user) && $user->runscript()) {
 		for ($i = 0; $i < count($sl->zeit); $i++) {
 			echo "<div id=\"timediv-" . ($i + 1) . "\"><select name=\"zeit[" . ($i + 1) . "][tag]\">";
 			$tagekuerzel = array(
-					"mo", 
-					"di", 
-					"mi", 
-					"do", 
+					"mo",
+					"di",
+					"mi",
+					"do",
 					"fr"
 			);
 			$tage = array(
-					"Montag", 
-					"Dienstag", 
-					"Mittwoch", 
-					"Donnerstag", 
+					"Montag",
+					"Dienstag",
+					"Mittwoch",
+					"Donnerstag",
 					"Freitag"
 			);
 			for ($j = 0; $j < count($tagekuerzel); $j++) {
@@ -446,9 +446,9 @@ if (isset($user) && $user->runscript()) {
 				}
 			}
 			echo "</select><br>
-			<br>Von: 
+			<br>Von:
 			<input type=\"text\" class=\"timepickervon input_text\" name=\"zeit[" . ($i + 1) . "][from]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['anfang'])) . "\">
-	    	 Bis: 
+	    	 Bis:
 		 	<input type=\"text\" class=\"timepickerbis input_text\" name=\"zeit[" . ($i + 1) . "][until]\" value=\"" . date("H:i", strtotime($sl->zeit[$i]['ende'])) . "\">
 	 		<a class=\"mybuttons\" onclick=\"deletetime('timediv-" . ($i + 1) . "')\">Zeit löschen</a>
 			<br><br><br><br></div>";
@@ -502,7 +502,7 @@ if (isset($user) && $user->runscript()) {
 				defaultTime: '13:00'
 			});
 		});
-		
+
 			$('body').on('focus','.timepickerbis', function(){
 				$(this).timepicker({
 					showPeriodLabels: false,
@@ -534,17 +534,17 @@ if (isset($user) && $user->runscript()) {
 			<select name="zeit[tag]">
 			<?php
 					$tagekuerzel = array(
-							"mo", 
-							"di", 
-							"mi", 
-							"do", 
+							"mo",
+							"di",
+							"mi",
+							"do",
 							"fr"
 					);
 					$tage = array(
-							"Montag", 
-							"Dienstag", 
-							"Mittwoch", 
-							"Donnerstag", 
+							"Montag",
+							"Dienstag",
+							"Mittwoch",
+							"Donnerstag",
 							"Freitag"
 					);
 					for ($j = 0; $j < count($tagekuerzel); $j++) {
@@ -564,7 +564,7 @@ if (isset($user) && $user->runscript()) {
 			<input type="text" class="timepickerbis input_text" name="zeit[until]" value="<?php if(isset($paar->ende)){echo $paar->ende;}else{echo "14:00";}?>">
 			<br>
 			<br>
-			<?php 
+			<?php
 			if(!isset($paar->anfang) || !isset($paar->ende) || !isset($paar->tag)) {
 				echo "<i>Keine Automatische Zimmersuche möglich!</i><br><br>";
 			}else{
@@ -573,7 +573,7 @@ if (isset($user) && $user->runscript()) {
 				$stunden = get_stunde_for_time($paar->anfang, $paar->ende);
 				if(is_array($stunden)) {
 					$return = query_db("SELECT raum.*, r.stunde as stunde1, zahlnummer FROM `raum` INNER JOIN (SELECT raum.* FROM raum WHERE stunde = :stunde AND frei = 1 AND tag = :tag) as r on r.nummer = raum.nummer
-							LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id 
+							LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id
 							GROUP BY raum.id, raum.nummer, raum.tag HAVING raum.tag = :tag) AS rz ON rz.nummer = raum.nummer
 							HAVING raum.stunde = :stunde2 AND raum.tag = :tag ", $stunden[0], $paar->tag, $paar->tag, $stunden[1], $paar->tag);
 				}else {
@@ -594,7 +594,7 @@ if (isset($user) && $user->runscript()) {
 						}
 						$result = $return->fetch();
 					}
-					echo "</select><br><br>";	
+					echo "</select><br><br>";
 				}
 			}
 			?>
@@ -620,7 +620,7 @@ if (isset($user) && $user->runscript()) {
 			</script>
 		</form>
 		<?php
-		
+		// TODO: Daten per JS validieren
 	}
 }else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";

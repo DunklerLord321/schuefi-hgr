@@ -90,7 +90,7 @@ if (isset($user) && $user->runscript()) {
 		$return = query_db("SELECT finanzuebersicht.*, users.vname, users.nname, person.vname AS pvname, person.nname AS pnname FROM `finanzuebersicht`
 			LEFT JOIN `users` ON finanzuebersicht.uid = users.id LEFT JOIN `person` ON finanzuebersicht.pid = person.id ORDER BY finanzuebersicht.datum ASC;");
 	}
-	echo "<br><br><b>Hinweis:</b> Die Kontostände und Kassenstände werden auf der Basis von den angezeigten Datensätzen erstellt. 
+	echo "<br><br><b>Hinweis:</b> Die Kontostände und Kassenstände werden auf der Basis von den angezeigten Datensätzen erstellt.
 			Um den korrekten Stand der Kasse oder des Kontos zu sehen bitte alle Datensätze ohne Filter anzeigen lassen oder einen Finanzbericht erstellen.";
 	if ($return != false) {
 		$result = $return->fetch();
@@ -119,7 +119,8 @@ if (isset($user) && $user->runscript()) {
 				echo "<td>" . (strlen($result['geldbetrag']) > 0 ? $result['geldbetrag']:'0') . "€</td><td></td>";
 			}
 			echo "<td>" . $result['konto_bar'] . "</td><td>" . $result['betreff'] . "</td><td>" . $result['dokument'] . "</td><td>" . $result['bemerkung'] . "</td><td>" . date('d.m.Y', strtotime($result['datum'])) . "</td>";
-			echo ($user->isuserallowed('f') ?"<td><a href=\"index.php?page=input_finanzen&change=".$result['id']."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Finanzeintrags\"></a></td></tr>":"");
+			echo ($user->isuserallowed('f') ?"<td><a href=\"index.php?page=input_finanzen&change=".$result['id']."\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern des Finanzeintrags\"></a></td>
+			<td><a href=\"index.php?page=input_finanzen&finanzloeschen=".$result['id']."\" class=\"links2\"><img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Finanzeintrags\"></a></td></tr>":"");
 			if ($result['konto_bar'] == "konto") {
 				$sum_konto += $result['geldbetrag'];
 			}else if ($result['konto_bar'] == "bar") {
@@ -137,4 +138,3 @@ if (isset($user) && $user->runscript()) {
 }else {
 	echo "<h1>Ein Fehler ist aufgetreten. Sie haben versucht, die Seite zu laden, ohne die Navigation zu benutzen!</h1>";
 }
-	

@@ -15,23 +15,28 @@ if (isset($user) && $user->runscript()) {
 		require 'includes/class_person.php';
 		require 'includes/class_lehrer.php';
 		$schueler_array = array(
-				'klassenlehrer_name' => $_POST['klassenlehrer'], 
-				'klasse' => $_POST['klasse'], 
-				'klassenstufe' => $_POST['klassenstufe'], 
+				'klassenlehrer_name' => $_POST['klassenlehrer'],
+  				'klasse' => $_POST['klasse'],
+				'klassenstufe' => $_POST['klassenstufe'],
 				'comment' => $_POST['comment']
 		);
 		$schueler = new schueler($_POST['person']);
 		if (!$schueler->add_schueler($schueler_array)) {
 			die();
 		}
+//		var_dump($_POST['fach']);
 		if (isset($_POST['fach'])) {
-			for ($i = 1; $i <= count($_POST['fach']); $i++) {
-				$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], 'neu');
+			for ($i = 1; $i <= max(array_keys($_POST['fach'])); $i++) {
+				if (isset($_POST['fach'][$i])) {
+					$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], 'neu');
+				}
 			}
 		}
 		if (isset($_POST['zeit'])) {
-			for ($i = 1; $i <= count($_POST['zeit']); $i++) {
-				$schueler->add_time($_POST['zeit'][$i]);
+			for ($i = 1; $i <= max(array_keys($_POST['zeit'])); $i++) {
+				if (isset($_POST['zeit'][$i])) {
+					$schueler->add_time($_POST['zeit'][$i]);
+				}
 			}
 		}
 		$show_formular_schueler = false;
@@ -40,9 +45,9 @@ if (isset($user) && $user->runscript()) {
 		require 'includes/class_person.php';
 		require 'includes/class_lehrer.php';
 		$lehrer_array = array(
-				'klassenlehrer_name' => $_POST['klassenlehrer'], 
-				'klasse' => $_POST['klasse'], 
-				'klassenstufe' => $_POST['klassenstufe'], 
+				'klassenlehrer_name' => $_POST['klassenlehrer'],
+				'klasse' => $_POST['klasse'],
+				'klassenstufe' => $_POST['klassenstufe'],
 				'comment' => $_POST['comment']
 		);
 		$lehrer = new lehrer($_POST['person']);
@@ -59,7 +64,7 @@ if (isset($user) && $user->runscript()) {
 		$show_formular_lehrer = false;
 		$show_formular_schueler = false;
 	}
-	
+
 	if ($show_formular_schueler || $show_formular_lehrer) {
 		$return = query_db("SELECT * FROM `person` ORDER BY `person`.`nname` ASC");
 		if ($return) {
@@ -79,7 +84,7 @@ var zeitzahl = 0;
 $( function() {
 	$('#add-subject').click(function() {
 		fachzahl++;
-		$('#insert-subject').append('<div style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey; margin-top: 10px;">\
+		$('#insert-subject').append('<div id="faecherdiv-'+fachzahl+'" style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey; margin-top: 10px;">\
 				<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
 				<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
 				</select><br><br>Fachlehrer:<br><input type="text" class="input_text" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]" style="width: 95%;"><br>\
@@ -90,12 +95,13 @@ $( function() {
 						echo "<br><input type=\"radio\" name=\"fach['+ fachzahl + '][nachweis]\" value=\"true\">Ja";
 						echo "<input type=\"radio\" required name=\"fach['+ fachzahl + '][nachweis]\" value=\"false\" style=\"margin-left: 20%;\">Nein";
 					}
+					echo "<br><br><a class=\"mybuttons\" onClick=\"deletefach(\'faecherdiv-'+ fachzahl +'\')\">Fach löschen</a><br><br>";
 					?>
 				</div>');
 	});
 	$('#add-time').click(function() {
 		zeitzahl++;
-		$('#insert-time').append('<select name="zeit['+ zeitzahl + '][tag]"><option value="mo">Montag</option><option value="di">Dienstag</option>\
+		$('#insert-time').append('<div id="timediv-'+zeitzahl+'"><select name="zeit['+ zeitzahl + '][tag]"><option value="mo">Montag</option><option value="di">Dienstag</option>\
 				<option value="mi">Mittwoch</option><option value="do">Donnerstag</option>\
 				<option value="fr">Freitag</option>\
 				</select><br>\
@@ -103,13 +109,21 @@ $( function() {
 				<input type="text" class="timepickervon input_text" name="zeit['+zeitzahl + '][from]" value="13:00">\
 				     Bis: \
 			 	<input type="text" class="timepickerbis input_text" name="zeit['+zeitzahl + '][until]" value="14:00">\
-				<br><br><br><br>');
+				<a class="mybuttons" onclick="deletetime(\'timediv-'+zeitzahl+'\')">Zeit löschen</a>\
+				<br><br><br><br></div>');
 	});
 });
+function deletefach(id) {
+	document.getElementById(id).parentNode.removeChild(document.getElementById(id));
+}
+
+function deletetime(id) {
+	document.getElementById(id).parentNode.removeChild(document.getElementById(id));
+}
 
 /*
 $("form").submit(function (event) {
-	if( typeof 
+	if( typeof
 }
 */
 $('body').on('focus','.timepickervon', function(){
@@ -194,7 +208,7 @@ $( function() {
 			<span style="float: right; width: 50%;">Klasse/Kurs (a, b, c, d, L, L1, L2):</span>
 			<br>
 			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;" class="input_text">
-			<input type="text" pattern="([ABCDabcdlL1234567]|[lL][12])" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" class="input_text">
+			<input type="text" name="klasse" required style="width: 49%; float: right; margin-right: 5px; margin-left: 0;" class="input_text">
 			<br>
 			<br>
 			Klassenlehrer:
