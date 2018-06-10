@@ -3,6 +3,12 @@ if (isset($user) && $user->runscript()) {
 	if (!$user->is_valid()) {
 		echo "<h1>Anmelden</h1>";
 		if (!isset($_GET['loginreal']) || $_GET['loginreal'] != 1) {
+			if (get_xml("bauarbeiten","value") == "true") {
+				echo "<p>Achtung: Die Seite steht momenatan nur Administratoren zur Verfügung. Bitte versuche es später nochmal</p>";
+			}
+			if (get_xml("livesystem","value") == "false") {
+				echo "<p><b>Achtung: Dies ist nicht das Livesystem. Das heißt, einige Funktionen sind nur eingeschränkt benutzbar. <br><br>Dieses System ist <i>nicht für den normalen Gebrauch</i> gedacht!</b>";
+			}
 			?>
 			<p>Achtung: Diese Seite steht nur für Mitglieder im Organisationsteam der Schülerfirma des Humboldt-Gymnasiums Radeberg zur Verfügung. <br>
 			Die offizielle Homepage der Schülerfirma findest du hier: <a href="https://www.hgr-web.de/schuelerfirma" class="links2">Website der Schülerfirma "Schüler helfen Schülern"</a>

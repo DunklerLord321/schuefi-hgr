@@ -311,6 +311,7 @@ $(function() {
 						<a href=\"index.php?page=backup_data\">Backups</a></div></div>";
 		}
 		?>
+			<span class="navigation_li" style="background-color: #0b1162;"><?php echo get_xml("servername", "value");?></span>
 			<a <?php
 		
 		if (strcmp($active, "logout") == 0) {

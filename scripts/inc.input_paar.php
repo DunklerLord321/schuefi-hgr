@@ -41,7 +41,7 @@ if (isset($user) && $user->runscript()) {
 		}else {
 			echo "<p>Bitte überprüfe nochmal die Angaben. Wenn es mehrer mögliche Lehrer für den Schüler gab, dann kann es sein, dass das Programm nicht die beste Möglichkeit findet. Da es immer nur für einen Schüler den Lehrer sucht und nicht die beste Möglichkeit für alle Schüler findet.</p>";
 		}
-		$return = query_db("SELECT * FROM `schueler` WHERE schuljahr = :schuljahr", get_current_year());
+		$return = query_db("SELECT schueler.*, person.nname FROM `schueler` LEFT JOIN `person` ON `person`.`id` = `schueler`.`pid` WHERE schuljahr = :schuljahr ORDER BY `person`.`nname` ASC", get_current_year());
 		if ($return !== false) {
 			$schueler = $return->fetch();
 			?>
@@ -115,14 +115,13 @@ $('body').on('focus','.timepickerbis', function(){
 	<label>Nachhilfelehrer:</label>
 	<select name="lehrer">
 		<?php
-			$return = query_db("SELECT * FROM `lehrer` WHERE schuljahr = :schuljahr", get_current_year());
+			$return = query_db("SELECT lehrer.*, person.nname FROM `lehrer` LEFT JOIN person ON person.id = lehrer.pid WHERE schuljahr = :schuljahr ORDER BY person.nname ASC", get_current_year());
 			if ($return !== false) {
 				require 'includes/class_lehrer.php';
 				$lehrer = $return->fetch();
 				while ($lehrer) {
 					$lehrer = new lehrer(-1, $lehrer['id']);
 					$faecher = $lehrer->get_angebot_faecher();
-					// var_dump($lehrer);
 					for ($i = 0; $i < count($faecher); $i++) {
 						if (isset($_GET['control_paar']) && isset($_GET['lid']) && $_GET['lid'] == $lehrer->get_id() && $_GET['fid'] == $faecher[$i]['fid']) {
 							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\" selected >" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";

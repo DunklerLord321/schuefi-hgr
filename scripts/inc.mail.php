@@ -274,7 +274,7 @@ if (isset($user) && $user->runscript()) {
 					Sämtliche Textbausteine (:vorname,:fach...) werden erst im nächsten Schritt ersetzt.</i></p>";
 			echo "<button type=\"button\" class=\"mybuttons\" onclick=\"vermittlungsmail()\">Vorlage für Vermittlungsmail</button><br>";
 			if (isset($_SESSION['mail_step3']['subject2'])) {
-				echo "<input id=\"subject2\" type=\"text\" name=\"subject2\" placeholder=\"Betreff\" value=\"" . strip_tags($_SESSION['mail_step3']['subject2']) . "style=\"width: 40%\">";
+				echo "<input id=\"subject2\" type=\"text\" name=\"subject2\" placeholder=\"Betreff\" value=\"" . strip_tags($_SESSION['mail_step3']['subject2']) . "\" style=\"width: 40%\">";
 			}else {
 				echo "<input id=\"subject2\" type=\"text\" name=\"subject2\" placeholder=\"Betreff\" style=\"width: 40%\">";
 			}
@@ -409,18 +409,16 @@ if (isset($user) && $user->runscript()) {
 				$schuelertext = str_replace(":tag", get_name_of_tag($paar->tag), $schuelertext);
 				$schuelertext = str_replace(":treff_zeit", $paar->anfang, $schuelertext);
 				$schuelertext = str_replace(":tag", get_name_of_tag($paar->tag), $schuelertext);
-				$_SESSION['mail_step3']['subject2'] = str_replace(":fach", get_faecher_name_of_id($paar->fid), $_SESSION['mail_step3']['subject2']);
-				$_SESSION['mail_step3']['subject'] = str_replace(":fach", get_faecher_name_of_id($paar->fid), $_SESSION['mail_step3']['subject']);
 				$lehrermail = array(
 						'empfaenger' => $paar->lehrer->person->email, 
 						'text' => $lehrertext, 
-						'betreff' => $_SESSION['mail_step3']['subject2'], 
+						'betreff' => str_replace(":fach", get_faecher_name_of_id($paar->fid), $_SESSION['mail_step3']['subject2']), 
 						'anhang' => ''
 				);
 				$schuelermail = array(
 						'empfaenger' => $paar->schueler->person->email, 
 						'text' => $schuelertext, 
-						'betreff' => $_SESSION['mail_step3']['subject'], 
+						'betreff' => str_replace(":fach", get_faecher_name_of_id($paar->fid), $_SESSION['mail_step3']['subject2']), 
 						'anhang' => ''
 				);
 				if ($_SESSION['mail_step3']['anhang2'] == 1) {

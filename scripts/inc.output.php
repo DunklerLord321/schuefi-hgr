@@ -388,10 +388,12 @@ function warn(string) {
 				$count++;
 			}
 			if (get_view() == "table") {
-				echo "</table><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers ändern.";
+				echo "</table></div><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers ändern.";
 				echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers löschen.";
 				echo "<br>Wenn du auf <img src=\"img/png_refresh_24_24.png\" alt=\"Erneut erstellen\" style=\"width:13px;\"> klickst, kannst du das Vermittlungsdokument erneut erstellen, falls sich Daten geändert haben sollten.";
+				echo "<br><a href=\"index.php?page=create_doc&renew_docs=1\" class=\"links2\">Alle Vermittlungsdokumente erneuern</a>";
 			}else{
+				echo "<a href=\"index.php?page=create_doc&renew_docs=1\" class=\"links2\">Alle Vermittlungsdokumente erneuern</a>";
 				echo "<br><br><span style=\"float:right;\">$count Datensätze</span><br><br>";
 			}
 		}

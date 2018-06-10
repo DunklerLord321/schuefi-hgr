@@ -300,6 +300,9 @@ function write_xml() {
 function init_settings_xml() {
 	global $GLOBAL_CONFIG,$xml;
 	$xml = simplexml_load_file($GLOBAL_CONFIG['settings_file']);
+	if($xml == false) {
+		echo "<h2>Ein sehr schwerwiegender Fehler ist aufgetreten. Bitte unbedingt den Administrator kontaktieren.";
+	}
 	return $xml;	
 }
 
