@@ -163,7 +163,7 @@ class user {
 			$this->count_login_trys = intval($user['count_login']);
 			return true;
 		}else {
-			$this->error = "Ein Nutzer mit dieser E-Mail-Adresse existiert leider nicht oder wurde deaktiviert";
+			$this->error = Das Passwort oder die E-Mail-Adresse war leider falsch;
 			return false;
 		}
 	}
@@ -219,12 +219,12 @@ class user {
 		if (isset($this->hash_password) && isset($password)) {
 			if ($this->count_login_trys < 5) {
 				$return = password_verify($password, $this->hash_password);
-				$return ?: $this->error = 'Das Passwort war leider falsch!';
+				$return ?: $this->error = 'Das Passwort oder die E-Mail-Adresse war leider falsch!';
 				$return ? $this->reset_count_login() : $this->increase_count_login();
 				$return ? $this->log(user::LEVEL_NOTICE, "Login erfolgreich") : $this->log(user::LEVEL_NOTICE, "Anmeldung fehlgeschlagen");
 				return $return;
 			}else {
-				$this->error = "Sie haben mindestens fünfmal versucht, sich mit falschem Passwort anzumelden.<br><br> Bitte kontaktieren Sie den Admin." . $this->vname . $this->nname;
+				$this->error = "Sie haben mindestens fünfmal versucht, sich mit falschem Passwort oder E-Mail-Adresse anzumelden.<br><br> Bitte kontaktieren Sie den Admin." . $this->vname . $this->nname;
 				if ($this->count_login_trys == 5)
 					$this->send_mail();
 				$this->increase_count_login();
