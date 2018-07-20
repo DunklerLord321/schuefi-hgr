@@ -72,6 +72,7 @@ if (isset($_GET['page'])) {
 		<?php
 	}else if ($user->is_valid()) {
 		$active = $_GET['page'];
+                            //@TODO Navigation in Funktion 
 		?>
 		<nav>
 		<div id="nav_div">

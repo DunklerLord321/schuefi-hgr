@@ -1,0 +1,8 @@
+TODO:
+--Passwort aus Session-Cockie entfernen.
+--Datenbankausgaben gegen Fremdcode überprüfen!!!
+--PDF-DATEIEN sind momentan für jeden erreichbar?!?!
+--Taint Checking
+--Fehler in Logdateien Protokollieren
+#Passwort und Nutzername als eine Fehlermeldung 
+--Navigation in Funktionen und automatisch bauen

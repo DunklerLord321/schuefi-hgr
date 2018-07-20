@@ -14,7 +14,7 @@ CREATE TABLE `users` (
   `nname` varchar(50) COLLATE utf8_german2_ci NOT NULL,
   `email` varchar(50) COLLATE utf8_german2_ci NOT NULL,
   `passwort` varchar(255) COLLATE utf8_german2_ci NOT NULL,
-  `account` enum('k','f','v','w') COLLATE utf8_german2_ci NOT NULL DEFAULT 'w',
+  `account` enum('k','f','v','g','c') COLLATE utf8_german2_ci NOT NULL DEFAULT 'g',
   `createt_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `count_login` int(11) DEFAULT 0,
@@ -137,6 +137,13 @@ CREATE TABLE `finanzuebersicht` (
   `datum` datetime DEFAULT CURRENT_TIMESTAMP
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
+DROP TABLE IF EXISTS `nachhilfetreffen`;
+CREATE TABLE `nachhilfetreffen` (
+  `id` int(11) NOT NULL,
+  `paar_id` int(11),
+  `bemerkung` text COLLATE utf8_german2_ci,
+  `datum` datetime DEFAULT CURRENT_TIMESTAMP
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 --
 -- Indexes
 --
@@ -174,6 +181,9 @@ ALTER TABLE `users`
  ALTER TABLE `finanzuebersicht`
   ADD PRIMARY KEY (`id`);
 
+ALTER TABLE `nachhilfetreffen`
+  ADD PRIMARY KEY (`id`);
+
 ALTER TABLE `person` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `lehrer` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `schueler` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
@@ -185,6 +195,7 @@ ALTER TABLE `unterricht` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `users`  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 ALTER TABLE `finanzuebersicht` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `raum` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `nachhilfetreffen` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `lehrer`
 	ADD FOREIGN KEY (`pid`) REFERENCES `person` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -207,16 +218,19 @@ ALTER TABLE `fragt_nach` ADD FOREIGN KEY (`sid`) REFERENCES `schueler`(`id`) ON 
 ALTER TABLE `fragt_nach` ADD FOREIGN KEY (`fid`) REFERENCES `faecher`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE `finanzuebersicht` ADD FOREIGN KEY (`pid`) REFERENCES `person`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `finanzuebersicht` ADD FOREIGN KEY (`uid`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE `nachhilfetreffen` ADD FOREIGN KEY (`paar_id`) REFERENCES `unterricht`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
 
 DROP TABLE IF EXISTS `navigation`;
 CREATE TABLE `navigation`(
 	`kuerzel` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
 	`path` varchar(255) COLLATE utf8_unicode_ci  NOT NULL,
-	`allowed_users` enum('w','k','f','v','kf') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'w',
+	`allowed_users` enum('g','k','f','v','kf','c','a') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'w',
 	`visible` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- w - Alle dürfen auf Seite zugreifen
+-- c - customer (Schüler/Lehrer), dürfen nur auf Seiten für customer zugreifen
+-- a - alle dürfen auf Seite zugreifen (auch customer)
+-- g - Gäste dürfen auf Seite zugreifen
 -- k - BLoß Kundenbetreuer+Vorstand
 -- f - Bloß Finanzler+Vorstand
 -- v - bloß der Vorstand
@@ -237,28 +251,28 @@ ALTER TABLE `navigation`
 	
 INSERT INTO `navigation` (`kuerzel`, `path`, `allowed_users`, `visible`) VALUES
 ('change', 'scripts/inc.change.php', 'k', 1),
-('content', 'scripts/inc.content.php', 'w', 1),
+('content', 'scripts/inc.content.php', 'g', 1),
 ('input', 'scripts/inc.input.php', 'k', 1),
 ('input_paar', 'scripts/inc.input_paar.php', 'k', 1),
 ('mail', 'scripts/inc.mail.php', 'kf', 1),
-('output', 'scripts/inc.output.php', 'w', 1),
+('output', 'scripts/inc.output.php', 'g', 1),
 ('delete', 'scripts/inc.delete.php', 'k', 1),
 ('registrate', 'scripts/inc.registrate.php', 'v', 1),
 ('settings', 'scripts/inc.settings.php', 'kf', 1),
 ('user', 'scripts/inc.user.php', 'v', 1),
-('change_passwd', 'scripts/inc.change_passwd.php', 'w', 1),
+('change_passwd', 'scripts/inc.change_passwd.php', 'a', 1),
 ('person', 'scripts/inc.person.php', 'k', 1),
 ('imap', 'scripts/inc.imapmail.php', 'v', 0),
 ('info', 'includes/info.php', 'v', 0),
-('filter', 'scripts/inc.filter.php', 'w', 1),
+('filter', 'scripts/inc.filter.php', 'g', 1),
 ('create_doc', 'scripts/inc.create_doc.php', 'k',1),
-('output_person' ,'scripts/inc.output_person.php', 'w', 1),
+('output_person' ,'scripts/inc.output_person.php', 'g', 1),
 ('input_finanzen', 'scripts/inc.input_finanz.php','f',1),
-('output_finanzen', 'scripts/inc.output_finanz.php', 'w', 1),
+('output_finanzen', 'scripts/inc.output_finanz.php', 'g', 1),
 ('export_finanzen', 'scripts/inc.export_finanz.php', 'f', 1),
 ('backup_data', 'scripts/inc.backup_data.php', 'v',1),
 ('input_raum', 'scripts/inc.input_raum.php', 'k', 1),
-('output_raum', 'scripts/inc.output_raum.php', 'w', 1);
+('output_raum', 'scripts/inc.output_raum.php', 'g', 1);
 
 
 INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwort`, `account`, `createt_time`, `update_time`, `count_login`, `aktiv`) VALUES

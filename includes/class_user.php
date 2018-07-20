@@ -61,19 +61,24 @@ class user {
 				return true;
 				break;
 			case 'f':
-				if ($rights == 'w' || $rights == 'f' || $rights == 'fk' || $rights == 'kf')
+				if ($rights == 'g' || $rights == 'f' || $rights == 'fk' || $rights == 'kf' || $rights == 'a')
 					return true;
 				else
 					return false;
 				break;
 			case 'k':
-				if ($rights == 'w' || $rights == 'k' || $rights == 'fk' || $rights == 'kf')
+				if ($rights == 'g' || $rights == 'k' || $rights == 'fk' || $rights == 'kf' || $rights == 'a)
 					return true;
 				else
 					return false;
 				break;
-			case 'w':
-				if ($rights == 'w')
+			case 'g':
+				if ($rights == 'g' || $rights == 'a)
+					return true;
+				else
+					return false;
+			case 'c':
+				if ($rights == 'c' || $rights == 'a)
 					return true;
 				else
 					return false;
@@ -93,7 +98,10 @@ class user {
 			case 'k':
 				return true;
 				break;
-			case 'w':
+			case 'g':
+				return true;
+				break;
+			case 'c':
 				return true;
 				break;
 			default:
