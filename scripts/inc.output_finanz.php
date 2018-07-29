@@ -1,7 +1,6 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h1>Ausgabe der Finanzposten</h1>";
-	echo "<p>Filter:<br>";
 	$filter = array();
 	$filter[] = array(
 			'id' => 1,
@@ -46,7 +45,7 @@ if (isset($user) && $user->runscript()) {
 	$filter[] = array(
 			'id' => 6,
 			'row' => 'datum',
-			'property' => ' \'2017-01-01\' AND \'2018-01-01\'',
+			'property' => ' \'2017-01-01\' AND \'2017-12-31\'',
 			'typ' => 'dates',
 			'compare' => 'BETWEEN',
 			'label' => 'nur Einträge aus dem Jahr 2017'
@@ -54,15 +53,15 @@ if (isset($user) && $user->runscript()) {
 	$filter[] = array(
 			'id' => 7,
 			'row' => 'datum',
-			'property' => ' \'2017-08-01\' AND \'2018-07-01\'',
+			'property' => ' \''.get_first_part_year_sql().'\' AND \''.get_second_part_year_sql().'\'',
 			'typ' => 'dates',
 			'compare' => 'BETWEEN',
-			'label' => 'nur Einträge aus dem Schuljahr 2017/2018'
+			'label' => 'nur Einträge aus dem aktuellen Schuljahr '.(intval(date('Y'))-1).date('Y')
 	);
 	$filter[] = array(
 			'id' => 8,
 			'row' => 'datum',
-			'property' => ' \'2018-01-01\' AND \'2019-01-01\'',
+			'property' => ' \'2018-01-01\' AND \'2018-12-31\'',
 			'typ' => 'dates',
 			'compare' => 'BETWEEN',
 			'label' => 'nur Einträge aus dem Jahr 2018'

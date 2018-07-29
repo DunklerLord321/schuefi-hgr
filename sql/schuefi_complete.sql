@@ -112,7 +112,8 @@ CREATE TABLE `unterricht` (
   `treff_zeit_ende` time DEFAULT NULL,
   `treff_raum` varchar(50) DEFAULT NULL,
   `lehrer_dokument` varchar(50) DEFAULT NULL,
-  `schueler_dokument` varchar(50) DEFAULT NULL
+  `schueler_dokument` varchar(50) DEFAULT NULL,
+  `schuljahr` int(11) NOT NULL DEFAULT 1819
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `raum`;
@@ -257,6 +258,7 @@ INSERT INTO `navigation` (`kuerzel`, `path`, `allowed_users`, `visible`) VALUES
 ('output_finanzen', 'scripts/inc.output_finanz.php', 'w', 1),
 ('export_finanzen', 'scripts/inc.export_finanz.php', 'f', 1),
 ('backup_data', 'scripts/inc.backup_data.php', 'v',1),
+('next_year', 'scripts/inc.datenuebernahme.php', 'k', 1),
 ('input_raum', 'scripts/inc.input_raum.php', 'k', 1),
 ('output_raum', 'scripts/inc.output_raum.php', 'w', 1);
 

@@ -218,6 +218,31 @@ class person {
 		}
 	}
 	
+	function activate() {
+		if ($this->aktiv == true) {
+			return true;
+		}
+		$return = query_db("UPDATE `person` SET `aktiv` = 1 WHERE id = :id", $this->id);
+		if (!$return) {
+			return "Es trat beim Aktivieren ein Fehler auf";
+		}else{
+			return true;
+			$this->aktiv = true;
+		}
+	}
+	function deactivate() {
+		if ($this->aktiv == false) {
+			return true;
+		}
+		$return = query_db("UPDATE `person` SET `aktiv` = 0 WHERE id = :id", $this->id);
+		if (!$return) {
+			return "Es trat beim Deaktivieren ein Fehler auf";
+		}else{
+			return true;
+			$this->aktiv = true;
+		}
+	}
+	
 	function delete() {
 		if($this->aktiv == false) {
 			echo "Die Person wurde bereits gelöscht. Die Daten bleiben weiterhin erhalten, um Probleme mit der Finanztabelle zu vermeiden";
@@ -232,6 +257,7 @@ class person {
 			echo "Es trat beim Löschen ein Fehler auf";
 		}else{
 			echo "Die Person wurde erfolgreich gelöscht";
+			$this->aktiv = false;
 		}
 		
 	}

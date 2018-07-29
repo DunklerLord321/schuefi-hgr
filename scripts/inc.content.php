@@ -3,6 +3,7 @@ if (isset($user) && $user->runscript()) {
 	echo "<h2>Hauptseite</h2>";
 	echo "<h3>Anleitung/Dokumentationen</h3>";
 	echo "<h3>Kundenbetreuer</h3>";
+	echo "<a href=\"index.php?page=next_year\" class=\"links2\">Übernahme der Daten in nächstes Schuljahr</a><br>";
 	echo "<a href=\"docs/Anleitung-kunden.pdf\"class=\"links2\">Anleitung für Kundenbetreuer</a><br>";
 	echo "<h4>Vorlagen der Vermittlungsdokumente:</h4>";
 	echo "<a href=\"docs/formulare/Anmeldeformular_Lehrer.pdf\" class=\"links2\">Anmeldeformular Lehrer</a><br>";
