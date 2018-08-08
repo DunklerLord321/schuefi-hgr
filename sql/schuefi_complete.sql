@@ -10,11 +10,14 @@ USE `schuefi`;
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `vname` varchar(50) COLLATE utf8_german2_ci NOT NULL,
-  `nname` varchar(50) COLLATE utf8_german2_ci NOT NULL,
-  `email` varchar(50) COLLATE utf8_german2_ci NOT NULL,
-  `passwort` varchar(255) COLLATE utf8_german2_ci NOT NULL,
+  `person_id` int(11) DEFAULT NULL,
+  `vname` varchar(50) COLLATE utf8_german2_ci NULL,
+  `nname` varchar(50) COLLATE utf8_german2_ci NULL,
+  `email` varchar(50) COLLATE utf8_german2_ci NULL,
+  `passwort` varchar(255) COLLATE utf8_german2_ci NULL,
   `account` enum('k','f','v','g','c') COLLATE utf8_german2_ci NOT NULL DEFAULT 'g',
+  `security_token` varchar(255) COLLATE utf8_german2_ci DEFAULT NULL,
+  `security_token_time` TIMESTAMP NULL DEFAULT NULL,
   `createt_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `count_login` int(11) DEFAULT 0,
@@ -176,7 +179,8 @@ ALTER TABLE `raum`
   
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `person_id` (`person_id`);
 
  ALTER TABLE `finanzuebersicht`
   ADD PRIMARY KEY (`id`);
@@ -196,6 +200,9 @@ ALTER TABLE `users`  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT
 ALTER TABLE `finanzuebersicht` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `raum` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `nachhilfetreffen` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `users`
+  ADD FOREIGN KEY (`person_id`) REFERENCES `person` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE `lehrer`
 	ADD FOREIGN KEY (`pid`) REFERENCES `person` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -222,9 +229,10 @@ ALTER TABLE `nachhilfetreffen` ADD FOREIGN KEY (`paar_id`) REFERENCES `unterrich
 
 DROP TABLE IF EXISTS `navigation`;
 CREATE TABLE `navigation`(
+  `id` int(11) NOT NULL,
 	`kuerzel` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
 	`path` varchar(255) COLLATE utf8_unicode_ci  NOT NULL,
-	`allowed_users` enum('g','k','f','v','kf','c','a') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'w',
+	`allowed_users` enum('g','k','f','v','kf','c','a') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'g',
 	`visible` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -243,37 +251,67 @@ CREATE TABLE `navigation`(
 -- 0 = im Moment nicht sichtbar
 --
 
+DROP TABLE IF EXISTS `navigation_menu`;
+CREATE TABLE `navigation_menu`(
+                `id` int(11) NOT NULL,
+                `navigation_id` int(11),
+                `url_parameter` varchar(50) COLLATE utf8_unicode_ci NOT NULL,  
+                `is_shown_main_menu` tinyint(1) DEFAULT 1,
+                `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci; 
 
 ALTER TABLE `navigation`
-	ADD PRIMARY KEY (`kuerzel`);
+	ADD PRIMARY KEY (`id`);
+ALTER TABLE `navigation_menu`
+	ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `navigation` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `navigation_menu` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `navigation_menu` ADD FOREIGN KEY (`navigation_id`) REFERENCES `navigation`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
 
 	-- -- wenn Pfad der inc.login.php geändert wird, muss Pfad in index.php ebenfalls geändert werden
 	
-INSERT INTO `navigation` (`kuerzel`, `path`, `allowed_users`, `visible`) VALUES
-('change', 'scripts/inc.change.php', 'k', 1),
-('content', 'scripts/inc.content.php', 'g', 1),
-('input', 'scripts/inc.input.php', 'k', 1),
-('input_paar', 'scripts/inc.input_paar.php', 'k', 1),
-('mail', 'scripts/inc.mail.php', 'kf', 1),
-('output', 'scripts/inc.output.php', 'g', 1),
-('delete', 'scripts/inc.delete.php', 'k', 1),
-('registrate', 'scripts/inc.registrate.php', 'v', 1),
-('settings', 'scripts/inc.settings.php', 'kf', 1),
-('user', 'scripts/inc.user.php', 'v', 1),
-('change_passwd', 'scripts/inc.change_passwd.php', 'a', 1),
-('person', 'scripts/inc.person.php', 'k', 1),
-('imap', 'scripts/inc.imapmail.php', 'v', 0),
-('info', 'includes/info.php', 'v', 0),
-('filter', 'scripts/inc.filter.php', 'g', 1),
-('create_doc', 'scripts/inc.create_doc.php', 'k',1),
-('output_person' ,'scripts/inc.output_person.php', 'g', 1),
-('input_finanzen', 'scripts/inc.input_finanz.php','f',1),
-('output_finanzen', 'scripts/inc.output_finanz.php', 'g', 1),
-('export_finanzen', 'scripts/inc.export_finanz.php', 'f', 1),
-('backup_data', 'scripts/inc.backup_data.php', 'v',1),
-('input_raum', 'scripts/inc.input_raum.php', 'k', 1),
-('output_raum', 'scripts/inc.output_raum.php', 'g', 1);
+INSERT INTO `navigation` (`id`, `kuerzel`, `path`, `allowed_users`, `visible`) VALUES
+(1, 'change', 'scripts/inc.change.php', 'k', 1),
+(2, 'content', 'scripts/inc.content.php', 'g', 1),
+(3, 'input', 'scripts/inc.input.php', 'k', 1),
+(4, 'input_paar', 'scripts/inc.input_paar.php', 'k', 1),
+(5, 'mail', 'scripts/inc.mail.php', 'kf', 1),
+(6, 'output', 'scripts/inc.output.php', 'g', 1),
+(7, 'delete', 'scripts/inc.delete.php', 'k', 1),
+(8, 'registrate', 'scripts/inc.registrate.php', 'v', 1),
+(9, 'settings', 'scripts/inc.settings.php', 'kf', 1),
+(10, 'user', 'scripts/inc.user.php', 'v', 1),
+(11, 'change_passwd', 'scripts/inc.change_passwd.php', 'a', 1),
+(12, 'person', 'scripts/inc.person.php', 'k', 1),
+(13, 'imap', 'scripts/inc.imapmail.php', 'v', 0),
+(14, 'info', 'includes/info.php', 'v', 0),
+(15, 'filter', 'scripts/inc.filter.php', 'g', 1),
+(16, 'create_doc', 'scripts/inc.create_doc.php', 'k',1),
+(17, 'output_person' ,'scripts/inc.output_person.php', 'g', 1),
+(18, 'input_finanzen', 'scripts/inc.input_finanz.php','f',1),
+(19, 'output_finanzen', 'scripts/inc.output_finanz.php', 'g', 1),
+(20, 'export_finanzen', 'scripts/inc.export_finanz.php', 'f', 1),
+(21, 'backup_data', 'scripts/inc.backup_data.php', 'v',1),
+(22, 'input_raum', 'scripts/inc.input_raum.php', 'k', 1),
+(23, 'output_raum', 'scripts/inc.output_raum.php', 'g', 1),
+(24, 'customer_meetings', 'scripts/inc.customer_meetings.php', 'c', 1);
 
+ INSERT INTO `navigation_menu`( `id`, `navigation_id`, `url_parameter`,  `is_shown_main_menu`, `title`) VALUES 
+(1, 12, '', 1, 'Neue Person'),
+(2, 3, 'schueler=1', 1, 'Neuer Nachhilfeschüler'),
+(3, 3, 'lehrer=1', 1, 'Neuer Nachhilfelehrer'),
+(4, 4, '', 1, 'Neues Nachhilfepaar'),
+(5, 17, '', 1, 'Ausgeben der Personen'),
+(6, 6, 'schueler=1', 1, 'Ausgeben der Schüler'),
+(7, 6, 'lehrer=1', 1, 'Ausgeben der Lehrer'),
+(8, 6, 'paare=1', 1, 'Ausgeben der Paare'),
+(9, 5, '', 1, 'Sende E-Mail'),
+(10, 18, '', 1, 'Eingabe Finanzposten'),
+(11, 19, '', 1, 'Ausgeben der Finanzposten'),
+(12, 15, '', 1, 'Filtern'),
+(13,  23, '', 1, 'Ausgeben der Raumbelegung'), 
+(14, 22, '', 1, 'Eingabe der Raumbelegung');
 
 INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwort`, `account`, `createt_time`, `update_time`, `count_login`, `aktiv`) VALUES
 (6,	'Extern',	'Systemaufgaben',	'system@system.de',	'$2y$10$bFI39TeqDc.6LpF777nHc.f1wOWYDx9fhqBk3tBXgD4z3Mcou5fJW',	'k',	'2018-02-21 09:46:43',	'2018-02-21 09:46:43',	0,	1),

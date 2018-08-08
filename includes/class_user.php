@@ -7,6 +7,8 @@ class user {
 	protected $account;
 	private $hash_password;
 	private $count_login_trys;
+	public $security_token;
+	public $security_token_time;
 	private $error;
 	private $run_script;
 	private $logfile;
@@ -67,18 +69,18 @@ class user {
 					return false;
 				break;
 			case 'k':
-				if ($rights == 'g' || $rights == 'k' || $rights == 'fk' || $rights == 'kf' || $rights == 'a)
+				if ($rights == 'g' || $rights == 'k' || $rights == 'fk' || $rights == 'kf' || $rights == 'a')
 					return true;
 				else
 					return false;
 				break;
 			case 'g':
-				if ($rights == 'g' || $rights == 'a)
+				if ($rights == 'g' || $rights == 'a')
 					return true;
 				else
 					return false;
 			case 'c':
-				if ($rights == 'c' || $rights == 'a)
+				if ($rights == 'c' || $rights == 'a')
 					return true;
 				else
 					return false;
@@ -109,6 +111,30 @@ class user {
 		}
 		return false;
 	}
+  function is_admin() {
+          $admins = get_xml("admin", "value");
+          if ( strstr($admins, $user->getemail() ) == false ) {
+                  return false;
+          } else {
+                  return true;
+          }
+  }
+	function add_reference_to_person($person_id) {
+		$return = query_db("SELECT * FROM `person` WHERE id = :person_id", $person_id);
+		$return = $return->fetch();
+		if ($return === false) {
+			echo "Es existiert kein Nutzer mit dieser ID";
+			return false;
+		}
+		$return = query_db("INSERT INTO `users` (person_id, account) VALUES (:person_id, :account)", $person_id, 'c');
+		if ($return) {
+			return true;
+		}else {
+			echo 'Beim Abspeichern ist leider ein Fehler aufgetreten<br>';
+			return false;
+		}
+	}
+	
 	function adduser($vname, $nname, $email, $passwort, $passwort2, $type = 'k') {
 		$error = '';
 		if (strlen($vname) == 0 || strlen($vname) > 49) {
@@ -155,25 +181,34 @@ class user {
 	}
 	
 	// Holt alle Informationen über Nutzer aus DB, wenn angegebene E-Mail existiert
-	function setmail($m_mail) {
+	function load_user($m_mail, $uid = -1) {
 		if (!function_exists("query_db")) {
 			require 'includes/functions.inc.php';
 		}
-		$this->email = $m_mail;
-		$result = query_db("SELECT * FROM users WHERE email = :email AND aktiv = 1", $this->email);
+		if ($uid != -1) {
+			$result = query_db("SELECT * FROM users WHERE id = :id AND aktiv = 1", $uid);			
+		}else{
+			$result = query_db("SELECT * FROM users WHERE email = :email AND aktiv = 1", $m_mail);
+		}
 		$user = $result->fetch();
-		if ($user !== false) {
+		if ($user === false) {
+			$result = query_db("SELECT users.*, person.vname, person.nname, person.email FROM person LEFT JOIN users on users.person_id = person.id WHERE person.email = :email", $m_mail);
+			$user = $result->fetch();
+			if ($user === false) {
+				$this->error = 'Das Passwort oder die E-Mail-Adresse war leider falsch';
+				return false;
+			}
+		}
+			$this->email = $user['email'];
 			$this->vname = $user['vname'];
 			$this->nname = $user['nname'];
 			$this->account = $user['account'];
 			$this->hash_password = $user['passwort'];
 			$this->id = $user['id'];
 			$this->count_login_trys = intval($user['count_login']);
+			$this->security_token = $user['security_token'];
+			$this->security_token_time = $user['security_token_time'];
 			return true;
-		}else {
-			$this->error = Das Passwort oder die E-Mail-Adresse war leider falsch;
-			return false;
-		}
 	}
 	
 	/*
@@ -270,6 +305,40 @@ class user {
 		}
 	}
 	
+	function validate_security_token($token) {
+		if (!$this->has_security_code()) {
+			$this->error = 'Es wurde keine Registrierung mit dieser E-Mail-Addresse erlaubt';
+			return false;
+		}
+		if ($this->security_token_time === null || strtotime($this->security_token_time) < (time()-3*24*3600)) {
+			$this->error = 'Der Link zur Registrierung ist veraltet';
+			return false;
+		}
+		if (sha1($token) != $this->security_token) {
+			$this->error = "Der übergebene Code zur Registrierung war ungültig. Stelle sicher, dass du genau den Link kopiert hast";
+			return false;
+		}
+	}
+	
+	function create_security_token() {
+		$passwortcode = random_string();
+		$result = query_db("UPDATE users SET security_token = :security_token, security_token_time = NOW() WHERE id = :userid", sha1($passwortcode), $this->id);
+
+		$url_passwortcode = 'https://localhost/schuefi/index.php?page=login&reset_password=1&userid='.$this->id.'&code='.$passwortcode;
+		$text = 'Hallo '.$this->vname.',
+		für deinen Account auf www.php-einfach.de wurde nach einem neuen Passwort gefragt. Um ein neues Passwort zu vergeben, rufe innerhalb der nächsten 24 Stunden die folgende Website auf:
+		'.$url_passwortcode.'
+
+		Sollte dir dein Passwort wieder eingefallen sein oder hast du dies nicht angefordert, so bitte ignoriere diese E-Mail.
+
+		Viele Grüße,
+		dein PHP-Einfach.de-Team';
+
+		mail("jo12ya29@posteo.de", "Neues Password", $text, "jo12ya29@posteo.de");
+
+	}
+
+	
 	/*
 	 * Benachrichtige bei 5 falschen Anmeldeversuchen automatisch Admin(s)
 	 */
@@ -280,6 +349,7 @@ class user {
 		// $mail->isSMTP();
 		$mail->Host = 'mail.gmx.net';
 		$mail->SMTPAuth = true;
+		// TODO an xml anpassen
 		$mail->Username = $GLOBAL_CONFIG['mail_address'];
 		$mail->Password = $GLOBAL_CONFIG['mail_passwd'];
 		$mail->SMTPSecure = 'tls';
@@ -314,10 +384,35 @@ class user {
 		return $this->error;
 		$reset ?: $this->error;
 	}
+	function has_security_code() {
+		if (strlen($this->security_token) > 0 && strlen($this->security_token_time) > 0) {
+			return true;
+		}else{
+			return false;
+		}
+	}
 	function is_valid() {
 		if (strlen($this->vname) > 0 && strlen($this->nname) > 0 && strlen($this->email) > 0 && strlen($this->account) > 0 && $this->id !== 0) {
 			return true;
 		}else {
+			return false;
+		}
+	}
+	function exists($m_mail) {
+		$return = query_db("SELECT * FROM users WHERE email = :email", $m_mail);
+		$result = $return->fetch();
+		if ($result !== false) {
+			return true;
+		}else{
+			return false;
+		}
+	}
+	function has_reference_to_person($person_id) {
+		$return = query_db("SELECT * FROM users WHERE person_id = :person_id", $person_id);
+		$result = $return->fetch();
+		if ($result !== false) {
+			return true;
+		}else{
 			return false;
 		}
 	}
