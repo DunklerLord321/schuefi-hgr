@@ -22,7 +22,7 @@ function warn(string) {
 		}else {
 			echo "Ansicht: <a href=\"index.php?page=output&lehrer=1&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&lehrer=1&layout=table\" class=\"links2\">Tabelle</a><br><br>";
 			$return = query_db("SELECT `lehrer`.*, `person`.`nname`, u.zahl_schueler FROM `lehrer` LEFT JOIN `person` ON `person`.`id` = `lehrer`.`pid` LEFT JOIN (SELECT unterricht.lid, COUNT(unterricht.lid) AS zahl_schueler FROM unterricht
-        						GROUP BY unterricht.lid) AS u ON u.lid = lehrer.id WHERE `schuljahr` = '1718' GROUP BY `person`.`nname`, `lehrer`.`id` ASC  ", get_current_year());
+        						GROUP BY unterricht.lid) AS u ON u.lid = lehrer.id WHERE `schuljahr` = :schuljahr GROUP BY `person`.`nname`, `lehrer`.`id` ASC  ", get_current_year());
 		}
 		if ($return === false) {
 			echo "Ein Problem";
@@ -61,7 +61,7 @@ function warn(string) {
 					}
 					echo "</td>";
 					if (strlen($lehrer->get_comment()) > 0) {
-						echo "<td>" . $lehrer->get_comment()."</td>";
+						echo "<td style=\"word-wrap: break-word; width:20%;\">" . $lehrer->get_comment()."</td>";
 					}else{
 						echo "<td>Kein Kommentar</td>";
 					}
@@ -300,20 +300,20 @@ function warn(string) {
 	if (isset($_GET['paare']) && $_GET['paare'] == 1) {
 		require 'includes/class_paar.php';
 		echo "Ansicht: <a href=\"index.php?page=output&paare=1&layout=list\" class=\"links2\">Liste</a> oder <a href=\"index.php?page=output&paare=1&layout=table\" class=\"links2\">Tabelle</a><br><br>";
-			if(isset($_GET['filter'])) {
-			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.id = :id", get_current_year(), $_GET['filter']);
+		if(isset($_GET['filter'])) {
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE unterricht.schuljahr = :jahr AND unterricht.id = :id", get_current_year(), $_GET['filter']);
 			echo "<a href=\"index.php?page=output&paare=1\" class=\"links2\">Ausgabe aller Paare ohne Filterung</a><br><br>";
 		}else if (isset($_GET['raumfilter'])) {
-			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.rid = :rid", get_current_year(), $_GET['raumfilter']);
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE unterricht.schuljahr = :jahr AND unterricht.rid = :rid", get_current_year(), $_GET['raumfilter']);
 			echo "<a href=\"index.php?page=output&paare=1\" class=\"links2\">Ausgabe aller Paare ohne Filterung</a><br><br>";
 		}else if(isset($_GET['lehrerfilter'])) {
-			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.lid = :lid", get_current_year(), $_GET['lehrerfilter']);
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE unterricht.schuljahr = :jahr AND unterricht.lid = :lid", get_current_year(), $_GET['lehrerfilter']);
 			echo "<a href=\"index.php?page=output&paare=1\" class=\"links2\">Ausgabe aller Paare ohne Filterung</a><br><br>";
 		}else if(isset($_GET['schuelerfilter'])) {
-			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = :jahr AND unterricht.sid = :sid", get_current_year(), $_GET['schuelerfilter']);
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE unterricht.schuljahr = :jahr AND unterricht.sid = :sid", get_current_year(), $_GET['schuelerfilter']);
 			echo "<a href=\"index.php?page=output&paare=1\" class=\"links2\">Ausgabe aller Paare ohne Filterung</a><br><br> ";
 		}else{
-			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE lehrer.schuljahr = '" . get_current_year() . "';");
+			$return = query_db("SELECT unterricht.* FROM `unterricht` LEFT JOIN lehrer ON unterricht.lid = lehrer.id WHERE unterricht.schuljahr = '" . get_current_year() . "';");
 		}
 		if (isset($_GET['layout']) && $_GET['layout'] == "table") {
 			set_view("table");
@@ -391,9 +391,13 @@ function warn(string) {
 				echo "</table></div><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b><br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers ändern.";
 				echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten des Schülers löschen.";
 				echo "<br>Wenn du auf <img src=\"img/png_refresh_24_24.png\" alt=\"Erneut erstellen\" style=\"width:13px;\"> klickst, kannst du das Vermittlungsdokument erneut erstellen, falls sich Daten geändert haben sollten.";
-				echo "<br><a href=\"index.php?page=create_doc&renew_docs=1\" class=\"links2\">Alle Vermittlungsdokumente erneuern</a>";
+				if(!isset($_GET['filter']) && !isset($_GET['lehrerfilter']) && !isset($_GET['schuelerfilter']) && !isset($_GET['raumfilter'])) {
+					echo "<br><a href=\"index.php?page=create_doc&renew_docs=1\" class=\"links2\">Alle Vermittlungsdokumente erneuern</a>";
+				}
 			}else{
-				echo "<a href=\"index.php?page=create_doc&renew_docs=1\" class=\"links2\">Alle Vermittlungsdokumente erneuern</a>";
+				if(!isset($_GET['filter']) && !isset($_GET['lehrerfilter']) && !isset($_GET['schuelerfilter']) && !isset($_GET['raumfilter'])) {
+					echo "<a href=\"index.php?page=create_doc&renew_docs=1\" class=\"links2\">Alle Vermittlungsdokumente erneuern</a>";
+				}
 				echo "<br><br><span style=\"float:right;\">$count Datensätze</span><br><br>";
 			}
 		}

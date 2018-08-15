@@ -339,7 +339,12 @@ if (isset($user) && $user->runscript()) {
 
 				</script>
 <div class="formular_class">
-	<form action="?page=change&change=<?php if(isset($_GET['schueler'])){echo "2";}if(isset($_GET['lehrer'])){echo "3";}?>" method="POST">
+	<?php if(isset($_GET['prev']) && $_GET['prev'] == "next_year") {
+		echo "<form action=\"?page=input&prev=next_year&input=".(isset($_GET['schueler']) ?"1":"2")."\" method=\"POST\">";
+	}else{
+		echo "<form action=\"?page=change&change=".(isset($_GET['schueler']) ?"2":"3")."\" method=\"POST\">";
+	}
+	?>
 		<fieldset style="padding: 40px;">
 			<legend>
 				<b><?php if(isset($_GET['schueler'])){echo "Nachhilfeschüler";}if(isset($_GET['lehrer'])){echo "Nachhilfelehrer";}?></b>
@@ -349,7 +354,12 @@ if (isset($user) && $user->runscript()) {
 				<b><?php echo $sl->person->vname.' '.$sl->person->nname;?></b>
 			</p>
 			<input type="hidden" value="<?php if(isset($_GET['schueler'])){echo $_GET['schueler'];}if(isset($_GET['lehrer'])){echo $_GET['lehrer'];}?>" name="id">
-			Klassenstufe (5-12):
+			<input type="hidden" value="<?php echo $sl->person->id;?>" name="person">
+			<?php if(isset($_GET['prev']) && $_GET['prev'] == "next_year") {
+				echo "Daten im letzten Schuljahr:".format_klassenstufe_kurs($sl->get_klassenstufe(), $sl->get_klasse());
+				echo "<br>Klassenlehrer:".$sl->get_klassenlehrer();
+			}?>
+			<br><br>Klassenstufe (5-12):
 			<span style="float: right; width: 50%;">Klasse/Kurs (a, b, c, d, L, L1, L2):</span>
 			<br>
 			<input type="number" name="klassenstufe" min="5" max="12" required style="width: 40%;" value="<?php echo $sl->get_klassenstufe();?>" class="input_text">
@@ -462,7 +472,7 @@ if (isset($user) && $user->runscript()) {
 			<br>
 			<br>
 			<br>
-			<input type="submit" value="Ändern" style="float: right;" class="mybuttons">
+			<input type="submit" value="<?php echo (isset($_GET['prev'])?"Übernahme in nächstes Jahr":"Ändern" );?>" style="float: right;" class="mybuttons">
 		</fieldset>
 	</form>
 </div>

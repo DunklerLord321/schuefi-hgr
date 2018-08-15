@@ -20,7 +20,7 @@ class lehrer {
 	 */
 	function __construct(int $pid, int $id = -1) {
 		if ($id != -1) {
-			$return = query_db("SELECT * FROM `lehrer` WHERE id = :lid AND schuljahr = :schuljahr", $id, get_current_year());
+			$return = query_db("SELECT * FROM `lehrer` WHERE id = :lid", $id);
 			$lehrer = $return->fetch();
 			if ($lehrer) {
 				$this->id = $lehrer['id'];
@@ -324,5 +324,18 @@ class lehrer {
 		}
 		
 		
+	}
+	
+	function exists_in_current_year() {
+		$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :year;", $this->person->id, get_current_year());
+		if(!$return) {
+			return false;
+		}
+		$result = $return->fetch();
+		if($result === false) {
+			return false;
+		}else{
+			return true;
+		}
 	}
 }
