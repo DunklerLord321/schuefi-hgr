@@ -20,6 +20,9 @@ function create_list_entry_for_menu($row, $current_page) {
 
 function show_main_navigation($current_page) {
   global $user;
+  if ($user->getaccount() == 'c') {
+    return true;
+  }
   ?>
 <nav>
   <div id="nav_div">

@@ -191,10 +191,18 @@ class user {
 			$result = query_db("SELECT * FROM users WHERE email = :email AND aktiv = 1", $m_mail);
 		}
 		$user = $result->fetch();
-		if ($user === false) {
-			$result = query_db("SELECT users.*, person.vname, person.nname, person.email FROM person LEFT JOIN users on users.person_id = person.id WHERE person.email = :email", $m_mail);
+		if ($user === false || strlen($user['email']) == 0) {
+			if ($uid != -1) {
+				$result = query_db("SELECT users.*, person.vname, person.nname, person.email FROM person LEFT JOIN users on users.person_id = person.id WHERE users.id = :uid", $uid);
+			}else{
+				$result = query_db("SELECT users.*, person.vname, person.nname, person.email FROM person LEFT JOIN users on users.person_id = person.id WHERE person.email = :email", $m_mail);
+			}
 			$user = $result->fetch();
-			if ($user === false) {
+			if ($user === false || $user['id'] == NULL) {
+				if ($user['id'] == NULL) {
+					//TODO log ohne Login
+//					$user->log(LEVEL_ERROR, "Ein Nutzer ohne korrekten Login versucht, sich anzumelden".$m_mail);
+				}
 				$this->error = 'Das Passwort oder die E-Mail-Adresse war leider falsch';
 				return false;
 			}
@@ -245,7 +253,7 @@ class user {
 		for ($i = (count($debug) - 1); $i >= 0; $i--) {
 			$string .= "{" . $debug[$i]['file'] . ":" . $debug[$i]['line'] . "-" . $debug[$i]['function'];
 			if (count($debug[$i]['args']) > 0) {
-				if ($debug[$i]['function'] == "testpassword") {
+				if ($debug[$i]['function'] == "testpassword" || $debug[$i]['function'] == "reset_password" || $debug[$i]['function'] == "neuespassword") {
 					$string .= "[*****]";
 				}else {
 					$string .= "[" . implode("_", $debug[$i]['args']) . "]";
@@ -277,14 +285,6 @@ class user {
 		}
 	}
 	function neuespassword($passwortaktuell, $password_neu, $password_neu2) {
-		if (strlen($password_neu) < 4) {
-			$this->error = 'Das neue Passwort muss mindestens 4 Zeichen lang sein';
-			return false;
-		}
-		if ($password_neu != $password_neu2) {
-			$this->error = 'Die beiden Passwörter müssen übereinstimmen';
-			return false;
-		}
 		if ($password_neu == $passwortaktuell) {
 			$this->error = 'Das neue Passwort darf nicht mit dem alten Passwort übereinstimmen';
 			return false;
@@ -293,16 +293,32 @@ class user {
 			$this->error = 'Das alte Passwort war leider falsch';
 			return false;
 		}
+		if (!$this->reset_password($password_neu, $password_neu2)) {
+			return false;
+		}
+		return true;
+	}
+	
+	function reset_password($password_neu, $password_neu2) {
+		if (strlen($password_neu) < 4) {
+			$this->error = 'Das neue Passwort muss mindestens 4 Zeichen lang sein';
+			return false;
+		}
+		if ($password_neu != $password_neu2) {
+			$this->error = 'Die beiden Passwörter müssen übereinstimmen';
+			return false;
+		}
 		$passwort_hash = password_hash($password_neu, PASSWORD_DEFAULT);
 		$return = query_db("UPDATE `users` SET passwort = :passwort_hash, `update_time` = CURRENT_TIME() WHERE id = :id", $passwort_hash, $this->id);
 		if ($return) {
 			$this->log(user::LEVEL_NOTICE, "Passwort erfolgreich geändert");
+			$this->error = 'Passwort erfolgreich gespeichert';
 			return true;
 		}else {
 			$this->error = 'Ein Datenbankfehler ist aufgetreten';
 			$this->log(user::LEVEL_WARNING, "DB-Fehler bei Passwortänderung");
 			return false;
-		}
+		}		
 	}
 	
 	function validate_security_token($token) {
@@ -318,23 +334,58 @@ class user {
 			$this->error = "Der übergebene Code zur Registrierung war ungültig. Stelle sicher, dass du genau den Link kopiert hast";
 			return false;
 		}
+		return true;
+	}
+	
+	function delete_security_token() {
+		$result = query_db("UPDATE users SET security_token = NULL, security_token_time = NULL WHERE id = :userid", $this->id);
+		if ($result === false) {
+			return false;
+		}else{
+			return true;
+		}		
 	}
 	
 	function create_security_token() {
+		global $GLOBAL_CONFIG;
 		$passwortcode = random_string();
 		$result = query_db("UPDATE users SET security_token = :security_token, security_token_time = NOW() WHERE id = :userid", sha1($passwortcode), $this->id);
 
-		$url_passwortcode = 'https://localhost/schuefi/index.php?page=login&reset_password=1&userid='.$this->id.'&code='.$passwortcode;
+		require 'extensions/mail/PHPMailer-master/PHPMailerAutoload.php';
+		$mail = new PHPMailer();
+		$mail->Host = 'mail.gmx.net';
+		$mail->SMTPAuth = true;
+		// TODO an xml anpassen
+		$mail->Username = $GLOBAL_CONFIG['mail_address'];
+		$mail->Password = $GLOBAL_CONFIG['mail_passwd'];
+		$mail->SMTPSecure = 'tls';
+		$mail->Port = 587;
+		$mail->isHTML(True);
+		$mail->CharSet = 'utf-8';
+		$mail->SetLanguage("de");
+		
+		$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
+		// $mail->addAddress($this->email);
+		$mail->addAddress("jo12ya29@posteo.de");
+		
+		$url_passwortcode = 'https://localhost/schuefi/index.php?reset_password=1&userid='.$this->id.'&security_token='.$passwortcode;
 		$text = 'Hallo '.$this->vname.',
-		für deinen Account auf www.php-einfach.de wurde nach einem neuen Passwort gefragt. Um ein neues Passwort zu vergeben, rufe innerhalb der nächsten 24 Stunden die folgende Website auf:
+		vielen Dank für deine Anmeldung bei der Schülerfirma "Schüler helfen Schülern"!
+		
+		
 		'.$url_passwortcode.'
 
 		Sollte dir dein Passwort wieder eingefallen sein oder hast du dies nicht angefordert, so bitte ignoriere diese E-Mail.
 
 		Viele Grüße,
-		dein PHP-Einfach.de-Team';
+		deine Schülerfirma';
 
-		mail("jo12ya29@posteo.de", "Neues Password", $text, "jo12ya29@posteo.de");
+		$mail->Subject = 'Schuelerfirma HGR - Registrierung von ' . $this->vname . ' ' . $this->nname;
+		$mail->Body = $text;
+		echo $text;
+		if (!$mail->send()) {
+			echo $mail->ErrorInfo;
+		}
 
 	}
 

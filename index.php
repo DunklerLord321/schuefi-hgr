@@ -81,8 +81,13 @@ if (isset($_GET['page'])) {
 		}else {
 			echo "class=\"navigation_li\"";
 		}
-		?> href="index.php?page=content">Hauptseite</a>
-			<a <?php
+		if ($user->getaccount() == 'c') {
+			?> href="index.php?page=customer_meetings">Hauptseite</a>
+				<a <?php			
+		}else{
+			?> href="index.php?page=content">Hauptseite</a>
+				<a <?php
+		}
 		if (strcmp($active, "change_passwd") == 0) {
 			echo "class=\"navigation_active\"";
 		}else {

@@ -1,6 +1,16 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h2>Ausgabe</h2>";
+	if (isset($_GET['send_registrate_link']) && isset($_GET['person_id'])) {
+		require 'includes/class_person.php';
+		$person = new person();
+		$person->load_person($_GET['person_id']);
+		if (!$person->user->has_reference_to_person($person->id)) {
+			die("Der Login wurde der Person noch nicht ermöglicht!");
+		}
+		$person->user->create_security_token();
+		die();
+	}
 	?>
 	<script type="text/javascript">
 function warn(string) {
@@ -88,6 +98,9 @@ function warn(string) {
 				echo "<div style=\"padding-left: 10%;\">";
 				echo "<br><br><a href=\"index.php?page=output&schueler=1&filter=" . $person->id . "\" class=\"links2\">$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet</a></div>";
 			}
+			if ($person->user->has_security_code()) {
+				echo "<br><br>Der Person wurde bereits ein Registrierungslink gesendet, der bis zum ".date("d.m.y H:i",strtotime($person->user->security_token_time)+3*24*3600)." gültig ist.";
+			}
 			?>
 		</div>
 		<?php
@@ -97,6 +110,11 @@ function warn(string) {
 		<div style="width: 30%;">
 			<a href="index.php?page=change&person=<?php echo $person->id;?>" class="links">Ändere die Daten</a><br><br><br>
 			<a href="index.php?page=delete&person=1&delete=<?php echo $person->id;?>" class="links" onclick="return warn('Willst du die Person wirklich löschen?')">Löschen</a>
+			<?php 
+			if (!$person->user->has_security_code()) {
+				echo '<a href="index.php?page=output_person&send_registrate_link=1&person_id='.$person->id.'" class="links">Sende Registrierungslink</a><br><br>';
+			}
+			?>
 		</div>	
 		<?php }
 			}else{

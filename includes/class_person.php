@@ -141,6 +141,7 @@ class person {
 		if ($ret_prepp) {
 			$schueler = $ret_prepp->fetch();
 		}
+		//Nur ein Eintrag je schueler- und lehrer-Tabelle auf eine Person und ein Jahr gesehen möglich
 		if (isset($lehrer) && isset($schueler)) {
 			return array(
 					'lehrer' => $lehrer, 

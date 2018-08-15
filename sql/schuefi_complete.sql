@@ -144,6 +144,8 @@ DROP TABLE IF EXISTS `nachhilfetreffen`;
 CREATE TABLE `nachhilfetreffen` (
   `id` int(11) NOT NULL,
   `paar_id` int(11),
+  `sid` int(11),
+  `lid` int(11),
   `bemerkung` text COLLATE utf8_german2_ci,
   `datum` datetime DEFAULT CURRENT_TIMESTAMP
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
@@ -226,6 +228,8 @@ ALTER TABLE `fragt_nach` ADD FOREIGN KEY (`fid`) REFERENCES `faecher`(`id`) ON D
 ALTER TABLE `finanzuebersicht` ADD FOREIGN KEY (`pid`) REFERENCES `person`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `finanzuebersicht` ADD FOREIGN KEY (`uid`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
 ALTER TABLE `nachhilfetreffen` ADD FOREIGN KEY (`paar_id`) REFERENCES `unterricht`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE `nachhilfetreffen` ADD FOREIGN KEY (`sid`) REFERENCES `schueler`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
+ALTER TABLE `nachhilfetreffen` ADD FOREIGN KEY (`lid`) REFERENCES `lehrer`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE; 
 
 DROP TABLE IF EXISTS `navigation`;
 CREATE TABLE `navigation`(
