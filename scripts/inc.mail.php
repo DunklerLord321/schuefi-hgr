@@ -48,7 +48,7 @@ if (isset($user) && $user->runscript()) {
 				$mail->addAttachment(get_xml("attachement/agb/path","value"), get_xml("attachement/agb/displayed-name","value"));
 				$mail->addAttachment(get_xml("attachement/lehrernachweis/path","value"), get_xml("attachement/lehrernachweis/displayed-name","value"));
 				$mail->addAttachment(get_xml("dirs/doc","value") . $_SESSION['lehrermail']['anhang'], "Vermittlungsdokument.pdf");
-				echo get_xml("dirs/doc","value") . $_SESSION['lehrermail']['anhang'];
+				//				echo get_xml("dirs/doc","value") . $_SESSION['lehrermail']['anhang'];
 				$mail->Body = $_SESSION['lehrermail']['text'];
 				$mail->Subject = $_SESSION['lehrermail']['betreff'];
 				if (!$mail->send()) {
@@ -153,9 +153,26 @@ if (isset($user) && $user->runscript()) {
 				echo "EIN PROBLEM";
 			}else {
 				?>
+				<script type="text/javascript">
+			$(function() {
+				$("A[href='#select_all_teacher']").click(function() {
+					$(".teacher").prop('checked',true);
+				});
+				$("A[href='#select_all_student']").click(function() {
+					$(".student").prop('checked',true);
+				});
+				$("A[href='#select_none_teacher']").click(function() {
+					$(".teacher").prop('checked',false);
+				});
+				$("A[href='#select_none_student']").click(function() {
+					$(".student").prop('checked',false);
+				});
+			});
+			</script>
 				<div style="display: inline-block; width: 30%;">
 			<br>
 			<br>Nachhilfelehrer:<?php
+			echo "<br><br><a href=\"#select_all_teacher\" class=\"mybuttons\">Alle auswählen</a><a href=\"#select_none_teacher\" class=\"mybuttons\">Alle abwählen</a><br><br>";
 				while ($result) {
 					$person->load_person($result['id']);
 					$lehrerschueler = $person->search_lehrer_schueler();
@@ -166,9 +183,9 @@ if (isset($user) && $user->runscript()) {
 						$lehrer->load_lehrer_pid();
 						
 						if (isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest-' . $i]) && $_SESSION['mail_step2']['dest-' . $i] == $person->id . "-" . $person->email) {
-							echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							echo "<br><label><input type=\"checkbox\" class=\"teacher\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 						}else {
-							echo "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							echo "<br><label><input type=\"checkbox\" class=\"teacher\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 						}
 					}
 					if (is_array($lehrerschueler['schueler'])) {
@@ -177,9 +194,9 @@ if (isset($user) && $user->runscript()) {
 						$schueler->load_schueler_pid();
 						
 						if (isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest-' . $i]) && $_SESSION['mail_step2']['dest-' . $i] == $person->id . "-" . $person->email) {
-							$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							$schueler_output .= "<br><label><input type=\"checkbox\" class=\"student\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 						}else {
-							$schueler_output .= "<br><label><input type=\"checkbox\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							$schueler_output .= "<br><label><input type=\"checkbox\" class=\"student\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
 						}
 					}
 					// var_dump($lehrer);
@@ -192,6 +209,7 @@ if (isset($user) && $user->runscript()) {
 		<div style="display: inline-block; width: 30%;">
 			<br>
 			<br>Nachhilfeschüler:<?php
+			echo "<br><br><a href=\"#select_all_student\" class=\"mybuttons\">Alle auswählen</a><a href=\"#select_none_student\" class=\"mybuttons\">Alle abwählen</a><br><br>";
 			echo $schueler_output;
 			echo "</div>";
 		}else {

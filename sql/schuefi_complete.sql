@@ -115,7 +115,8 @@ CREATE TABLE `unterricht` (
   `treff_zeit_ende` time DEFAULT NULL,
   `treff_raum` varchar(50) DEFAULT NULL,
   `lehrer_dokument` varchar(50) DEFAULT NULL,
-  `schueler_dokument` varchar(50) DEFAULT NULL
+  `schueler_dokument` varchar(50) DEFAULT NULL,
+  `schuljahr` int(11) NOT NULL DEFAULT 1819
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `raum`;
@@ -275,6 +276,7 @@ ALTER TABLE `navigation_menu` ADD FOREIGN KEY (`navigation_id`) REFERENCES `navi
 
 	-- -- wenn Pfad der inc.login.php geändert wird, muss Pfad in index.php ebenfalls geändert werden
 	
+
 INSERT INTO `navigation` (`id`, `kuerzel`, `path`, `allowed_users`, `visible`) VALUES
 (1, 'change', 'scripts/inc.change.php', 'k', 1),
 (2, 'content', 'scripts/inc.content.php', 'g', 1),

@@ -110,11 +110,40 @@ function get_current_year() {
 	// echo "<br><br>".$year;
 	return $year;
 }
+function get_last_year() {
+	$year = intval(date('y'))-1;
+	$comp_date = intval(date('md'));
+	// vor oder nach 1.8. ?
+	if ($comp_date > 801) {
+		$year = $year * 100 + $year + 1;
+	}else {
+		$year = (($year - 1) * 100) + $year;
+	}
+	return $year;	
+}
 function format_klassenstufe_kurs($klassenstufe, $klasse) {
 	if (is_numeric($klasse)) {
 		return $klassenstufe . "/" . $klasse;
 	}else {
 		return $klassenstufe . $klasse;
+	}
+}
+function get_first_part_year_sql() {
+	$comp_date = intval(date('md'));
+	if ($comp_date > 801) {
+		return date('Y').'-07-31';
+	}else{
+		$year = intval(date('Y'));
+		return (($year-1).'-08-01');
+	}
+}
+function get_second_part_year_sql() {
+	$comp_date = intval(date('md'));
+	if ($comp_date > 801) {
+		$year = intval(date('Y'));
+		return (($year+1).'-08-01');
+	}else{
+		return date('Y').'-07-31';
 	}
 }
 

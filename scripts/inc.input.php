@@ -21,6 +21,9 @@ if (isset($user) && $user->runscript()) {
 				'comment' => $_POST['comment']
 		);
 		$schueler = new schueler($_POST['person']);
+		if(isset($_GET['prev']) && $_GET['prev'] == "next_year") {
+			$schueler->person->activate();
+		}
 		if (!$schueler->add_schueler($schueler_array)) {
 			die();
 		}
@@ -28,7 +31,11 @@ if (isset($user) && $user->runscript()) {
 		if (isset($_POST['fach'])) {
 			for ($i = 1; $i <= max(array_keys($_POST['fach'])); $i++) {
 				if (isset($_POST['fach'][$i])) {
-					$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], 'neu');
+					if(isset($_GET['prev']) && $_GET['prev'] == "next_year") {
+						$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['status']);
+					}else{
+						$schueler->add_nachfrage_fach($_POST['fach'][$i]['id'], true, $_POST['fach'][$i]['fachlehrer'], 'neu');
+					}
 				}
 			}
 		}
@@ -51,15 +58,22 @@ if (isset($user) && $user->runscript()) {
 				'comment' => $_POST['comment']
 		);
 		$lehrer = new lehrer($_POST['person']);
-		echo $lehrer->get_id();
+		if(isset($_GET['prev']) && $_GET['prev'] == "next_year") {
+			$lehrer->person->activate();
+		}
+//		echo $lehrer->get_id();
 		if (!$lehrer->add_lehrer($lehrer_array)) {
 			die();
 		}
 		for ($i = 1; $i <= count($_POST['fach']); $i++) {
-			$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], $_POST['fach'][$i]['nachweis'], $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt'], 'neu');
+			if (isset($_POST['fach'][$i])) {
+				$lehrer->add_angebot_fach($_POST['fach'][$i]['id'], $_POST['fach'][$i]['nachweis'], $_POST['fach'][$i]['fachlehrer'], $_POST['fach'][$i]['notenschnitt'], 'neu');
+			}
 		}
 		for ($i = 1; $i <= count($_POST['zeit']); $i++) {
-			$lehrer->add_time($_POST['zeit'][$i]);
+			if (isset($_POST['zeit'][$i])) {
+				$lehrer->add_time($_POST['zeit'][$i]);
+			}
 		}
 		$show_formular_lehrer = false;
 		$show_formular_schueler = false;

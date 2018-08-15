@@ -75,6 +75,7 @@ if (isset($_GET['page'])) {
 		?>
 		<nav class="nav" id="nav">
 		<div class="navigation">
+			<div class="nav_parts" style="width: 40%;">
 			<a <?php
 		if (strcmp($active, "content") == 0) {
 			echo "class=\"navigation_active\"";
@@ -106,7 +107,11 @@ if (isset($_GET['page'])) {
 						<a href=\"index.php?page=backup_data\">Backups</a></div></div>";
 		}
 		?>
-			<span class="navigation_li" style="background-color: #0b1162;"><?php echo get_xml("servername", "value");?></span>
+			</div>
+			<div class="nav_parts" style="width: 20%;">
+			<span class="navigation_li" style="background-color: #0b1162;width:100%;"><?php echo get_xml("servername", "value");?></span>
+			</div>
+			<div class="nav_parts" style="width:40%; display: initial;">
 			<a <?php
 		
 		if (strcmp($active, "logout") == 0) {
@@ -119,6 +124,7 @@ if (isset($_GET['page'])) {
 		
 		echo "<a id=\"angemeldet\" class=\"navigation_li\" href=\"index.php?page=change_passwd\">Du bist als " . $user->getemail() . " angemeldet.</a>";
 		?>
+			</div>
 		</div>
 		</nav>
 	<!-- - div endet in letzter Zeile   -->
