@@ -35,7 +35,8 @@ if ((isset($_GET['user']) && isset($_GET['passwd']) && isset($_GET['host'])) || 
 	$amount = count($code);
 	echo "$amount Abfragen werden ausgeführt. Die kann eine Weile dauern...";
 	flush();
-	for ($i = 0; $i < count($code); $i++) {
+	$success_queries = 1;
+	for ($i = 0; $i < $amount; $i++) {
 		if (strlen($code[$i]) > 5) {
 			$ret = $pdo->exec($code[$i].";");
 			echo "<br><br><hr><br>".$code[$i];
@@ -44,13 +45,16 @@ if ((isset($_GET['user']) && isset($_GET['passwd']) && isset($_GET['host'])) || 
 				break;
 			}else{
 				echo "<br>$ret Zeilen wurden geändert";
+				$success_queries++;
 			}
 			flush();
 		}
 	}
 	fclose($file);
 	$eret = $pdo->query("SET foreign_key_checks=0;");
-	echo "<br><br><b>Alle Abfragen wurden erfolgreich ausgeführt</b><br><br>";
+	if ($amount <= $success_queries) {
+		echo "<br><br><b>Alle Abfragen wurden erfolgreich ausgeführt</b><br><br>";
+	}
 }else {
 	echo "Gib als GET user, host, dbname und passwd an oder alternativ als GET art=datei zum Auslesen der DB-Daten aus includes/db_data.php";
 }

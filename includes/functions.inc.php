@@ -1,4 +1,5 @@
 <?php
+//TODO rename to english
 function get_name_of_tag($kuerzel) {
 	$tage = array(
 			'mo' => 'Montag', 
@@ -148,11 +149,12 @@ function get_second_part_year_sql() {
 
 // Bei Fehler wird false zurückgegeben
 /*
- * Syntax: ("UPDATE tabelle SET row1 = :row1, row2 = :row2.....")
+ * Syntax: ("UPDATE tabelle SET row1 = :row1, row2 = :row2.....", $row1, $row2)
  * Wichtig: Leerzeichen zwischen :row1, und row2. Ansonsten funktioniert Funktion nicht!!!!!!!!!!
  * 
  * 
  */
+//TODO Absicherung gegen XSS direkt in Funktion mit strip_tags
 function query_db($statement, ...$params) {
 	global $pdo;
 	global $user;
@@ -199,6 +201,7 @@ function query_db($statement, ...$params) {
 			echo "Ein DB-Fehler ist aufgtreten";
 			$user->log(user::LEVEL_ERROR, "DB-Fehler ist aufgetreten!" . implode("-", $ret_prep->errorInfo()));
 			var_dump($ret_prep->errorInfo());
+			var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 			get_xml("exit_on_db_failure","value") == 'true' ?: die();
 			return false;
 		}else {
@@ -336,4 +339,21 @@ function init_settings_xml() {
 }
 
 
+function random_string() {
+ if(function_exists('random_bytes')) {
+ 		$bytes = random_bytes(16);
+ 		$str = bin2hex($bytes); 
+ } else if(function_exists('openssl_random_pseudo_bytes')) {
+ 		$bytes = openssl_random_pseudo_bytes(16);
+ 		$str = bin2hex($bytes); 
+ } else if(function_exists('mcrypt_create_iv')) {
+ 		$bytes = mcrypt_create_iv(16, MCRYPT_DEV_URANDOM);
+ 		$str = bin2hex($bytes); 
+ } else {
+	 	// Coh9loka1eeGheeReleij6eiy als SALT
+ 		$str = md5(uniqid('Coh9loka1eeGheeReleij6eiy', true));
+ } 
+ return $str;
+}
+ 
 ?>

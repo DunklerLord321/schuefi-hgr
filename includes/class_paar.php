@@ -107,4 +107,41 @@ class paar {
 		}
 		
 	}
+	
+	function add_meeting($sid, $lid, $date, $comment = '') {
+		if (!strtotime($date)) {
+			echo "<br><br>Bitte gib ein gültiges Datum an.";
+		}else {
+			$time = strtotime($date);
+			$date = date('Y-m-d', $time);
+		}
+		if (strlen($sid) > 0) {
+			$return = query_db("SELECT * FROM nachhilfetreffen WHERE paar_id = :paar_id AND datum = :datum AND sid = :sid AND lid is :lid", $this->paarid, $date, $sid, $lid);
+		}else{
+			$return = query_db("SELECT * FROM nachhilfetreffen WHERE paar_id = :paar_id AND datum = :datum AND sid is :sid AND lid = :lid", $this->paarid, $date, $sid, $lid);			
+		}
+		$return = $return->fetch();
+		if ($return !== false) {
+			die("Es existiert für dieses Nachhilfepaar an diesem Tag schon ein Eintrag von dir!<br><a href=\"index.php?page=customer_meetings\" class=\"links2\">Zurück zur Übersicht</a><br><br>");
+		}		
+		$return = query_db("INSERT INTO nachhilfetreffen (paar_id, sid, lid, bemerkung, datum) VALUES (:paar_id, :sid, :lid, :comment, :datum)",$this->paarid, $sid, $lid, $comment, $date);
+		if ($return) {
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	function all_meetings() {
+		$return = query_db("SELECT nachhilfetreffen.sid, n2.lid, nachhilfetreffen.datum, nachhilfetreffen.paar_id, nachhilfetreffen.bemerkung as bemerkung_schueler, n2.bemerkung as bemerkung_lehrer FROM `nachhilfetreffen`
+			 LEFT JOIN (SELECT * FROM nachhilfetreffen WHERE sid is NULL) as n2 ON n2.paar_id = nachhilfetreffen.paar_id 
+			 AND n2.datum = nachhilfetreffen.datum WHERE nachhilfetreffen.sid = :sid AND nachhilfetreffen.paar_id = :paar_id", $this->schueler->get_id(), $this->paarid);
+		if ($return) {
+			return $return;
+		}else{
+			return false;
+		}
+		
+	}
+	
 }

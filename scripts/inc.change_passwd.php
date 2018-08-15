@@ -17,7 +17,7 @@ if (isset($user) && $user->runscript()) {
 	
 	if ($show_formular) {
 		?>
-<form action="index.php?page=user&change=1" method="post">
+<form action="index.php?page=change_passwd&change=1" method="post">
 	Dein Passwort:
 	<br>
 	<input type="password" size="40" maxlength="250" name="passwort_alt" required="required" autofocus="autofocus" placeholder="Passwort" value="" class="input_text">

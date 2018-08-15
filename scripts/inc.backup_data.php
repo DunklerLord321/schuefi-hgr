@@ -14,7 +14,7 @@ if (isset($user) && $user->runscript()) {
 			'raum'
 	);
 	if (isset($_GET['restore'])) {
-		//Gefahrenpotential
+		//TODO Gefahrenpotential
 		if (file_exists(get_xml("dirs/backup","value") . $_GET['restore'])) {
 			$zip = new ZipArchive();
 			$zip->open(get_xml("dirs/backup","value") . $_GET['restore']);
@@ -241,8 +241,8 @@ if (isset($user) && $user->runscript()) {
 			}
 		}
 		array_multisort($backups);
-		if (count($backups > 0)) {
-			for ($i = 0; $i < count($backups); $i++) {
+		if (count($backups) > 0) {
+			for ($i = count($backups)-1; $i >= 0; $i--) {
 				echo "<br>" . $backups[$i][0] . ":  " . $backups[$i][3] . "." . (strlen($backups[$i][2]) == 1 ? "0".$backups[$i][2] : $backups[$i][2]) . "." . $backups[$i][1] . " " . $backups[$i][5] . ":" . $backups[$i][6] . ":" . $backups[$i][7] . "Uhr";
 				echo "<div class=\"tooltip\" style=\"margin-top: 10px; margin-left: 100px;\"><a href=\"index.php?page=backup_data&delete=" . $backups[$i][8] . "\" class=\"links2 \" onclick=\"return warn('Willst du das Backup wirklich löschen?')\" style=\"font-style: normal; text-decoration: none;\">";
 				echo "<img src=\"img/png_delete_24_24.png\" alt=\"Löschen des Backups\" style=\"position:relative;z-index:-1;\"><span class=\"tooltext\">Lösche das Backup</span></a></div>";

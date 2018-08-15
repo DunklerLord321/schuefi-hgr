@@ -10,7 +10,12 @@ if (isset($user) && $user->runscript()) {
 				echo "Diese Person existiert nicht.";
 				die();
 			}
-			if ($person->change_person($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['telefon'], $_POST['geb'])) {
+			if (isset($_POST['login'])) {
+				$is_person_allowed_to_login = true;
+			}else{
+				$is_person_allowed_to_login = false;				
+			}
+			if ($person->change_person($_POST['vname'], $_POST['nname'], $_POST['email'], $_POST['telefon'], $_POST['geb'], $is_person_allowed_to_login)) {
 				echo "Die Daten wurden erfolgreich geändert!";
 			}else {
 				echo "Es ist ein Fehler aufgetreten!";
@@ -170,7 +175,7 @@ if (isset($user) && $user->runscript()) {
 				<b>Person</b>
 			</legend>
 			<br>
-			<input type="hidden" value="<?php echo $_GET['person'];?>" name="id">
+			<input type="hidden" value="<?php echo $person->id;?>" name="id">
 			Vorname:
 			<span style="float: right; width: 50%;">Nachname:</span>
 			<br>
@@ -200,6 +205,11 @@ if (isset($user) && $user->runscript()) {
 			Telefon
 			<br>
 			<input type="tel" name="telefon" value="<?php echo $person->telefon;?>" class="input_text">
+			<br>
+			<br>
+			Möglichkeit zum Login:
+			<input type="checkbox" name="login" <?php echo ($person->user->has_reference_to_person($person->id)?"checked":""); ?> class="input_text">
+			<?php if ($person->user->exists($person->email)) {echo "Diese Person hat schon einen Login!";} ?>
 			<br>
 			<br>
 			<input type="submit" value="Ändern" class="mybuttons">

@@ -7,6 +7,8 @@ class user {
 	protected $account;
 	private $hash_password;
 	private $count_login_trys;
+	public $security_token;
+	public $security_token_time;
 	private $error;
 	private $run_script;
 	private $logfile;
@@ -61,19 +63,24 @@ class user {
 				return true;
 				break;
 			case 'f':
-				if ($rights == 'w' || $rights == 'f' || $rights == 'fk' || $rights == 'kf')
+				if ($rights == 'g' || $rights == 'f' || $rights == 'fk' || $rights == 'kf' || $rights == 'a')
 					return true;
 				else
 					return false;
 				break;
 			case 'k':
-				if ($rights == 'w' || $rights == 'k' || $rights == 'fk' || $rights == 'kf')
+				if ($rights == 'g' || $rights == 'k' || $rights == 'fk' || $rights == 'kf' || $rights == 'a')
 					return true;
 				else
 					return false;
 				break;
-			case 'w':
-				if ($rights == 'w')
+			case 'g':
+				if ($rights == 'g' || $rights == 'a')
+					return true;
+				else
+					return false;
+			case 'c':
+				if ($rights == 'c' || $rights == 'a')
 					return true;
 				else
 					return false;
@@ -93,7 +100,10 @@ class user {
 			case 'k':
 				return true;
 				break;
-			case 'w':
+			case 'g':
+				return true;
+				break;
+			case 'c':
 				return true;
 				break;
 			default:
@@ -101,6 +111,30 @@ class user {
 		}
 		return false;
 	}
+  function is_admin() {
+          $admins = get_xml("admin", "value");
+          if ( strstr($admins, $user->getemail() ) == false ) {
+                  return false;
+          } else {
+                  return true;
+          }
+  }
+	function add_reference_to_person($person_id) {
+		$return = query_db("SELECT * FROM `person` WHERE id = :person_id", $person_id);
+		$return = $return->fetch();
+		if ($return === false) {
+			echo "Es existiert kein Nutzer mit dieser ID";
+			return false;
+		}
+		$return = query_db("INSERT INTO `users` (person_id, account) VALUES (:person_id, :account)", $person_id, 'c');
+		if ($return) {
+			return true;
+		}else {
+			echo 'Beim Abspeichern ist leider ein Fehler aufgetreten<br>';
+			return false;
+		}
+	}
+	
 	function adduser($vname, $nname, $email, $passwort, $passwort2, $type = 'k') {
 		$error = '';
 		if (strlen($vname) == 0 || strlen($vname) > 49) {
@@ -147,25 +181,42 @@ class user {
 	}
 	
 	// Holt alle Informationen über Nutzer aus DB, wenn angegebene E-Mail existiert
-	function setmail($m_mail) {
+	function load_user($m_mail, $uid = -1) {
 		if (!function_exists("query_db")) {
 			require 'includes/functions.inc.php';
 		}
-		$this->email = $m_mail;
-		$result = query_db("SELECT * FROM users WHERE email = :email AND aktiv = 1", $this->email);
+		if ($uid != -1) {
+			$result = query_db("SELECT * FROM users WHERE id = :id AND aktiv = 1", $uid);			
+		}else{
+			$result = query_db("SELECT * FROM users WHERE email = :email AND aktiv = 1", $m_mail);
+		}
 		$user = $result->fetch();
-		if ($user !== false) {
+		if ($user === false || strlen($user['email']) == 0) {
+			if ($uid != -1) {
+				$result = query_db("SELECT users.*, person.vname, person.nname, person.email FROM person LEFT JOIN users on users.person_id = person.id WHERE users.id = :uid", $uid);
+			}else{
+				$result = query_db("SELECT users.*, person.vname, person.nname, person.email FROM person LEFT JOIN users on users.person_id = person.id WHERE person.email = :email", $m_mail);
+			}
+			$user = $result->fetch();
+			if ($user === false || $user['id'] == NULL) {
+				if ($user['id'] == NULL) {
+					//TODO log ohne Login
+//					$user->log(LEVEL_ERROR, "Ein Nutzer ohne korrekten Login versucht, sich anzumelden".$m_mail);
+				}
+				$this->error = 'Das Passwort oder die E-Mail-Adresse war leider falsch';
+				return false;
+			}
+		}
+			$this->email = $user['email'];
 			$this->vname = $user['vname'];
 			$this->nname = $user['nname'];
 			$this->account = $user['account'];
 			$this->hash_password = $user['passwort'];
 			$this->id = $user['id'];
 			$this->count_login_trys = intval($user['count_login']);
+			$this->security_token = $user['security_token'];
+			$this->security_token_time = $user['security_token_time'];
 			return true;
-		}else {
-			$this->error = Das Passwort oder die E-Mail-Adresse war leider falsch;
-			return false;
-		}
 	}
 	
 	/*
@@ -202,7 +253,7 @@ class user {
 		for ($i = (count($debug) - 1); $i >= 0; $i--) {
 			$string .= "{" . $debug[$i]['file'] . ":" . $debug[$i]['line'] . "-" . $debug[$i]['function'];
 			if (count($debug[$i]['args']) > 0) {
-				if ($debug[$i]['function'] == "testpassword") {
+				if ($debug[$i]['function'] == "testpassword" || $debug[$i]['function'] == "reset_password" || $debug[$i]['function'] == "neuespassword") {
 					$string .= "[*****]";
 				}else {
 					$string .= "[" . implode("_", $debug[$i]['args']) . "]";
@@ -234,14 +285,6 @@ class user {
 		}
 	}
 	function neuespassword($passwortaktuell, $password_neu, $password_neu2) {
-		if (strlen($password_neu) < 4) {
-			$this->error = 'Das neue Passwort muss mindestens 4 Zeichen lang sein';
-			return false;
-		}
-		if ($password_neu != $password_neu2) {
-			$this->error = 'Die beiden Passwörter müssen übereinstimmen';
-			return false;
-		}
 		if ($password_neu == $passwortaktuell) {
 			$this->error = 'Das neue Passwort darf nicht mit dem alten Passwort übereinstimmen';
 			return false;
@@ -250,17 +293,102 @@ class user {
 			$this->error = 'Das alte Passwort war leider falsch';
 			return false;
 		}
+		if (!$this->reset_password($password_neu, $password_neu2)) {
+			return false;
+		}
+		return true;
+	}
+	
+	function reset_password($password_neu, $password_neu2) {
+		if (strlen($password_neu) < 4) {
+			$this->error = 'Das neue Passwort muss mindestens 4 Zeichen lang sein';
+			return false;
+		}
+		if ($password_neu != $password_neu2) {
+			$this->error = 'Die beiden Passwörter müssen übereinstimmen';
+			return false;
+		}
 		$passwort_hash = password_hash($password_neu, PASSWORD_DEFAULT);
 		$return = query_db("UPDATE `users` SET passwort = :passwort_hash, `update_time` = CURRENT_TIME() WHERE id = :id", $passwort_hash, $this->id);
 		if ($return) {
 			$this->log(user::LEVEL_NOTICE, "Passwort erfolgreich geändert");
+			$this->error = 'Passwort erfolgreich gespeichert';
 			return true;
 		}else {
 			$this->error = 'Ein Datenbankfehler ist aufgetreten';
 			$this->log(user::LEVEL_WARNING, "DB-Fehler bei Passwortänderung");
 			return false;
-		}
+		}		
 	}
+	
+	function validate_security_token($token) {
+		if (!$this->has_security_code()) {
+			$this->error = 'Es wurde keine Registrierung mit dieser E-Mail-Addresse erlaubt';
+			return false;
+		}
+		if ($this->security_token_time === null || strtotime($this->security_token_time) < (time()-3*24*3600)) {
+			$this->error = 'Der Link zur Registrierung ist veraltet';
+			return false;
+		}
+		if (sha1($token) != $this->security_token) {
+			$this->error = "Der übergebene Code zur Registrierung war ungültig. Stelle sicher, dass du genau den Link kopiert hast";
+			return false;
+		}
+		return true;
+	}
+	
+	function delete_security_token() {
+		$result = query_db("UPDATE users SET security_token = NULL, security_token_time = NULL WHERE id = :userid", $this->id);
+		if ($result === false) {
+			return false;
+		}else{
+			return true;
+		}		
+	}
+	
+	function create_security_token() {
+		global $GLOBAL_CONFIG;
+		$passwortcode = random_string();
+		$result = query_db("UPDATE users SET security_token = :security_token, security_token_time = NOW() WHERE id = :userid", sha1($passwortcode), $this->id);
+
+		require 'extensions/mail/PHPMailer-master/PHPMailerAutoload.php';
+		$mail = new PHPMailer();
+		$mail->Host = 'mail.gmx.net';
+		$mail->SMTPAuth = true;
+		// TODO an xml anpassen
+		$mail->Username = $GLOBAL_CONFIG['mail_address'];
+		$mail->Password = $GLOBAL_CONFIG['mail_passwd'];
+		$mail->SMTPSecure = 'tls';
+		$mail->Port = 587;
+		$mail->isHTML(True);
+		$mail->CharSet = 'utf-8';
+		$mail->SetLanguage("de");
+		
+		$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
+		// $mail->addAddress($this->email);
+		$mail->addAddress("jo12ya29@posteo.de");
+		
+		$url_passwortcode = 'https://localhost/schuefi/index.php?reset_password=1&userid='.$this->id.'&security_token='.$passwortcode;
+		$text = 'Hallo '.$this->vname.',
+		vielen Dank für deine Anmeldung bei der Schülerfirma "Schüler helfen Schülern"!
+		
+		
+		'.$url_passwortcode.'
+
+		Sollte dir dein Passwort wieder eingefallen sein oder hast du dies nicht angefordert, so bitte ignoriere diese E-Mail.
+
+		Viele Grüße,
+		deine Schülerfirma';
+
+		$mail->Subject = 'Schuelerfirma HGR - Registrierung von ' . $this->vname . ' ' . $this->nname;
+		$mail->Body = $text;
+		echo $text;
+		if (!$mail->send()) {
+			echo $mail->ErrorInfo;
+		}
+
+	}
+
 	
 	/*
 	 * Benachrichtige bei 5 falschen Anmeldeversuchen automatisch Admin(s)
@@ -272,6 +400,7 @@ class user {
 		// $mail->isSMTP();
 		$mail->Host = 'mail.gmx.net';
 		$mail->SMTPAuth = true;
+		// TODO an xml anpassen
 		$mail->Username = $GLOBAL_CONFIG['mail_address'];
 		$mail->Password = $GLOBAL_CONFIG['mail_passwd'];
 		$mail->SMTPSecure = 'tls';
@@ -306,10 +435,35 @@ class user {
 		return $this->error;
 		$reset ?: $this->error;
 	}
+	function has_security_code() {
+		if (strlen($this->security_token) > 0 && strlen($this->security_token_time) > 0) {
+			return true;
+		}else{
+			return false;
+		}
+	}
 	function is_valid() {
 		if (strlen($this->vname) > 0 && strlen($this->nname) > 0 && strlen($this->email) > 0 && strlen($this->account) > 0 && $this->id !== 0) {
 			return true;
 		}else {
+			return false;
+		}
+	}
+	function exists($m_mail) {
+		$return = query_db("SELECT * FROM users WHERE email = :email", $m_mail);
+		$result = $return->fetch();
+		if ($result !== false) {
+			return true;
+		}else{
+			return false;
+		}
+	}
+	function has_reference_to_person($person_id) {
+		$return = query_db("SELECT * FROM users WHERE person_id = :person_id", $person_id);
+		$result = $return->fetch();
+		if ($result !== false) {
+			return true;
+		}else{
 			return false;
 		}
 	}

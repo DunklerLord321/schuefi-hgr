@@ -7,6 +7,7 @@ class person {
 	public $telefon;
 	public $geburtstag;
 	public $aktiv;
+	public $user;
 	
 	function __construct() {
 		$this->id = null;
@@ -38,10 +39,7 @@ class person {
 	}
 	function load_person($pid) {
 		global $pdo;
-		$ret_prep = $pdo->prepare("SELECT * FROM `person` WHERE id = :id");
-		$return = $ret_prep->execute(array(
-				'id' => $pid
-		));
+		$ret_prep = query_db("SELECT person.*, users.id as userid FROM `person` LEFT JOIN users ON users.person_id = person.id WHERE person.id = :id", $pid);
 		$result = $ret_prep->fetch();
 		if ($result === false) {
 			return false;
@@ -52,6 +50,8 @@ class person {
 		$this->email = $result['email'];
 		$this->telefon = $result['telefon'];
 		$this->aktiv = $result['aktiv'];
+		$this->user = new user();
+		$this->user->load_user($this->email);
 		if (strlen($result['geburtstag']) > 0) {
 			$time = strtotime($result['geburtstag']);
 			$this->geburtstag = date('d.m.Y', $time);
@@ -141,6 +141,7 @@ class person {
 		if ($ret_prepp) {
 			$schueler = $ret_prepp->fetch();
 		}
+		//Nur ein Eintrag je schueler- und lehrer-Tabelle auf eine Person und ein Jahr gesehen möglich
 		if (isset($lehrer) && isset($schueler)) {
 			return array(
 					'lehrer' => $lehrer, 
@@ -153,7 +154,7 @@ class person {
 			);
 		}
 	}
-	function change_person($vname, $nname, $email, $telefon, $geburtstag) {
+	function change_person($vname, $nname, $email, $telefon, $geburtstag, $is_allowed_to_login) {
 		global $pdo;
 		if (!isset($this->id) || $this->id == NULL || $this->aktiv == false) {
 			return false;
@@ -202,7 +203,11 @@ class person {
 		}else {
 			// Ändere Person
 			$ret_prep = query_db("UPDATE `person` SET `vname` = :vname, `nname` = :nname, `email` = :email, `telefon` = :telefon, `geburtstag` = :geburtstag WHERE `id` = :id", $vname, $nname, $email, $telefon, $geburtstag, $this->id);
-			;
+			if ($is_allowed_to_login == true && !$this->user->exists($email)) {
+				$this->user->add_reference_to_person($this->id);
+			}else{
+				echo "<b>Es ist momentan noch nicht möglich, den Login einer Person abzuwählen</b>";
+			}
 			if ($ret_prep) {
 				$this->vname = $vname;
 				$this->nname = $nname;
