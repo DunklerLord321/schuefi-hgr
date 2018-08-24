@@ -112,12 +112,12 @@ class user {
 		return false;
 	}
   function is_admin() {
-          $admins = get_xml("admin", "value");
-          if ( strstr($admins, $user->getemail() ) == false ) {
-                  return false;
-          } else {
-                  return true;
-          }
+    $admins = get_xml("admin", "value");
+    if ( strstr($admins, $this->getemail() ) == false ) {
+      return false;
+    } else {
+      return true;
+    }
   }
 	function add_reference_to_person($person_id) {
 		$return = query_db("SELECT * FROM `person` WHERE id = :person_id", $person_id);
@@ -350,7 +350,7 @@ class user {
 		global $GLOBAL_CONFIG;
 		$passwortcode = random_string();
 		$result = query_db("UPDATE users SET security_token = :security_token, security_token_time = NOW() WHERE id = :userid", sha1($passwortcode), $this->id);
-
+		echo "Registrierungslink erfolgreich erstellt.<br>";
 		require 'extensions/mail/PHPMailer-master/PHPMailerAutoload.php';
 		$mail = new PHPMailer();
 		$mail->Host = 'mail.gmx.net';
@@ -360,29 +360,43 @@ class user {
 		$mail->Password = $GLOBAL_CONFIG['mail_passwd'];
 		$mail->SMTPSecure = 'tls';
 		$mail->Port = 587;
+
 		$mail->isHTML(True);
-		$mail->CharSet = 'utf-8';
+		$mail->CharSet = "UTF-8";
 		$mail->SetLanguage("de");
 		
-		$mail->setFrom('schuelerfirma.sender.hgr@gmx.de', 'Schülerfirma HGR');
 		// $mail->addAddress($this->email);
-		$mail->addAddress("jo12ya29@posteo.de");
+		if (get_xml("livesystem","value") !== null && get_xml("livesystem","value") != 'true' && get_xml("testmail","value") !== null) {
+			$mail->addAddress(get_xml("testmail", "value"), get_xml("testmail", "value"));
+		}else{
+			$mail->addAddress($this->email);
+		}
+		$mail->addBCC("schuelerfirma@hgr-web.de");
+		$mail->setFrom("schuelerfirma.sender.hgr@gmx.de", "Schülerfirma HGR");
+		$mail->Subject = "Schülerfirma HGR - Registrierung von " . $this->vname . " " . $this->nname;
 		
-		$url_passwortcode = 'https://localhost/schuefi/index.php?reset_password=1&userid='.$this->id.'&security_token='.$passwortcode;
-		$text = 'Hallo '.$this->vname.',
-		vielen Dank für deine Anmeldung bei der Schülerfirma "Schüler helfen Schülern"!
+		$url_passwortcode = 'https://'.get_xml("servername2", "value").'/index.php?reset_password=1&userid='.$this->id.'&security_token='.$passwortcode;
+		$text = 'Hallo '.$this->vname." ".$this->nname.',<br>
+		vielen Dank für dein Interessen an der Schülerfirma "Schüler helfen Schülern"!<br>
+		Seit diesem Jahr benötigst du einen Login bei der Schülerfirma. Um dich zu registrieren, klicke bitte auf folgenden Link.<br>	
+		<a href='.$url_passwortcode.' style="font-style: italic;	text-decoration: underline;	color: black;">Registrierungslink</a>
+		<br><i>Bitte beachte, dass der Link nur bis zum '.date("d.m.Y H:i").' gültig ist!</i><br>
+		Weiter Informationen zu deinem Nachhilfeunterricht erhälst du in einer separaten E-Mail.<br>
 		
-		
-		'.$url_passwortcode.'
+		Viele Grüße,<br>
+		deine Schülerfirma<br>';
+		$alternate_text = "Hallo ".$this->vname." ".$this->nname.",\n
+		vielen Dank für dein Interessen an der Schülerfirma \"Schüler helfen Schülern\"!\n
+		Seit diesem Jahr benötigst du einen Login bei der Schülerfirma. Um dich zu registrieren, klicke bitte auf folgenden Link.\n\n
+		Registrierungslink:\r".$url_passwortcode."\n\n
+		Bitte beachte, dass der Link nur bis ".date("d.m.Y H:i")." gültig ist!\n
+		Weiter Informationen zu deinem Nachhilfeunterricht erhälst du in einer separaten E-Mail.\n
+		Viele Grüße,\n
+		deine Schülerfirma\n";
 
-		Sollte dir dein Passwort wieder eingefallen sein oder hast du dies nicht angefordert, so bitte ignoriere diese E-Mail.
-
-		Viele Grüße,
-		deine Schülerfirma';
-
-		$mail->Subject = 'Schuelerfirma HGR - Registrierung von ' . $this->vname . ' ' . $this->nname;
 		$mail->Body = $text;
-		echo $text;
+		$mail->AltBody = $alternate_text;
+		echo $url_passwortcode."<br>Registrierungslink versenden...";
 		if (!$mail->send()) {
 			echo $mail->ErrorInfo;
 		}

@@ -116,7 +116,7 @@ CREATE TABLE `unterricht` (
   `treff_raum` varchar(50) DEFAULT NULL,
   `lehrer_dokument` varchar(50) DEFAULT NULL,
   `schueler_dokument` varchar(50) DEFAULT NULL,
-  `schuljahr` int(11) NOT NULL DEFAULT 1819
+  `schuljahr` int(11) NOT NULL DEFAULT 1718
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_german2_ci;
 
 DROP TABLE IF EXISTS `raum`;
@@ -301,7 +301,8 @@ INSERT INTO `navigation` (`id`, `kuerzel`, `path`, `allowed_users`, `visible`) V
 (21, 'backup_data', 'scripts/inc.backup_data.php', 'v',1),
 (22, 'input_raum', 'scripts/inc.input_raum.php', 'k', 1),
 (23, 'output_raum', 'scripts/inc.output_raum.php', 'g', 1),
-(24, 'customer_meetings', 'scripts/inc.customer_meetings.php', 'c', 1);
+(24, 'customer_meetings', 'scripts/inc.customer_meetings.php', 'c', 1),
+(25, 'next_year', 'scripts/inc.datenuebernahme.php', 'k', 1);
 
  INSERT INTO `navigation_menu`( `id`, `navigation_id`, `url_parameter`,  `is_shown_main_menu`, `title`) VALUES 
 (1, 12, '', 1, 'Neue Person'),
@@ -318,13 +319,6 @@ INSERT INTO `navigation` (`id`, `kuerzel`, `path`, `allowed_users`, `visible`) V
 (12, 15, '', 1, 'Filtern'),
 (13,  23, '', 1, 'Ausgeben der Raumbelegung'), 
 (14, 22, '', 1, 'Eingabe der Raumbelegung');
-
-INSERT INTO `users` (`id`, `vname`, `nname`, `email`, `passwort`, `account`, `createt_time`, `update_time`, `count_login`, `aktiv`) VALUES
-(6,	'Extern',	'Systemaufgaben',	'system@system.de',	'$2y$10$bFI39TeqDc.6LpF777nHc.f1wOWYDx9fhqBk3tBXgD4z3Mcou5fJW',	'k',	'2018-02-21 09:46:43',	'2018-02-21 09:46:43',	0,	1),
-(8, 'Vorstand', 'Schülerfirma', 'schuelerfirma.hgr@gmx.de', '$2y$10$GPNqeeX7XGZx0mmydSMWpupnEYCEVstwzvDvJZNbAiZdT0bJG1I2q', 'v', '2017-08-06 16:42:15', '2017-08-06 16:42:15', 0, 1),
-(9, 'Finanzvorstand', 'Schülerfirma', 'schuelerfirma.hgr.finanzen@test.de', '$2y$10$DVmbZkojvWRGKdbl3hbA2u1dB4nSrgHrrL/Lvyu0YyAY6jSswTqvW', 'f', '2017-08-06 16:45:35', '2017-08-06 16:45:35', 0, 1),
-(10, 'Kundenbetreuer', 'Schülerfirma', 'schuelerfirma.hgr.kunden@test.de', '$2y$10$.kmQ9xuJRUvvTC18ZharVOBI2I.rwoQGv5JCe6W93xWnNapO4wJIm', 'k', '2017-08-06 16:49:03', '2017-08-06 16:49:03', 0, 1),
-(11, 'Yannik', 'Weber', 'yajo10@yahoo.de', '$2y$10$i5rueGBkBTwMKMhPUmSk5uxtoxMg5LNEpgrsDytjF9yyxqfA7L5Gi', 'v', '2017-08-06 16:50:05', '2017-08-06 16:50:05', 0, 1);
 
 
 INSERT INTO `faecher` (`id`, `kuerzel`, `name`) VALUES

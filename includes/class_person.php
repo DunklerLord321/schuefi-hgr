@@ -131,13 +131,16 @@ class person {
 			}
 		}
 	}
-	function search_lehrer_schueler() {
+	function search_lehrer_schueler($year = -1) {
+		if ($year == -1) {
+			$year = get_current_year();
+		}
 		global $pdo;
-		$ret_prepp = query_db("SELECT * FROM `lehrer` WHERE pid = :id AND schuljahr = :year", $this->id, get_current_year());
+		$ret_prepp = query_db("SELECT * FROM `lehrer` WHERE pid = :id AND schuljahr = :year", $this->id, $year);
 		if ($ret_prepp) {
 			$lehrer = $ret_prepp->fetch();
 		}
-		$ret_prepp = query_db("SELECT * FROM `schueler` WHERE pid = :id AND schuljahr = :year", $this->id, get_current_year());
+		$ret_prepp = query_db("SELECT * FROM `schueler` WHERE pid = :id AND schuljahr = :year", $this->id, $year);
 		if ($ret_prepp) {
 			$schueler = $ret_prepp->fetch();
 		}

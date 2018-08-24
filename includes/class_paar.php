@@ -132,10 +132,18 @@ class paar {
 		}
 	}
 	
-	function all_meetings() {
-		$return = query_db("SELECT nachhilfetreffen.sid, n2.lid, nachhilfetreffen.datum, nachhilfetreffen.paar_id, nachhilfetreffen.bemerkung as bemerkung_schueler, n2.bemerkung as bemerkung_lehrer FROM `nachhilfetreffen`
-			 LEFT JOIN (SELECT * FROM nachhilfetreffen WHERE sid is NULL) as n2 ON n2.paar_id = nachhilfetreffen.paar_id 
-			 AND n2.datum = nachhilfetreffen.datum WHERE nachhilfetreffen.sid = :sid AND nachhilfetreffen.paar_id = :paar_id", $this->schueler->get_id(), $this->paarid);
+	function all_meetings($is_person_teacher) {
+		if ($is_person_teacher) {
+			$return = query_db("SELECT nachhilfetreffen.lid, n2.sid, nachhilfetreffen.datum, nachhilfetreffen.paar_id, nachhilfetreffen.bemerkung as bemerkung_schueler, n2.bemerkung as bemerkung_lehrer FROM `nachhilfetreffen`
+				 LEFT JOIN (SELECT * FROM nachhilfetreffen WHERE lid is NULL) as n2 ON n2.paar_id = nachhilfetreffen.paar_id 
+				 AND n2.datum = nachhilfetreffen.datum WHERE nachhilfetreffen.paar_id = :paar_id", $this->paarid);						
+		}else{
+			$return = query_db("SELECT nachhilfetreffen.sid, n2.lid, nachhilfetreffen.datum, nachhilfetreffen.paar_id, nachhilfetreffen.bemerkung as bemerkung_schueler, n2.bemerkung as bemerkung_lehrer FROM `nachhilfetreffen`
+				 LEFT JOIN (SELECT * FROM nachhilfetreffen WHERE sid is NULL) as n2 ON n2.paar_id = nachhilfetreffen.paar_id 
+				 AND n2.datum = nachhilfetreffen.datum WHERE nachhilfetreffen.paar_id = :paar_id", $this->paarid);
+	 	}
+ 	  if ($return === false) {
+		}
 		if ($return) {
 			return $return;
 		}else{

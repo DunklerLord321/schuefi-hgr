@@ -25,13 +25,13 @@ if (isset($user) && $user->runscript()) {
 			echo "Ein Fehler ist beim Aktivieren aufgetreten";
 		}
 	}else if(isset($_GET['reset_passwd'])) {
-		$result = query_db("UPDATE `users` SET passwort = :passwort WHERE id = :id", password_hash(get_xml("defaultpasswd","value"), PASSWORD_DEFAULT), $_GET['reset_passwd']);
-		if ($result !== false) {
-			echo "Erfolgreich das Passwort zurückgesetzt. Das Passwort lautet nun ".get_xml("defaultpasswd","value");
-			echo "<br><a href=\"index.php?page=user\" class=\"links2\">Zurück zur Übersicht</a>";
-		}else {
-			echo "Ein Fehler ist beim Aktivieren aufgetreten";
+		$user_to_change = new user();
+		$user_to_change->load_user("", $_GET['reset_passwd']);
+		var_dump($user_to_change);
+		if (!$user->has_security_code()) {
+			$user_to_change->create_security_token();
 		}
+		die();
 	}else {
 		$result = query_db("SELECT * FROM `users` ORDER BY `users`.`account` DESC");
 		if ($result !== false) {
@@ -58,6 +58,9 @@ if (isset($user) && $user->runscript()) {
 				echo "<br>Erstellungsdatum: " . date('d.m.Y H:i', strtotime($result_user['createt_time']));
 				echo "<br>Datum der letzten Änderung: " . date('d.m.Y H:i', strtotime($result_user['update_time']));
 				echo "<br>Anzahl Loginversuche mit falschem Passwort: " . $result_user['count_login'];
+				if (strlen($result_user['security_token']) > 0) {
+					echo "<br><br>Der Person wurde bereits ein Registrierungslink gesendet, der bis zum ".date("d.m.y H:i",strtotime($result_user['security_token_time'])+3*24*3600)." gültig ist.";
+				}
 				if ($result_user['count_login'] > 0) {
 					echo "   <a href=\"index.php?page=user&reset_count=" . $result_user['id'] . "\" class=\"links2\">Zurücksetzen und Login entsperren</a>";
 				}
@@ -67,7 +70,9 @@ if (isset($user) && $user->runscript()) {
 					echo "<br><br><i>Der Nutzer wurde bereits deaktiviert. Nutzer können nicht gelöscht werden, um die Daten für die Finanzabteilung zu erhalten.<i>";
 					echo "<br><a href=\"index.php?page=user&activate=" . $result_user['id'] . "\" class=\"links2\">Aktivieren</a>";
 				}
-				echo "<br><a href=\"index.php?page=user&reset_passwd=" . $result_user['id'] . "\" class=\"links2\">Passwort zurücksetzen</a>";
+				if (strlen($result_user['security_token']) <= 0) {
+					echo "<br><a href=\"index.php?page=user&reset_passwd=" . $result_user['id'] . "\" class=\"links2\">Passwort zurücksetzen</a>";
+				}
 				echo "</fieldset>";
 				$result_user = $result->fetch();
 			}

@@ -29,6 +29,9 @@ if (isset($user) && $user->runscript()) {
 				$user->load_user("", $_GET['userid']);
 				if (!$user->validate_security_token($_GET['security_token'])) {
 					echo $user->geterror();
+					die();
+				}else{
+					echo "Der Code wurde korrekt validiert. Du kannst dir nun ein neues Passwort auswählen:<br>";
 				}
 				echo $user->getemail();
 				?>

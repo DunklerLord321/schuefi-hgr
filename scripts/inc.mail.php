@@ -127,6 +127,7 @@ if (isset($user) && $user->runscript()) {
 			echo "<label><input type=\"radio\" name=\"mailart\" value=\"1\" checked>E-Mail an ein Nachhilfepaar</label><br>";
 			echo "<label><input type=\"radio\" name=\"mailart\" value=\"2\" >Serien-E-Mail/E-Mail an eine Person</label>";
 		}
+		echo "<label><input type=\"checkbox\" name=\"last_year\" value=\"true\" >Nutze Schüler- / Lehrerdaten aus vorigem Jahr</label>";
 		echo "<br><br><input type=\"submit\" value=\"Weiter\" class=\"mybuttons\" style=\"float: right;\"><br><br><br></form>";
 	}
 	if (isset($_GET['step']) && $_GET['step'] == 2) {
@@ -136,8 +137,7 @@ if (isset($user) && $user->runscript()) {
 		?>
 <form action="<?php
 		
-		echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=3"?>" method="POST">
-	<div style="display: flex;"><?php
+		echo htmlspecialchars($_SERVER['PHP_SELF']) . "?page=mail&step=3"?>" method="POST"><?php
 		require 'includes/class_person.php';
 		require 'includes/class_lehrer.php';
 		require 'includes/class_schueler.php';
@@ -152,7 +152,11 @@ if (isset($user) && $user->runscript()) {
 			if ($result == false) {
 				echo "EIN PROBLEM";
 			}else {
+				if (isset($_POST['last_year'])) {
+					echo "<b>Achtung: Es handelt sich hierbei um Schüler und Lehrer aus dem letzten Jahr! Die angegebene Klasse bezieht sich auf das Schuljahr ".get_last_year()."</b>";
+				}
 				?>
+				<div style="display: flex;">
 				<script type="text/javascript">
 			$(function() {
 				$("A[href='#select_all_teacher']").click(function() {
@@ -175,28 +179,38 @@ if (isset($user) && $user->runscript()) {
 			echo "<br><br><a href=\"#select_all_teacher\" class=\"mybuttons\">Alle auswählen</a><a href=\"#select_none_teacher\" class=\"mybuttons\">Alle abwählen</a><br><br>";
 				while ($result) {
 					$person->load_person($result['id']);
-					$lehrerschueler = $person->search_lehrer_schueler();
-					
+					if (isset($_POST['last_year'])) {
+						$lehrerschueler = $person->search_lehrer_schueler(get_last_year());						
+					}else{
+						$lehrerschueler = $person->search_lehrer_schueler();
+					}
 					if (is_array($lehrerschueler['lehrer'])) {
 						
 						$lehrer = new lehrer($person->id);
-						$lehrer->load_lehrer_pid();
-						
+						if (isset($_POST['last_year'])) {
+							$lehrer->load_lehrer_pid($person->id, get_last_year());
+						}else{
+							$lehrer->load_lehrer_pid();
+						}
 						if (isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest-' . $i]) && $_SESSION['mail_step2']['dest-' . $i] == $person->id . "-" . $person->email) {
-							echo "<br><label><input type=\"checkbox\" class=\"teacher\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							echo "<br><label><input type=\"checkbox\" class=\"teacher\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . ", Klasse ". format_klassenstufe_kurs($lehrer->get_klassenstufe(),$lehrer->get_klasse()) . "<br>" . $person->email . "</label><br>";
 						}else {
-							echo "<br><label><input type=\"checkbox\" class=\"teacher\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							echo "<br><label><input type=\"checkbox\" class=\"teacher\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\"> " . $person->vname . " " . $person->nname . ", Klasse ". format_klassenstufe_kurs($lehrer->get_klassenstufe(),$lehrer->get_klasse()) . "<br>" . $person->email . "</label><br>";
 						}
 					}
 					if (is_array($lehrerschueler['schueler'])) {
 						
 						$schueler = new schueler($person->id);
-						$schueler->load_schueler_pid();
+						if (isset($_POST['last_year'])) {
+							$schueler->load_schueler_pid($person->id, get_last_year());
+						}else{
+							$schueler->load_schueler_pid();
+						}
 						
 						if (isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest-' . $i]) && $_SESSION['mail_step2']['dest-' . $i] == $person->id . "-" . $person->email) {
-							$schueler_output .= "<br><label><input type=\"checkbox\" class=\"student\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							$schueler_output .= "<br><label><input type=\"checkbox\" class=\"student\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\" checked> " . $person->vname . " " . $person->nname . ", Klasse ". format_klassenstufe_kurs($schueler->get_klassenstufe(),$schueler->get_klasse()) . "<br>" . $person->email . "</label><br>";
 						}else {
-							$schueler_output .= "<br><label><input type=\"checkbox\" class=\"student\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\"> " . $person->vname . " " . $person->nname . "<br>" . $person->email . "</label><br>";
+							$schueler_output .= "<br><label><input type=\"checkbox\" class=\"student\" name=\"dest-$i\" value=\"" . $person->id . "-" . $person->email . "\"> " . $person->vname . " " . $person->nname . ", Klasse ". format_klassenstufe_kurs($schueler->get_klassenstufe(),$schueler->get_klasse()) . "<br>" . $person->email . "</label><br>";
 						}
 					}
 					// var_dump($lehrer);

@@ -32,11 +32,12 @@ if (isset($user) && $user->runscript()) {
 	$person = new person();
 	$person->load_person($person_id);
 	$schueler_lehrer = $person->search_lehrer_schueler();
+	unset($result);
 	if (is_array($schueler_lehrer['lehrer'])) {
 		if (!class_exists("lehrer")) {
 			require 'includes/class_lehrer.php';
 		}
-		$lehrer = new schueler(0,$schueler_lehrer['lehrer']['id']);
+		$lehrer = new lehrer(0, $schueler_lehrer['lehrer']['id']);
 		$result = query_db("SELECT unterricht.* FROM unterricht WHERE lid = :id", $lehrer->get_id());
 		$is_person_teacher = true;
 	}
@@ -48,7 +49,7 @@ if (isset($user) && $user->runscript()) {
 		$result = query_db("SELECT unterricht.* FROM unterricht WHERE sid = :id", $schueler->get_id());
 		$is_person_teacher = false;
 	}
-	if ($result === false) {
+	if (!isset($result) || $result === false) {
 		echo "Es ist ein Fehler aufgetreten. Für dich gibt es noch keine Nachhilfedaten!";
 		$user->log(USER::LEVEL_WARNING, "Kein Lehrer oder Schüler zu Person gefunden:".$person_id);
 		return false;
@@ -56,6 +57,10 @@ if (isset($user) && $user->runscript()) {
 	$return = $result->fetch();
 	if (!class_exists("paar")) {
 		require 'includes/class_paar.php';
+	}
+	if ($return === false) {
+		echo "Für dich gibt es noch keinen Nachhilfeunterricht!";
+		return false;
 	}
 	while($return) {
 		$paar = new paar($return['id']);
@@ -75,7 +80,7 @@ if (isset($user) && $user->runscript()) {
 		}else{
 			echo "<br><h3>Nachhilfetreffen mit ".$paar->lehrer->person->vname." ".$paar->lehrer->person->nname."</h3>";
 		}
-		$return_meetings = $paar->all_meetings();
+		$return_meetings = $paar->all_meetings($is_person_teacher);
 		if ($return_meetings !== false) {
 			$result_meetings = $return_meetings->fetch();
 			if ($result_meetings) {

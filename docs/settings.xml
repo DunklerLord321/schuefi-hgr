@@ -2,8 +2,9 @@
 <settings>
 	<admin name="Administratoren" type="stringlist">yajo10@yahoo.de</admin>
 	<bauarbeiten name="Bauarbeiten" type="bool">false</bauarbeiten>
-	<livesystem name="Livesystem" type="bool">false</livesystem>
-	<servername name="Servername" type="string">local</servername>
+	<livesystem name="Livesystem" type="bool">true</livesystem>
+	<servername name="Servername" type="string">localhost</servername>
+	<servername2 name="Servername mit Pfad zum Ordner, in dem sich index.php-Skript befindet in Form von URL" type="string">localhost/schuefi</servername2>
 	<testmail name="E-Mail an die alle Mails des Testsystems gehen" type="string">jo12ya29@posteo.de</testmail>
 	<exit_on_db_failure name="bei Datenbankfehler wird Skript beendet" type="bool"/>
 	<dirs name="Ordner" type="category">

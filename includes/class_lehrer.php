@@ -180,11 +180,14 @@ class lehrer {
 			}
 		}
 	}
-	function load_lehrer_pid($pid = -1) {
-		if ($pid = -1) {
+	function load_lehrer_pid($pid = -1, $year = -1) {
+		if ($pid == -1) {
 			$pid = $this->person->id;
 		}
-		$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $pid, get_current_year());
+		if ($year == -1) {
+			$year = get_current_year();
+		}
+		$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $pid, $year);
 		$lehrer = $return->fetch();
 		if ($lehrer) {
 			$this->id = $lehrer['id'];
