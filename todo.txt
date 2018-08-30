@@ -7,3 +7,6 @@ TODO:
 #Passwort und Nutzername als eine Fehlermeldung 
 --Navigation in Funktionen und automatisch bauen
 --Cookie als HTTPOnly setzen
+--Cookie: secure flag setzen
+--Autocomplete in Fomular aus
+--XSS Browser Protection not enabled
