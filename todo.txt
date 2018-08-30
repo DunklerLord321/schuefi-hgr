@@ -6,3 +6,4 @@ TODO:
 --Fehler in Logdateien Protokollieren
 #Passwort und Nutzername als eine Fehlermeldung 
 --Navigation in Funktionen und automatisch bauen
+--Cookie als HTTPOnly setzen
