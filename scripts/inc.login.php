@@ -62,7 +62,7 @@ if (isset($user) && $user->runscript()) {
 					echo "<p><b>Achtung: Dies ist nicht das Livesystem. Das heißt, einige Funktionen sind nur eingeschränkt benutzbar. <br><br>Dieses System ist <i>nicht für den normalen Gebrauch</i> gedacht!</b>";
 				}
 				?>
-				<p>Achtung: Diese Seite steht nur für Mitglieder im Organisationsteam der Schülerfirma des Humboldt-Gymnasiums Radeberg zur Verfügung. <br>
+				<p>Achtung: Diese Seite steht nur für Mitglieder im Organisationsteam der Schülerfirma sowie Nachhilfeschülern und Nachhilfelehrern des Humboldt-Gymnasiums Radeberg zur Verfügung. <br> 
 				Die offizielle Homepage der Schülerfirma findest du hier: <a href="https://www.hgr-web.de/schuelerfirma" class="links2">Website der Schülerfirma "Schüler helfen Schülern"</a>
 				<br>Wenn du mit uns in Kontakt treten willst, kannst du uns per E-Mail unter <a href="mailto:schuelerfirma@hgr-web.de" class="links2">schuelerfirma@hgr-web.de</a> erreichen. 
 	<form action="?loginreal=1" method="post">

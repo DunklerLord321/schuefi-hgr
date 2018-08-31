@@ -12,6 +12,9 @@ class user {
 	private $error;
 	private $run_script;
 	private $logfile;
+	public $time_of_creation; 
+  public $time_of_last_update; 
+  private $activated; 
 	const LEVEL_ERROR = 1;
 	const LEVEL_WARNING = 2;
 	const LEVEL_NOTICE = 3;
@@ -29,13 +32,7 @@ class user {
 		$this->run_script = false;
 	}
 	public function __construct() {
-		$this->id = NULL;
-		$this->vname = "";
-		$this->nname = "";
-		$this->email = "";
-		$this->account = "";
-		$this->password = "";
-		$this->count_login_trys = 0;
+		$this->reset();
 	}
 	public function reset() {
 		$this->id = NULL;
@@ -45,6 +42,9 @@ class user {
 		$this->account = "";
 		$this->password = "";
 		$this->count_login_trys = 0;
+		$this->time_of_creation = ""; 
+    $this->time_of_last_update = ""; 
+    $this->activated = ""; 
 	}
 	function getemail() {
 		return $this->email;
@@ -52,6 +52,9 @@ class user {
 	
 	function getaccount() {
 		return $this->account;
+	}
+	function get_login_tries() {
+		return $this->count_login_trys;
 	}
 	/*
 	 * Testet, ob dieser Nutzer Script/Teilbereich eines Scripts ausführen darf;
@@ -181,14 +184,18 @@ class user {
 	}
 	
 	// Holt alle Informationen über Nutzer aus DB, wenn angegebene E-Mail existiert
+	/* 
+ *Wichtig: Customer können nur über user-id geladen werden, wenn die Abfrage zur Anzeige aller Nutzer SELECT * FROM users; lautet, da dort für Customer keine Mail vorhanden ist 
+ * 
+ */ 
 	function load_user($m_mail, $uid = -1) {
 		if (!function_exists("query_db")) {
 			require 'includes/functions.inc.php';
 		}
 		if ($uid != -1) {
-			$result = query_db("SELECT * FROM users WHERE id = :id AND aktiv = 1", $uid);			
+			$result = query_db("SELECT * FROM users WHERE id = :id", $uid);			
 		}else{
-			$result = query_db("SELECT * FROM users WHERE email = :email AND aktiv = 1", $m_mail);
+			$result = query_db("SELECT * FROM users WHERE email = :email", $m_mail);
 		}
 		$user = $result->fetch();
 		if ($user === false || strlen($user['email']) == 0) {
@@ -216,6 +223,9 @@ class user {
 			$this->count_login_trys = intval($user['count_login']);
 			$this->security_token = $user['security_token'];
 			$this->security_token_time = $user['security_token_time'];
+			$this->time_of_creation = $user['createt_time']; 
+			$this->time_of_last_update = $user['update_time']; 
+			$this->activated = intval($user['aktiv']); 
 			return true;
 	}
 	
@@ -267,6 +277,7 @@ class user {
 		fclose($this->logfile);
 	}
 	function testpassword($password) {
+		//TODO add valide überprüfen ebenfalls vor passwort zurücksetzen und security code 
 		if (isset($this->hash_password) && isset($password)) {
 			if ($this->count_login_trys < 5) {
 				$return = password_verify($password, $this->hash_password);
@@ -456,6 +467,13 @@ class user {
 			return false;
 		}
 	}
+	function has_valid_security_code() { 
+	 if (strlen($this->security_token) > 0 && strlen($this->security_token_time) > 0 && $this->security_token_time != null && strtotime($this->security_token_time) > (time()-3*24*3600)) { 
+		 return true; 
+	 }else{ 
+		 return false; 
+	 }
+ 	} 
 	function is_valid() {
 		if (strlen($this->vname) > 0 && strlen($this->nname) > 0 && strlen($this->email) > 0 && strlen($this->account) > 0 && $this->id !== 0) {
 			return true;
@@ -463,6 +481,13 @@ class user {
 			return false;
 		}
 	}
+	function is_activated() { 
+	 if ($this->activated == 1) { 
+		 return true; 
+	 }else{ 
+		 return false; 
+	 } 
+ 	}
 	function exists($m_mail) {
 		$return = query_db("SELECT * FROM users WHERE email = :email", $m_mail);
 		$result = $return->fetch();

@@ -180,7 +180,7 @@ function query_db($statement, ...$params) {
 			$stringpart = explode(':', $string);
 			// var_dump($stringpart);
 			// $parameter[$stringpart[1]] = $params[$i];
-			$parameter[strtr($stringpart[1], $replace)] = $params[$i];
+			$parameter[strtr($stringpart[1], $replace)] = strip_tags($params[$i]); 
 			// var_dump($parameter);
 			$i++;
 		}

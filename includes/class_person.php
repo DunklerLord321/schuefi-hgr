@@ -61,10 +61,6 @@ class person {
 	
 	function addperson($vname, $nname, $email, $telefon, $geburtstag) {
 		global $pdo;
-		$vname = strip_tags($vname);
-		$nname = strip_tags($nname);
-		$email = strip_tags($email);
-		$telefon = strip_tags($telefon);
 		$error = "";
 		if (!isset($vname) || strlen($vname) < 3 || strlen($vname) > 49) {
 			$error = $error . "<br><br>Bitte gib einen Vornamen an, der zwischen 3 und 49 Zeichen lang ist.";
@@ -75,10 +71,6 @@ class person {
 		if (!isset($email) || (!filter_var($email, FILTER_VALIDATE_EMAIL) && !preg_match("/^\+?([0-9\/ -]+)$/", $telefon))) {
 			$error = $error . "<br><br>Bitte gib eine korrekte E-Mail-Adresse oder Telefonnummer an.";
 		}
-		$vname = htmlspecialchars($vname, ENT_QUOTES, 'UTF-8');
-		$nname = htmlspecialchars($nname, ENT_QUOTES, 'UTF-8');
-		$email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
-		$telefon = htmlspecialchars($telefon, ENT_QUOTES, 'UTF-8');
 		if (strlen($geburtstag) != 0) {
 			if (!strtotime($geburtstag)) {
 				$error = $error . "<br><br>Bitte gib ein gültiges Geburtsdatum an.";
@@ -94,11 +86,7 @@ class person {
 			return false;
 		}
 		// Teste, ob Person bereits vorhanden ist
-		$ret_prep = $pdo->prepare("SELECT * FROM `person` WHERE vname = :vname AND nname = :nname");
-		$return = $ret_prep->execute(array(
-				'vname' => $vname, 
-				'nname' => $nname
-		));
+		$return = $query_db("SELECT * FROM `person` WHERE vname = :vname AND nname = :nname", $vname, $nname);
 		if ($return === false)
 			echo "EIn Fehler ist aufgetreten";
 		$result = $ret_prep->fetch();
@@ -106,14 +94,7 @@ class person {
 			echo "Diese Person existiert bereits!";
 		}else {
 			// Füge Person zu DB hinzu
-			$ret_prep = $pdo->prepare("INSERT INTO `person` (`vname`,`nname`,`email`,`telefon`,`geburtstag`) VALUES( :vname, :nname, :email, :telefon, :geburtstag)");
-			$return = $ret_prep->execute(array(
-					'vname' => $vname, 
-					'nname' => $nname, 
-					'email' => $email, 
-					'telefon' => $telefon, 
-					'geburtstag' => $geburtstag
-			));
+			$return = query_db("INSERT INTO `person` (`vname`,`nname`,`email`,`telefon`,`geburtstag`) VALUES( :vname, :nname, :email, :telefon, :geburtstag)", $vname, $nname, $email, $telefon, $geburtstag); 
 			if ($return) {
 				$this->vname = $vname;
 				$this->nname = $nname;
@@ -162,14 +143,6 @@ class person {
 		if (!isset($this->id) || $this->id == NULL || $this->aktiv == false) {
 			return false;
 		}
-		$vname = strip_tags($vname);
-		$nname = strip_tags($nname);
-		$email = strip_tags($email);
-		$telefon = strip_tags($telefon);
-		$vname = htmlspecialchars($vname, ENT_QUOTES, 'UTF-8');
-		$nname = htmlspecialchars($nname, ENT_QUOTES, 'UTF-8');
-		$email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
-		$telefon = htmlspecialchars($telefon, ENT_QUOTES, 'UTF-8');
 		$error = "";
 		if (!isset($vname) || strlen($vname) < 3 || strlen($vname) > 49) {
 			$error = $error . "<br><br>Bitte gib einen Vornamen an, der zwischen 3 und 49 Zeichen lang ist.";

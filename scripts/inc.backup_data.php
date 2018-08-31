@@ -152,6 +152,9 @@ if (isset($user) && $user->runscript()) {
 			echo "Dieses Backup existiert leider nicht!<br><a href=\"index.php?page=backup_data\" class=\"links2\">Zurück zur Übersicht über die Backups</a>";
 		}
 	}else if (isset($_GET['newbackup']) && $_GET['newbackup'] == 1) {
+		if (isset($_GET['table']) && $_GET['table'] == "users") { 
+		 $tables = array('users'); 
+	 	} 
 		$user->log(user::LEVEL_WARNING, "Neues Backup wird erstellt");
 		$content = '';
 		$content = "\n-- Automatisch generiert\n-- erstellt von: " . $user->vname . " " . $user->nname . " (" . $user->getemail() . ")\n-- erstellt am " . date(DATE_RSS, time()) . "\n\n";
@@ -205,6 +208,10 @@ if (isset($user) && $user->runscript()) {
 		$sqlfile = fopen(get_xml("dirs/backup","value") . "Backup-$filename.sql", "x");
 		fwrite($sqlfile, $content, strlen($content));
 		fclose($sqlfile);
+		if (isset($_GET['table']) && $_GET['table'] == "users") { 
+			echo 'Backup wurde erfolgreich erstellt<br><br><a href="'.get_xml("dirs/backup","value").'/Backup-'.$filename.'.sql" class="links2">Backup herunterladen</a>'; 
+			die(); 
+		}
 		$zip = new ZipArchive();
 		if ($zip->open(get_xml("dirs/backup","value") . "Backup-$filename.zip", ZipArchive::CREATE) !== TRUE) {
 			$user->log(user::LEVEL_ERROR, "Zip-Datei konnte nicht erstellt werden!");
@@ -225,6 +232,7 @@ if (isset($user) && $user->runscript()) {
 		echo "Backup wurde erfolgreich erstellt";
 	}else {
 		echo "<a href=\"index.php?page=backup_data&newbackup=1\" class=\"links\">Neues Backup</a><br><br>";
+		echo "<a href=\"index.php?page=backup_data&newbackup=1&table=users\" class=\"links2\">Neues Backup von allen Zugangsdaten</a><br><br>"; 
 		$backups = array();
 		$dir = opendir(get_xml("dirs/backup","value"));
 		if ($dir === false) {
