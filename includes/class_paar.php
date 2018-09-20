@@ -116,15 +116,23 @@ class paar {
 			$date = date('Y-m-d', $time);
 		}
 		if (strlen($sid) > 0) {
-			$return = query_db("SELECT * FROM nachhilfetreffen WHERE paar_id = :paar_id AND datum = :datum AND sid = :sid AND lid is :lid", $this->paarid, $date, $sid, $lid);
+			$return = query_db("SELECT * FROM nachhilfetreffen WHERE paar_id = :paar_id AND datum = :datum AND sid = :sid AND lid is NULL", $this->paarid, $date, $sid);
 		}else{
-			$return = query_db("SELECT * FROM nachhilfetreffen WHERE paar_id = :paar_id AND datum = :datum AND sid is :sid AND lid = :lid", $this->paarid, $date, $sid, $lid);			
+			$return = query_db("SELECT * FROM nachhilfetreffen WHERE paar_id = :paar_id AND datum = :datum AND sid is NULL AND lid = :lid", $this->paarid, $date, $lid);			
 		}
+		if (strlen($sid) == 0) {
+			$sid = NULL;
+		}
+		var_dump($return);
 		$return = $return->fetch();
 		if ($return !== false) {
-			die("Es existiert für dieses Nachhilfepaar an diesem Tag schon ein Eintrag von dir!<br><a href=\"index.php?page=customer_meetings\" class=\"links2\">Zurück zur Übersicht</a><br><br>");
-		}		
-		$return = query_db("INSERT INTO nachhilfetreffen (paar_id, sid, lid, bemerkung, datum) VALUES (:paar_id, :sid, :lid, :comment, :datum)",$this->paarid, $sid, $lid, $comment, $date);
+			die("Es existiert für dieses Nachhilfepaar an diesem Tag schon ein Eintrag von dir!<br><a href=\"index.php?page=customer_meetings".(isset($_GET['customer_id'])?"&customer_id=".$_GET['customer_id']:"")."\" class=\"links2\">Zurück zur Übersicht</a><br><br>");
+		}
+		if (strlen($sid) > 0) {
+			$return = query_db("INSERT INTO nachhilfetreffen (paar_id, sid, lid, bemerkung, datum) VALUES (:paar_id, :sid, NULL, :comment, :datum)",$this->paarid, $sid, $comment, $date);
+		}else{
+			$return = query_db("INSERT INTO nachhilfetreffen (paar_id, sid, lid, bemerkung, datum) VALUES (:paar_id, NULL, :lid, :comment, :datum)",$this->paarid, $lid, $comment, $date);			
+		}
 		if ($return) {
 			return true;
 		}else{

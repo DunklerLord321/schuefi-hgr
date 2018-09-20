@@ -141,16 +141,16 @@ if (isset($user) && $user->runscript()) {
 			echo "Die Daten des Lehrers wurden erfolgreich geändert.";
 		}
 		if ($_GET['change'] == 4) {
+			var_dump($_POST);
 			if (isset($_POST['ridraum']) && $_POST['ridraum'] != -1) {
-				$raum = $_POST['ridraum'];
-				query_db("UPDATE raum SET frei = 0 WHERE id = :id", $raum);
+				$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende, treff_raum = :treff_raum, `rid` = :rid WHERE id = :pid",
+						$_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum'], $_POST['ridraum'], $_POST['paar_id']);
 			}else{
-				$raum = NULL;
+				$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende,
+						treff_raum = :treff_raum, `rid` = NULL WHERE id = :pid",
+						$_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum'],
+						$_POST['paar_id']);
 			}
-			$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende,
-					treff_raum = :treff_raum, `rid` = :rid WHERE id = :pid",
-					$_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum'], $raum,
-					$_POST['paar_id']);
 			if ($return !== false) {
 				echo "<br><a href=\"index.php?page=output&paare=1&filter=".$_POST['paar_id']."\" class=\"links2\">Daten des Paares wurden erfolgreich geändert</a>";
 			}else{
@@ -246,7 +246,7 @@ if (isset($user) && $user->runscript()) {
 			var element = document.createElement('div');
 			element.innerHTML = '<div id="faecherdiv-'+ fachzahl+'" style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;">\
 		<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
-		<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
+		<?php	$faecher = all_subjects(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
 		</select><br><br>Fachlehrer:<br><input type="text" class="input_text" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]" style="width: 98%;"><br>\
 		<?php
 		if (isset($_GET['lehrer'])) {
@@ -390,7 +390,7 @@ if (isset($user) && $user->runscript()) {
 		for ($i = 0; $i < count($sl->faecher); $i++) {
 			echo "<div id=\"faecherdiv-" . ($i + 1) . "\" style=\"width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey;\">
 			<h3>" . ($i + 1) . ".Fach:</h3><select name=\"fach[" . ($i + 1) . "][id]\" required>";
-			$faecher = get_faecher_all();
+			$faecher = all_subjects();
 			for ($ii = 0; $ii < count($faecher); $ii++) {
 				if ($faecher[$ii]['id'] == intval($sl->faecher[$i]['fid'])) {
 					echo "<option value=\"" . $faecher[$ii]['id'] . "\" selected> " . $faecher[$ii]['name'] . "</option>";
@@ -590,7 +590,7 @@ if (isset($user) && $user->runscript()) {
 			}else{
 				echo "Mit automatischer Zimmersuche vorgeschlagenes Zimmer:";
 				echo "<br><br><i>Achtung:</i> Das Vorgeschlagene Zimmer bezieht sich auf die nicht geänderte Uhrzeit. Um sowohl Zeit als auch Zimmer zu ändern bitte in zwei Schritten vorgehen.<br><br>";
-				$stunden = get_stunde_for_time($paar->anfang, $paar->ende);
+				$stunden = get_lesson_for_time($paar->anfang, $paar->ende);
 				if(is_array($stunden)) {
 					$return = query_db("SELECT raum.*, r.stunde as stunde1, zahlnummer FROM `raum` INNER JOIN (SELECT raum.* FROM raum WHERE stunde = :stunde AND frei = 1 AND tag = :tag) as r on r.nummer = raum.nummer
 							LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id
@@ -608,9 +608,9 @@ if (isset($user) && $user->runscript()) {
 					$result = $return->fetch();
 					while ($result) {
 						if (isset($paar->rid) && $paar->rid == $result['id']) {
-							echo "<option selected value=\"" . $result['id'] . "\">momentanes Zimmer: ".$result['nummer']." -- " . (isset($result['stunde1'])?$result['stunde1']."./":"") . $result['stunde'] .".Stunde, " . get_name_of_tag($paar->tag). "</option>";
+							echo "<option selected value=\"" . $result['id'] . "\">momentanes Zimmer: ".$result['nummer']." -- " . (isset($result['stunde1'])?$result['stunde1']."./":"") . $result['stunde'] .".Stunde, " . get_name_of_day($paar->tag). "</option>";
 						}else{
-							echo "<option value=\"" . $result['id'] . "\">Zimmer: ".$result['nummer']." -- " . (isset($result['stunde1'])?$result['stunde1']."./":"") . $result['stunde'] .".Stunde, " . get_name_of_tag($paar->tag) .($result['zahlnummer'] != NULL ? $result['zahlnummer']."x belegt an dem Tag zu anderer Zeit. Eventuell sind Überschneidung möglich.":"")."</option>";
+							echo "<option value=\"" . $result['id'] . "\">Zimmer: ".$result['nummer']." -- " . (isset($result['stunde1'])?$result['stunde1']."./":"") . $result['stunde'] .".Stunde, " . get_name_of_day($paar->tag) .($result['zahlnummer'] != NULL ? $result['zahlnummer']."x belegt an dem Tag zu anderer Zeit. Eventuell sind Überschneidung möglich.":"")."</option>";
 						}
 						$result = $return->fetch();
 					}

@@ -50,14 +50,14 @@ function warn(string) {
 					$faecher = $lehrer->get_angebot_faecher();
 					$zeit = $lehrer->get_zeit();
 					for ($i = 0; $i < count($faecher); $i++) {
-						echo get_faecher_name_of_id($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
+						echo get_name_of_subject($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
 						echo "<br>Notenschnitt: " . $faecher[$i]['notenschnitt'];
 						echo " <br> Nachweis vorhanden: " . ($faecher[$i]['nachweis_vorhanden'] == true ? "ja" : "nein");
 						echo "<br>Vermittlungsstatus: " . $faecher[$i]['status'] . "<br>";
 					}
 					echo "</td><td>";
 					for ($i = 0; $i < count($zeit); $i++) {
-						echo get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
+						echo get_name_of_day($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
 					}
 					echo "</td>";
 					if (strlen($lehrer->get_comment()) > 0) {
@@ -78,7 +78,7 @@ function warn(string) {
 					echo "</tr>";
 /*					if (count($zeit) > 1) {
 						for ($i = 1; $i < count($zeit); $i++) {
-							echo "<tr><td style=\"rowspan=2\">".get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br></td><td></td></tr>";
+							echo "<tr><td style=\"rowspan=2\">".get_name_of_day($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br></td><td></td></tr>";
 						}
 					}*/
 				}else{
@@ -92,7 +92,7 @@ function warn(string) {
 					echo "<br><br><b>Fächer:</b>";
 					for ($i = 0; $i < count($faecher); $i++) {
 						echo "<div style=\"padding-left: 5%;\">";
-						echo "<br><b>" . get_faecher_name_of_id($faecher[$i]['fid']) . "</b>";
+						echo "<br><b>" . get_name_of_subject($faecher[$i]['fid']) . "</b>";
 						echo "<br>Fachlehrer: " . $faecher[$i]['fachlehrer'];
 						echo "<br>Notenschnitt: " . $faecher[$i]['notenschnitt'];
 						echo "<br> Nachweis vorhanden: " . ($faecher[$i]['nachweis_vorhanden'] == true ? "ja" : "nein");
@@ -102,7 +102,7 @@ function warn(string) {
 					echo "<br><b>Zeiten:</b>";
 					echo "<div style=\"padding-left: 5%;\">";
 					for ($i = 0; $i < count($zeit); $i++) {
-						echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " Uhr bis " . date("H:i", strtotime($zeit[$i]['ende'])) . " Uhr";
+						echo "<br>" . get_name_of_day($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " Uhr bis " . date("H:i", strtotime($zeit[$i]['ende'])) . " Uhr";
 					}
 					echo "</div>";
 					if (strlen($lehrer->get_comment()) > 0) {
@@ -216,7 +216,7 @@ function warn(string) {
 					$faecher = $schueler->get_nachfrage_faecher();
 					$zeit = $schueler->get_zeit();
 					for ($i = 0; $i < count($faecher); $i++) {
-						echo get_faecher_name_of_id($faecher[$i]['fid']) .(strlen($faecher[$i]['fachlehrer']) > 0 ? "<br>":"") . $faecher[$i]['fachlehrer'];
+						echo get_name_of_subject($faecher[$i]['fid']) .(strlen($faecher[$i]['fachlehrer']) > 0 ? "<br>":"") . $faecher[$i]['fachlehrer'];
 						echo " <br> Langfristig: " . ($faecher[$i]['langfristig'] == true ? "ja" : "nein");
 						echo "<br>Vermittlungsstatus: " . ($faecher[$i]['status'] == "neu" ? "<b>neu</b>" : $faecher[$i]['status']) . "<br>";
 						if($faecher[$i]['status'] != "vermittelt") {
@@ -255,7 +255,7 @@ function warn(string) {
 				for ($i = 0; $i < count($faecher); $i++) {
 					if (isset($faecher[$i]) || (isset($faecher[$i]) && isset($_GET['filterstatus']) && $_GET['filterstatus'] == $faecher[$i]['status'])) {
 						echo "<div style=\"padding-left: 5%;\">";
-						echo "<br>" . get_faecher_name_of_id($faecher[$i]['fid']) . " <br> Langfristig: " . ($faecher[$i]['langfristig'] == true ? "ja" : "nein");
+						echo "<br>" . get_name_of_subject($faecher[$i]['fid']) . " <br> Langfristig: " . ($faecher[$i]['langfristig'] == true ? "ja" : "nein");
 						echo "<br>Fachlehrer: " . $faecher[$i]['fachlehrer'];
 						echo "<br><b>Vermittlungsstatus: " . $faecher[$i]['status'] . "</b><br><br>";
 						echo "<a href=\"index.php?page=input_paar&schueler=" . $schueler->get_id() . "&fid=" . $faecher[$i]['fid'] . "\" class=\"links\">Suche nach Lehrer</a>";
@@ -265,7 +265,7 @@ function warn(string) {
 				echo "<br><b>Zeiten:</b>";
 				echo "<div style=\"padding-left: 5%;\">";
 				for ($i = 0; $i < count($zeit); $i++) {
-					echo "<br>" . get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " Uhr bis " . date("H:i", strtotime($zeit[$i]['ende'])) . " Uhr";
+					echo "<br>" . get_name_of_day($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " Uhr bis " . date("H:i", strtotime($zeit[$i]['ende'])) . " Uhr";
 				}
 				echo "</div>";
 				if (strlen($schueler->get_comment()) > 0) {
@@ -337,7 +337,7 @@ function warn(string) {
 				if (get_view() == "table") {
 					echo "<tr><td><a href=\"index.php?page=output&lehrer=1&filter=" . $npaar->lehrer->person->id . "\" class=\"links2\">" . $npaar->lehrer->person->vname . " " . $npaar->lehrer->person->nname . "</a></td>";
 					echo "<td><a href=\"index.php?page=output&schueler=1&filter=" . $npaar->schueler->person->id . "\" class=\"links2\">" . $npaar->schueler->person->vname . " " . $npaar->schueler->person->nname . "</a></td>";
-					echo "<td>". get_faecher_name_of_id($npaar->fid) . "</td><td>" . get_name_of_tag($npaar->tag) . " von " . $npaar->anfang . " Uhr bis " . $npaar->ende . " Uhr</td>";
+					echo "<td>". get_name_of_subject($npaar->fid) . "</td><td>" . get_name_of_day($npaar->tag) . " von " . $npaar->anfang . " Uhr bis " . $npaar->ende . " Uhr</td>";
 					echo "<td>" . $npaar->raum . "</td><td>";
 					if (strlen($npaar->lehrer_dokument) > 0) {
 						echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links2\">Lehrer</a>";
@@ -360,9 +360,9 @@ function warn(string) {
 				}else{
 					echo "<fieldset>";
 					echo "<legend>Nachhilfepaar</legend>";
-					echo "<p>Im Fach " . get_faecher_name_of_id($npaar->fid) . "</p>Lehrer: <a href=\"index.php?page=output&lehrer=1&filter=" . $npaar->lehrer->person->id . "\" class=\"links2\">" . $npaar->lehrer->person->vname . " " . $npaar->lehrer->person->nname . "</a><p>";
+					echo "<p>Im Fach " . get_name_of_subject($npaar->fid) . "</p>Lehrer: <a href=\"index.php?page=output&lehrer=1&filter=" . $npaar->lehrer->person->id . "\" class=\"links2\">" . $npaar->lehrer->person->vname . " " . $npaar->lehrer->person->nname . "</a><p>";
 					echo "Schüler: <a href=\"index.php?page=output&schueler=1&filter=" . $npaar->schueler->person->id . "\" class=\"links2\">" . $npaar->schueler->person->vname . " " . $npaar->schueler->person->nname . "</a><br>";
-					echo "<br>Zeitpunkt: " . get_name_of_tag($npaar->tag) . " von " . $npaar->anfang . " Uhr bis " . $npaar->ende . " Uhr";
+					echo "<br>Zeitpunkt: " . get_name_of_day($npaar->tag) . " von " . $npaar->anfang . " Uhr bis " . $npaar->ende . " Uhr";
 					echo "<br><br>Im Zimmer: " . $npaar->raum . "<br><br>";
 					if (strlen($npaar->lehrer_dokument) > 0) {
 						echo "<a href=\"docs/unterricht/" . $npaar->lehrer_dokument . "\" class=\"links\">Vermittlungsdokument für Lehrer ansehen</a><br><br><br>";

@@ -122,7 +122,7 @@ class lehrer {
 				$return = $return->fetch();
 				// var_dump($return);
 				if ($return === false) {
-					$return_prep = query_db("INSERT INTO `lehrer` (`id`,`pid`,`schuljahr`,`klassenstufe`,`klasse`,`klassenlehrer_name`, `comment`) VALUES (:id, :pid, :schuljahr, :klassenstufe, :klasse, :klassenlehrer_name, :comment );", NULL, $this->person->id, get_current_year(), $this->klassenstufe, $this->klasse, $this->klassenlehrer_name, $this->comment);
+					$return_prep = query_db("INSERT INTO `lehrer` (`pid`,`schuljahr`,`klassenstufe`,`klasse`,`klassenlehrer_name`, `comment`) VALUES (:pid, :schuljahr, :klassenstufe, :klasse, :klassenlehrer_name, :comment );", $this->person->id, get_current_year(), $this->klassenstufe, $this->klasse, $this->klassenlehrer_name, $this->comment);
 					$return = query_db("SELECT * FROM `lehrer` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, get_current_year());
 					$lehrer = $return->fetch();
 					$this->id = $lehrer['id'];

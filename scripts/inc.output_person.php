@@ -46,7 +46,7 @@ function warn(string) {
 	$person = new person();
 	if ($result !== false) {
 		if (get_view() == "table") {
-			echo "<table class=\"table1\"><tr><th>Vorname</th><th>Nachname</th><th>E-Mail-Adresse</th><th>Telefon</th><th>Geburtstag</th><th>Nachhilfeschüler</th><th>Nachhilfelehrer</th><th></th><th></th></tr>";
+			echo "<table class=\"table1\"><tr><th>Vorname</th><th>Nachname</th><th>E-Mail-Adresse</th><th>Telefon</th><th>Geburtstag</th><th>Nachhilfeschüler</th><th>Nachhilfelehrer</th><th>Login</th><th></th><th></th><th></th></tr>";
 		}
 		$count = 0;
 		while ($result) {
@@ -65,6 +65,16 @@ function warn(string) {
 				}else{
 					echo "<td><img src=\"img/png_no_13_20.png\" alt=\"nein\"></td>";
 				}
+				if($person->user->has_valid_login()) {
+					echo "<td>Ja</td>";
+				}else if($person->user->has_valid_security_code()) {
+					echo "<td>Ausstehend</td>";
+				}else if($person->user->has_reference_to_person($person->id)) {
+					echo "<td><a href=\"index.php?page=output_person&send_registrate_link=1&person_id=$person->id\" class=\"links\">Sende Registrierungslink</a></td>";
+				}else{
+					echo "<td>Nein</td>";
+				}
+				echo '<td><a href="index.php?page=customer_meetings&customer_id='.$person->user->id.'" class="links2">Nachhilfetreffen</a></td>';
 				if($person->aktiv) {
 					if ($user->isuserallowed('k')) {
 						echo "<td><a href=\"index.php?page=change&person=$person->id\" class=\"links2\"><img src=\"img/png_change_20_24.png\" alt=\"Ändern der Person\"></a></td>";
@@ -98,6 +108,7 @@ function warn(string) {
 				echo "<div style=\"padding-left: 10%;\">";
 				echo "<br><br><a href=\"index.php?page=output&schueler=1&filter=" . $person->id . "\" class=\"links2\">$person->vname $person->nname hat sich als Nachhilfeschüler angemeldet</a></div>";
 			}
+			echo '<br><a href="index.php?page=customer_meetings&customer_id='.$person->user->id.'" class="links2">Nachhilfetreffen ansehen</a>';
 			if ($person->user->has_security_code()) {
 				echo "<br><br>Der Person wurde bereits ein Registrierungslink gesendet, der bis zum ".date("d.m.y H:i",strtotime($person->user->security_token_time)+3*24*3600)." gültig ist.";
 			}
@@ -111,7 +122,7 @@ function warn(string) {
 			<a href="index.php?page=change&person=<?php echo $person->id;?>" class="links">Ändere die Daten</a><br><br><br>
 			<a href="index.php?page=delete&person=1&delete=<?php echo $person->id;?>" class="links" onclick="return warn('Willst du die Person wirklich löschen?')">Löschen</a>
 			<?php 
-			if (!$person->user->has_security_code()) {
+			if (!$person->user->has_valid_security_code()) {
 				echo '<a href="index.php?page=output_person&send_registrate_link=1&person_id='.$person->id.'" class="links">Sende Registrierungslink</a><br><br>';
 			}
 			?>
@@ -132,6 +143,7 @@ function warn(string) {
 			echo "</table><br><br><span style=\"float:right;\">$count Datensätze</span><b>Hinweis:</b> Wenn du auf <img src=\"img/png_yes_12_16.png\" alt=\"ja\" style=\"width:13px;\"> klickst, kannst du dir die Schüler- oder Lehrerdaten der Person ansehen.";
 			echo "<br>Wenn du auf <img src=\"img/png_change_20_24.png\" alt=\"Ändern\" style=\"width:13px;\"> klickst, kannst du die Daten der Person ändern.";
 			echo "<br>Wenn du auf <img src=\"img/png_delete_24_24.png\" alt=\"Löschen\" style=\"width:13px;\"> klickst, kannst du die Daten der Person löschen.";
+			echo "<br>Login-Status: Ausstehend bedeutet, dass die Person sich noch nicht registriert hat, aber einen gültigen Registrierungslink zugesendet bekommen hat";
 		}else{
 			echo "<br><br><span style=\"float:right;\">$count Datensätze</span><br>";
 		}

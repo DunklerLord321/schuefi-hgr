@@ -238,9 +238,9 @@ if (isset($user) && $user->runscript()) {
 				while ($result) {
 					$paar = new paar($result['id']);
 					if (isset($_SESSION['mail_step2']) && isset($_SESSION['mail_step2']['dest_paar-' . $i]) && $_SESSION['mail_step2']['dest_paar-' . $i] == $paar->paarid) {
-						$paar_output .= "<br><label><input type=\"radio\" name=\"dest_paar\" value=\"" . $paar->paarid . "\" checked> " . $paar->lehrer->person->vname . " " . $paar->lehrer->person->nname . " - " . $paar->schueler->person->vname . " " . $paar->schueler->person->nname . "<br>" . get_faecher_name_of_id($paar->fid) . "</label><br>";
+						$paar_output .= "<br><label><input type=\"radio\" name=\"dest_paar\" value=\"" . $paar->paarid . "\" checked> " . $paar->lehrer->person->vname . " " . $paar->lehrer->person->nname . " - " . $paar->schueler->person->vname . " " . $paar->schueler->person->nname . "<br>" . get_name_of_subject($paar->fid) . "</label><br>";
 					}else {
-						$paar_output .= "<br><label><input type=\"radio\" name=\"dest_paar\" value=\"" . $paar->paarid . "\"> " . $paar->lehrer->person->vname . " " . $paar->lehrer->person->nname . " - " . $paar->schueler->person->vname . " " . $paar->schueler->person->nname . "<br>" . get_faecher_name_of_id($paar->fid) . "</label><br>";
+						$paar_output .= "<br><label><input type=\"radio\" name=\"dest_paar\" value=\"" . $paar->paarid . "\"> " . $paar->lehrer->person->vname . " " . $paar->lehrer->person->nname . " - " . $paar->schueler->person->vname . " " . $paar->schueler->person->nname . "<br>" . get_name_of_subject($paar->fid) . "</label><br>";
 					}
 					$i++;
 					$result = $return->fetch();
@@ -425,32 +425,32 @@ if (isset($user) && $user->runscript()) {
 				$lehrertext = str_replace(":vorname", $paar->lehrer->person->vname, $lehrertext);
 				$lehrertext = str_replace(":nachname", $paar->lehrer->person->nname, $lehrertext);
 				$lehrertext = str_replace(":email", $paar->lehrer->person->email, $lehrertext);
-				$lehrertext = str_replace(":fach", get_faecher_name_of_id($paar->fid), $lehrertext);
+				$lehrertext = str_replace(":fach", get_name_of_subject($paar->fid), $lehrertext);
 				$lehrertext = str_replace(":treff_raum", $paar->raum, $lehrertext);
-				$lehrertext = str_replace(":tag", get_name_of_tag($paar->tag), $lehrertext);
+				$lehrertext = str_replace(":tag", get_name_of_day($paar->tag), $lehrertext);
 				$lehrertext = str_replace(":treff_zeit", $paar->anfang, $lehrertext);
-				$lehrertext = str_replace(":tag", get_name_of_tag($paar->tag), $lehrertext);
+				$lehrertext = str_replace(":tag", get_name_of_day($paar->tag), $lehrertext);
 				$schuelertext = str_replace(":vorname_lehrer", $paar->lehrer->person->vname, $schuelertext);
 				$schuelertext = str_replace(":nachname_lehrer", $paar->lehrer->person->nname, $schuelertext);
 				$schuelertext = str_replace(":email_lehrer", $paar->lehrer->person->email, $schuelertext);
 				$schuelertext = str_replace(":vorname", $paar->schueler->person->vname, $schuelertext);
 				$schuelertext = str_replace(":nachname", $paar->schueler->person->nname, $schuelertext);
 				$schuelertext = str_replace(":email", $paar->schueler->person->email, $schuelertext);
-				$schuelertext = str_replace(":fach", get_faecher_name_of_id($paar->fid), $schuelertext);
+				$schuelertext = str_replace(":fach", get_name_of_subject($paar->fid), $schuelertext);
 				$schuelertext = str_replace(":treff_raum", $paar->raum, $schuelertext);
-				$schuelertext = str_replace(":tag", get_name_of_tag($paar->tag), $schuelertext);
+				$schuelertext = str_replace(":tag", get_name_of_day($paar->tag), $schuelertext);
 				$schuelertext = str_replace(":treff_zeit", $paar->anfang, $schuelertext);
-				$schuelertext = str_replace(":tag", get_name_of_tag($paar->tag), $schuelertext);
+				$schuelertext = str_replace(":tag", get_name_of_day($paar->tag), $schuelertext);
 				$lehrermail = array(
 						'empfaenger' => $paar->lehrer->person->email, 
 						'text' => $lehrertext, 
-						'betreff' => str_replace(":fach", get_faecher_name_of_id($paar->fid), $_SESSION['mail_step3']['subject2']), 
+						'betreff' => str_replace(":fach", get_name_of_subject($paar->fid), $_SESSION['mail_step3']['subject2']), 
 						'anhang' => ''
 				);
 				$schuelermail = array(
 						'empfaenger' => $paar->schueler->person->email, 
 						'text' => $schuelertext, 
-						'betreff' => str_replace(":fach", get_faecher_name_of_id($paar->fid), $_SESSION['mail_step3']['subject2']), 
+						'betreff' => str_replace(":fach", get_name_of_subject($paar->fid), $_SESSION['mail_step3']['subject2']), 
 						'anhang' => ''
 				);
 				if ($_SESSION['mail_step3']['anhang2'] == 1) {

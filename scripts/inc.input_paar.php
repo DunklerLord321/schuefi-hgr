@@ -4,7 +4,7 @@ if (isset($user) && $user->runscript()) {
 	if (isset($_GET['schueler']) && isset($_GET['fid'])) {
 		require 'includes/class_schueler.php';
 		$schueler = new schueler(-1, $_GET['schueler']);
-		echo "Suche Nachhilfelehrer für: " . $schueler->person->vname . " " . $schueler->person->nname . " für das Fach <i>" . get_faecher_name_of_id($_GET['fid']) . "</i>";
+		echo "Suche Nachhilfelehrer für: " . $schueler->person->vname . " " . $schueler->person->nname . " für das Fach <i>" . get_name_of_subject($_GET['fid']) . "</i>";
 		$schueler->get_lehrer($_GET['fid']);
 	}
 	if (isset($_GET['manuell']) && $_GET['manuell'] == 1) {
@@ -13,19 +13,17 @@ if (isset($user) && $user->runscript()) {
 		if ($lehrer_ex[1] != $schueler_ex[1]) {
 			echo "Unterschiedliche Fächer wurden gewählt!";
 		}
-		if (isset($_POST['ridraum']) && $_POST['ridraum'] != -1) {
-			$raum = $_POST['ridraum'];
-			query_db("UPDATE raum SET frei = 0 WHERE id = :id", $raum);
-		}else{
-			$raum = NULL;
-		}
 		$return = query_db("SELECT * FROM `unterricht` WHERE `lid` = :lid AND `sid` = :sid AND `fid` = :fid", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1]);
 		$result = $return->fetch();
 		if ($result !== false) {
 			echo "Das Paar existiert schon!";
 		}else {
 			$return = query_db("UPDATE `fragt_nach` SET `status` = 'vermittelt' WHERE sid = :sid AND fid = :fid", $schueler_ex[0], $schueler_ex[1]);
-			$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, tag, treff_zeit, treff_zeit_ende, treff_raum, rid) VALUES (:lid, :sid, :fid, :tag, :treff_zeit, :treff_zeit_ende, :treff_raum, :rid)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], intval($_POST['raum']), $_POST['ridraum']);
+			if (isset($_POST['ridraum']) && $_POST['ridraum'] != -1) {
+				$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, tag, treff_zeit, treff_zeit_ende, schuljahr, treff_raum, rid) VALUES (:lid, :sid, :fid, :tag, :treff_zeit, :treff_zeit_ende, :schuljahr, :treff_raum, :rid)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], get_current_year(), $_POST['raum'], $_POST['ridraum']);
+			}else{
+				$return = query_db("INSERT INTO `unterricht` (lid, sid, fid, tag, treff_zeit, treff_zeit_ende, schuljahr, treff_raum, rid) VALUES (:lid, :sid, :fid, :tag, :treff_zeit, :treff_zeit_ende, :schuljahr, :treff_raum, NULL)", $lehrer_ex[0], $schueler_ex[0], $schueler_ex[1], $_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], get_current_year(), $_POST['raum']);
+			}
 			if ($return !== false) {
 				$return = query_db("SELECT unterricht.id FROM unterricht WHERE unterricht.lid = :lid AND unterricht.fid = :fid AND unterricht.sid = :sid ", $lehrer_ex[0], $schueler_ex[1], $schueler_ex[0]);
 				$result = $return->fetch();
@@ -101,9 +99,9 @@ $('body').on('focus','.timepickerbis', function(){
 				$faecher = $schueler->get_nachfrage_faecher();
 				for ($i = 0; $i < count($faecher); $i++) {
 					if (isset($_GET['control_paar']) && isset($_GET['sid']) && $_GET['sid'] == $schueler->get_id() && $_GET['fid'] == $faecher[$i]['fid'] ) {
-						echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\" selected>" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+						echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\" selected>" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_name_of_subject($faecher[$i]['fid']) . "</option>";
 					}else {
-						echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+						echo "<option value=\"" . $schueler->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $schueler->person->vname . " " . $schueler->person->nname . " - " . get_name_of_subject($faecher[$i]['fid']) . "</option>";
 					}
 				}
 				$schueler = $return->fetch();
@@ -124,9 +122,9 @@ $('body').on('focus','.timepickerbis', function(){
 					$faecher = $lehrer->get_angebot_faecher();
 					for ($i = 0; $i < count($faecher); $i++) {
 						if (isset($_GET['control_paar']) && isset($_GET['lid']) && $_GET['lid'] == $lehrer->get_id() && $_GET['fid'] == $faecher[$i]['fid']) {
-							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\" selected >" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\" selected >" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_name_of_subject($faecher[$i]['fid']) . "</option>";
 						}else {
-							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_faecher_name_of_id($faecher[$i]['fid']) . "</option>";
+							echo "<option value=\"" . $lehrer->get_id() . "-" . $faecher[$i]['fid'] . "\">" . $lehrer->person->vname . " " . $lehrer->person->nname . " - " . get_name_of_subject($faecher[$i]['fid']) . "</option>";
 						}
 					}
 					$lehrer = $return->fetch();
@@ -174,7 +172,7 @@ $('body').on('focus','.timepickerbis', function(){
 	if(!isset($_GET['anfang']) || !isset($_GET['ende']) || !isset($_GET['tag'])) {
 		echo "<i>Keine Automatische Zimmersuche möglich!</i><br><br>";
 	}else{
-		$stunden = get_stunde_for_time($_GET['anfang'], $_GET['ende']);
+		$stunden = get_lesson_for_time($_GET['anfang'], $_GET['ende']);
 		if(is_array($stunden)) {
 			$return = query_db("SELECT raum.*, r.stunde as stunde1, zahlnummer FROM `raum` INNER JOIN (SELECT raum.* FROM raum WHERE stunde = :stunde AND frei = 1 AND tag = :tag) as r on r.nummer = raum.nummer
 					LEFT JOIN ( SELECT raum.id, raum.nummer, raum.tag, COUNT(raum.nummer) AS zahlnummer FROM raum INNER JOIN unterricht ON unterricht.rid = raum.id 

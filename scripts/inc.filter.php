@@ -44,7 +44,7 @@ function showsecond(selected) {
 			<option value="nq">außer</option>\
 			</select>\
 			<select id="filtervalue" name="filtervalue" style="float: right; margin-left: 2%;">\
-			<?php	$faecher = get_faecher_all();	for ($i = 0; $i < count($faecher); $i++) {	echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>";	}?>\
+			<?php	$faecher = all_subjects();	for ($i = 0; $i < count($faecher); $i++) {	echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>";	}?>\
 		</select></div>';
 	}
 	if(selected == "zahlschueler" || selected == "klassenstufe" || selected == "durchschnitt" || selected == "geldausgabe" || selected == "geldeingabe"|| selected == "geldeinausgabe") {

@@ -1,6 +1,5 @@
 <?php
-//TODO rename to english
-function get_name_of_tag($kuerzel) {
+function get_name_of_day($kuerzel) {
 	$tage = array(
 			'mo' => 'Montag', 
 			'di' => 'Dienstag', 
@@ -14,7 +13,7 @@ function get_name_of_tag($kuerzel) {
 		return false;
 	}
 }
-function get_stunde_for_time($time, $time2) {
+function get_lesson_for_time($time, $time2) {
 	global $GLOBAL_CONFIG;
 	$timestamp = strtotime($time);
 	$timestamp2 = strtotime($time2);
@@ -49,7 +48,7 @@ function get_stunde_for_time($time, $time2) {
 		return false;
 	}
 }
-function get_faecher_all() {
+function all_subjects() {
 	$return = query_db("SELECT * FROM `faecher`");
 	$result = $return->fetchAll();
 	if ($result !== false) {
@@ -58,38 +57,11 @@ function get_faecher_all() {
 		return "Kein Fach gefunden";
 	}
 }
-function get_faecher_name_of_id($fachid) {
+function get_name_of_subject($fachid) {
 	$return = query_db("SELECT * FROM `faecher` WHERE id = :fid", $fachid);
 	$result = $return->fetch();
 	if ($result) {
 		return $result['name'];
-	}else {
-		return "Kein Fach gefunden";
-	}
-}
-function get_faecher_name_of_kuerzel($fach_kuerzel) {
-	$return = query_db("SELECT * FROM `faecher` WHERE kuerzel = :kuerzel", $fach_kuerzel);
-	$result = $return->fetch();
-	if ($result) {
-		return $result['name'];
-	}else {
-		return "Kein Fach gefunden";
-	}
-}
-function get_faecher_id_of_kuerzel($fach_kuerzel) {
-	$return = query_db("SELECT * FROM `faecher` WHERE kuerzel = :kuerzel", $fach_kuerzel);
-	$result = $return->fetch();
-	if ($result) {
-		return $result['id'];
-	}else {
-		return "Kein Fach gefunden";
-	}
-}
-function get_faecher_id_of_name($fachname) {
-	$return = query_db("SELECT * FROM `faecher` WHERE name = :name", $fachname);
-	$result = $return->fetch();
-	if ($result) {
-		return $result['id'];
 	}else {
 		return "Kein Fach gefunden";
 	}
@@ -154,7 +126,6 @@ function get_second_part_year_sql() {
  * 
  * 
  */
-//TODO Absicherung gegen XSS direkt in Funktion mit strip_tags
 function query_db($statement, ...$params) {
 	global $pdo;
 	global $user;
@@ -202,6 +173,8 @@ function query_db($statement, ...$params) {
 			$user->log(user::LEVEL_ERROR, "DB-Fehler ist aufgetreten!" . implode("-", $ret_prep->errorInfo()));
 			var_dump($ret_prep->errorInfo());
 			var_dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+			var_dump($statement);
+			var_dump($parameter);
 			get_xml("exit_on_db_failure","value") == 'true' ?: die();
 			return false;
 		}else {

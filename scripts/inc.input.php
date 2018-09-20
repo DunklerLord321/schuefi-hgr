@@ -100,7 +100,7 @@ $( function() {
 		fachzahl++;
 		$('#insert-subject').append('<div id="faecherdiv-'+fachzahl+'" style="width: 38%; display: inline-block; margin-right: 8%;padding: 10px; border: solid 1px grey; margin-top: 10px;">\
 				<h3>' + fachzahl +'.Fach:</h3><select name="fach['+ fachzahl + '][id]" required>\
-				<?php	$faecher = get_faecher_all(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
+				<?php	$faecher = all_subjects(); for($i = 0; $i < count($faecher); $i++) { echo "<option value=" . $faecher[$i]['id'] . ">" . $faecher[$i]['name'] . "</option>"; } ?>\
 				</select><br><br>Fachlehrer:<br><input type="text" class="input_text" maxlength="49" name="fach['+ fachzahl + '][fachlehrer]" style="width: 95%;"><br>\
 				<?php
 					if ($show_formular_lehrer) {

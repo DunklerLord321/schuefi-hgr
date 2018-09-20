@@ -69,7 +69,6 @@ if (isset($_GET['page'])) {
 		<?php
 	}else if ($user->is_valid()) {
 		$active = $_GET['page'];
-		//@TODO Navigation in Funktion
     require 'includes/navigation_functions.inc.php';
     show_main_navigation($active); 
 		?>

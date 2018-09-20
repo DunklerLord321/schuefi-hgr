@@ -281,7 +281,7 @@ if (isset($_GET['filter'])) {
 							if ($query[$j]['columns'][$i] == "vname") {
 								$ajax_return .= "<td style=\"text-align: left;\"><a href=\"index.php?page=output_person&filter=" . $return['pid'] . "\" class=\"links2\">" . $return[$query[$j]['columns'][$i]] . " " . $return[$query[$j]['columns'][$i+1]] . "</a></td>";
 							}else if ($query[$j]['columns'][$i] == "fid") {
-								$ajax_return .= "<td>" . get_faecher_name_of_id($return[$query[$j]['columns'][$i]]) . "</td>";
+								$ajax_return .= "<td>" . get_name_of_subject($return[$query[$j]['columns'][$i]]) . "</td>";
 							}else if ($query[$j]['columns'][$i] == "geldbetrag" && $query[$j]['columns'][($i+1)] == "geldbetrag2"){
 								if($return[$query[$j]['columns'][$i]] > 0) {
 									$ajax_return .= "<td>" . $return[$query[$j]['columns'][$i]] ."</td><td></td>";

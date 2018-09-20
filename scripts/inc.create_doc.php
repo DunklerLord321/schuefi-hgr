@@ -60,7 +60,7 @@ if (isset($user) && $user->runscript()) {
 				$file = str_replace("::nameschueler", $paar->schueler->person->vname . " " . $paar->schueler->person->nname, $file);
 				$file = str_replace("::schuefimail", get_xml("contact/email","value"), $file);
 				$file = str_replace("::schuefiweb", get_xml("contact/homepage","value"), $file);
-				$file = str_replace("::tag", get_name_of_tag($paar->tag), $file);
+				$file = str_replace("::tag", get_name_of_day($paar->tag), $file);
 				$file = str_replace("::raum", $paar->raum, $file);
 				$file = str_replace("::zeit", $paar->anfang, $file);
 				$file = str_replace("::emailschueler", $paar->schueler->person->email, $file);
@@ -102,6 +102,8 @@ if (isset($user) && $user->runscript()) {
 					echo "Dokument für ".$paar->schueler->person->vname." ". $paar->schueler->person->nname ." erfolgreich erstellt<br><br>";
 				}
 			}
+			//Notwendig für korrekten Link zurück zum Paar
+			$paarid = $paar->paarid;
 			if (isset($_GET['renew_docs'])) {
 				$result = $return->fetch();
 				if($result) {
@@ -114,7 +116,7 @@ if (isset($user) && $user->runscript()) {
 			}
 		}
 		if (isset($_GET['createdoc_paar'])) {
-			echo "<a href=\"index.php?page=output&paare=1&filter=" . $paar->paarid . "\" class=\"links2\">Zurück zum Paar</a>";
+			echo "<a href=\"index.php?page=output&paare=1&filter=" . $paarid . "\" class=\"links2\">Zurück zum Paar</a>";
 		}
 	}
 }else {

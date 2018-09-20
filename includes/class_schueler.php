@@ -114,7 +114,7 @@ class schueler {
 					$this->klassenstufe = $params_arr['klassenstufe'];
 					$this->klassenlehrer_name = $params_arr['klassenlehrer_name'];
 					$this->comment = $params_arr['comment'];
-					$return_prep = query_db("INSERT INTO `schueler` (`id`,`pid`,`schuljahr`,`klassenstufe`,`klasse`,`klassenlehrer_name`, `comment`) VALUES (:id, :pid, :schuljahr, :klassenstufe, :klasse, :klassenlehrer_name, :comment );", NULL, $this->person->id, get_current_year(), $this->klassenstufe, $this->klasse, $this->klassenlehrer_name, $this->comment);
+					$return_prep = query_db("INSERT INTO `schueler` (`pid`,`schuljahr`,`klassenstufe`,`klasse`,`klassenlehrer_name`, `comment`) VALUES (:pid, :schuljahr, :klassenstufe, :klasse, :klassenlehrer_name, :comment );", $this->person->id, get_current_year(), $this->klassenstufe, $this->klasse, $this->klassenlehrer_name, $this->comment);
 					$return = query_db("SELECT * FROM `schueler` WHERE pid = :pid AND schuljahr = :schuljahr", $this->person->id, get_current_year());
 					$schueler = $return->fetch();
 					$this->id = $schueler['id'];
@@ -444,7 +444,7 @@ class schueler {
 				if ($return) {
 					$return = $return->fetch();
 					echo "<br><br>" . $return['vname'] . " " . $return['nname'] . ", Klasse: " . format_klassenstufe_kurs($matching_lehrer[$i]['klassenstufe'], $matching_lehrer[$i]['klasse']);
-					echo "<br>Der Unterricht würde immer " . get_name_of_tag($matching_lehrer[$i]['unterricht']['tag']);
+					echo "<br>Der Unterricht würde immer " . get_name_of_day($matching_lehrer[$i]['unterricht']['tag']);
 					echo " von " . $matching_lehrer[$i]['unterricht']['anfang']->format("H:i");
 					echo " Uhr bis " . $matching_lehrer[$i]['unterricht']['ende']->format("H:i") . " Uhr stattfinden";
 					$ret = query_db("SELECT * FROM `unterricht` WHERE lid = :lid", $matching_lehrer[$i]['id']);

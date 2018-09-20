@@ -97,14 +97,14 @@ $(function() {
 				$faecher = $lehrer->get_angebot_faecher();
 				$zeit = $lehrer->get_zeit();
 				for ($i = 0; $i < count($faecher); $i++) {
-					echo get_faecher_name_of_id($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
+					echo get_name_of_subject($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
 					echo "<br>Notenschnitt: " . $faecher[$i]['notenschnitt'];
 					echo "<br> Nachweis vorhanden: " . ($faecher[$i]['nachweis_vorhanden'] == true ? "ja" : "nein");
 					echo "<br>Vermittlungsstatus: " . $faecher[$i]['status'] . "<br>";
 				}
 				echo "</td><td>";
 				for ($i = 0; $i < count($zeit); $i++) {
-					echo get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
+					echo get_name_of_day($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
 				}
 				echo "</td>";
 				if (strlen($lehrer->get_comment()) > 0) {
@@ -145,12 +145,12 @@ $(function() {
 				$faecher = $schueler->get_nachfrage_faecher();
 				$zeit = $schueler->get_zeit();
 				for ($i = 0; $i < count($faecher); $i++) {
-					echo get_faecher_name_of_id($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
+					echo get_name_of_subject($faecher[$i]['fid']) . "<br>". $faecher[$i]['fachlehrer'];
 					echo "<br>Vermittlungsstatus: " . $faecher[$i]['status'] . "<br>";
 				}
 				echo "</td><td>";
 				for ($i = 0; $i < count($zeit); $i++) {
-					echo get_name_of_tag($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
+					echo get_name_of_day($zeit[$i]['tag']) . " von " . date("H:i", strtotime($zeit[$i]['anfang'])) . " - " . date("H:i", strtotime($zeit[$i]['ende'])) . "<br>";
 				}
 				echo "</td>";
 				if (strlen($schueler->get_comment()) > 0) {

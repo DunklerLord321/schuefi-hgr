@@ -1,21 +1,25 @@
 <?php
 if (isset($user) && $user->runscript()) {
 	echo "<h1>Nachhilfetreffen</h1>";
-  echo "<h2>Eigene Daten</h2>";
+	if ($user->getaccount() == 'c') {
+		echo "<h2>Eigene Daten</h2>";		
+	}
 	if (isset($_GET['new_meeting'])) {
 		if (array_search($_POST['paar_id'], $user->all_pairs) === false) {
 			echo "Ein Fehler ist aufgetreten! Bitte versuche es erneut";
+			die();
 		}
 		if (!class_exists("paar")) {
 			require 'includes/class_paar.php';
 		}
+		var_dump($user);
 		$paar = new paar($_POST['paar_id']);
-		if (!isset($user->schueler_id) && !isset($schueler->lehrer_id)) {
+		if (!isset($user->schueler_id) && !isset($user->lehrer_id)) {
 			echo "Ein Fehler ist aufgetreten! Bitte versuche es erneut";
+			die();
 		}
-		if (isset($user->lehrer_id)) {
-			
-		}
+		var_dump($paar);
+		var_dump($_POST);
 		if (isset($user->schueler_id)) {
 			$paar->add_meeting($user->schueler_id, NULL, $_POST['datum'], $_POST['comment']);	
 		}
@@ -23,7 +27,11 @@ if (isset($user) && $user->runscript()) {
 			$paar->add_meeting(NULL, $user->lehrer_id, $_POST['datum'], $_POST['comment']);	
 		}
 	}
-  $return = query_db("SELECT person.* FROM users LEFT JOIN person ON person.id = users.person_id WHERE users.id = :id", $user->id);
+	if ($user->getaccount() == 'c') {
+  	$return = query_db("SELECT person.* FROM users LEFT JOIN person ON person.id = users.person_id WHERE users.id = :id", $user->id);
+	} else{
+		$return = query_db("SELECT person.* FROM users LEFT JOIN person ON person.id = users.person_id WHERE users.id = :id", $_GET['customer_id']);		
+	}
   $result = $return->fetch();
   $person_id = $result['id'];
 	if (!class_exists("person")) {
@@ -31,6 +39,9 @@ if (isset($user) && $user->runscript()) {
 	}
 	$person = new person();
 	$person->load_person($person_id);
+	if ($user->getaccount() != 'c') {
+		echo "<h2>Daten von $person->vname $person->nname</h2>";		
+	}
 	$schueler_lehrer = $person->search_lehrer_schueler();
 	unset($result);
 	if (is_array($schueler_lehrer['lehrer'])) {
@@ -115,7 +126,7 @@ if (isset($user) && $user->runscript()) {
 	<div class="formular_class">
 		<script type="text/javascript" src="includes/jquery/jquery-ui-1.12.1/datepicker-de.js"></script>
 		<script type="text/javascript" src="includes/javascript/javascript.js"></script>
-		<form method="post" action="index.php?page=customer_meetings&new_meeting=1">
+		<form method="post" action="index.php?page=customer_meetings&new_meeting=1<?php echo (isset($_GET['customer_id'])?"&customer_id=".$_GET['customer_id']:"");?>">
 			<script>
   $( function() {
     $( "#datepicker" ).datepicker({

@@ -86,10 +86,10 @@ class person {
 			return false;
 		}
 		// Teste, ob Person bereits vorhanden ist
-		$return = $query_db("SELECT * FROM `person` WHERE vname = :vname AND nname = :nname", $vname, $nname);
+		$return = query_db("SELECT * FROM `person` WHERE vname = :vname AND nname = :nname", $vname, $nname);
 		if ($return === false)
 			echo "EIn Fehler ist aufgetreten";
-		$result = $ret_prep->fetch();
+		$result = $return->fetch();
 		if ($result !== FALSE) {
 			echo "Diese Person existiert bereits!";
 		}else {
@@ -179,10 +179,12 @@ class person {
 		}else {
 			// Ändere Person
 			$ret_prep = query_db("UPDATE `person` SET `vname` = :vname, `nname` = :nname, `email` = :email, `telefon` = :telefon, `geburtstag` = :geburtstag WHERE `id` = :id", $vname, $nname, $email, $telefon, $geburtstag, $this->id);
-			if ($is_allowed_to_login == true && !$this->user->exists($email)) {
-				$this->user->add_reference_to_person($this->id);
+			if ($is_allowed_to_login == true) {
+				if (!$this->user->has_reference_to_person($this->id)) {
+					$this->user->add_reference_to_person($this->id);
+				}
 			}else{
-				echo "<b>Es ist momentan noch nicht möglich, den Login einer Person abzuwählen</b>";
+				$this->user->inactivate();
 			}
 			if ($ret_prep) {
 				$this->vname = $vname;

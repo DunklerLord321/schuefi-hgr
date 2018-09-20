@@ -277,7 +277,11 @@ class user {
 		fclose($this->logfile);
 	}
 	function testpassword($password) {
-		//TODO add valide überprüfen ebenfalls vor passwort zurücksetzen und security code 
+		if (!$this->is_activated()) {
+			$this->log(user::LEVEL_WARNING, "Anmeldung von gelöschter Person oder Nutzer");
+			$this->error = 'Das Passwort oder die E-Mail-Adresse war leider falsch!';
+			return false;
+		}
 		if (isset($this->hash_password) && isset($password)) {
 			if ($this->count_login_trys < 5) {
 				$return = password_verify($password, $this->hash_password);
@@ -311,6 +315,10 @@ class user {
 	}
 	
 	function reset_password($password_neu, $password_neu2) {
+		if (!$this->is_activated()) {
+			$this->error = 'Der Nutzer darf nicht inaktiv sein';
+			return false;
+		}
 		if (strlen($password_neu) < 4) {
 			$this->error = 'Das neue Passwort muss mindestens 4 Zeichen lang sein';
 			return false;
@@ -331,9 +339,24 @@ class user {
 			return false;
 		}		
 	}
-	
+	function activate() {
+		$result = query_db("UPDATE `users` SET aktiv = 1 WHERE id = :id", $this->id);
+		if ($result !== false) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	function inactivate() {
+		$result = query_db("UPDATE `users` SET aktiv = 0 WHERE id = :id", $this->id);
+		if ($result !== false) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 	function validate_security_token($token) {
-		if (!$this->has_security_code()) {
+		if (!$this->has_security_code() || !$this->is_activated()) {
 			$this->error = 'Es wurde keine Registrierung mit dieser E-Mail-Addresse erlaubt';
 			return false;
 		}
@@ -358,6 +381,10 @@ class user {
 	}
 	
 	function create_security_token() {
+		if (!$this->is_activated()) {
+			echo 'Der Nutzer darf nicht inaktiv sein';
+			return false;
+		}
 		global $GLOBAL_CONFIG;
 		$passwortcode = random_string();
 		$result = query_db("UPDATE users SET security_token = :security_token, security_token_time = NOW() WHERE id = :userid", sha1($passwortcode), $this->id);
@@ -462,6 +489,13 @@ class user {
 	}
 	function has_security_code() {
 		if (strlen($this->security_token) > 0 && strlen($this->security_token_time) > 0) {
+			return true;
+		}else{
+			return false;
+		}
+	}
+	function has_valid_login() {
+		if (strlen($this->hash_password) > 0 && !$this->has_valid_security_code()) {
 			return true;
 		}else{
 			return false;
