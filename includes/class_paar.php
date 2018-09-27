@@ -123,7 +123,6 @@ class paar {
 		if (strlen($sid) == 0) {
 			$sid = NULL;
 		}
-		var_dump($return);
 		$return = $return->fetch();
 		if ($return !== false) {
 			die("Es existiert für dieses Nachhilfepaar an diesem Tag schon ein Eintrag von dir!<br><a href=\"index.php?page=customer_meetings".(isset($_GET['customer_id'])?"&customer_id=".$_GET['customer_id']:"")."\" class=\"links2\">Zurück zur Übersicht</a><br><br>");

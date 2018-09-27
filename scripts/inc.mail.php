@@ -289,6 +289,14 @@ if (isset($user) && $user->runscript()) {
 		document.getElementById('subject').value = 'Anmeldung bei der Schülerfirma';
 		document.getElementById('textarea1').value = 'Hallo :vorname :nachname,\nvielen Dank für deine Anmeldung bei unserer Schülefirma "Schüler helfen Schülern".\nSobald wir einen passenden Schüler für dich gefunden haben, melden wir uns wieder bei dir.\n\nViele Grüße\nDie Schülerfirma';
 	}
+	function neuesfinanzsystem_mail() {
+		document.getElementById('subject').value = 'Bezahlsystem der Schülerfirma';
+		document.getElementById('textarea1').value = 'Hallo :vorname :nachname,\nEs gibt dieses Jahr für dich noch eine Neuerung. Und zwar stellen wir gerade auf ein neues Bezahlsystem um. Wie bisher gehabt musst du Geld für deine Nachhilfe bezahlen.\nDas geht entweder in Bar oder über unser Konto. Dann holst du dir bei uns eine Tutoring-Karte ab. Auf der Unterschreibt dein Nachhilfelehrer weiterhin. Dann musst du dich allerdings zusätzlich online bei der Schülerfirma anmelden.\n\
+Die Zugangsdaten erhälst du in einer separaten E-Mail. \nDort kannst du dann deine Nachhilfestunden eingeben. Diese werden dann von deinem Lehrer bestätigt. Wenn ihr beide eine Unterrichtsstunde eingetragen habt, gilt diese als ganz normal gehalten und Konrad bekommt dann von uns seinen Lohn. \n\nFindet mal eine Nachhilfestunde nicht statt, weil z.B. einer von euch krank wird oder aus anderen Gründen fehlt oder nicht erscheint und dies vorher abgesprochen ist, \
+tragt ihr einfach nichts für das  betreffende Datum ein. Sollte jedoch jemand unentschuldigt fehlen, dann tragt bitte einen entsprechenden Kommentar dazu ein. \n\
+Da das ganze erstmal getestet wird, behalten wir das alte System noch eine Weile weiter.\n\n\
+Wenn es noch Fragen oder Anregungen gibt oder etwas unklar ist, würde ich mich über eine Antwort sehr freuen.\n\nViele Grüße\nDie Schülerfirma';		
+	}
 	function add_text(text, element) {
 		var content = document.getElementById(element).value;
 		document.getElementById(element).value = content + text;
@@ -375,6 +383,7 @@ if (isset($user) && $user->runscript()) {
 			echo "<button type=\"button\" onclick=\"wartemail()\" class=\"mybuttons\">Vorlage für Warteschreiben</button>";
 			echo "<button type=\"button\" onclick=\"anmeldung_schueler()\" class=\"mybuttons\">Anmmeldungs-E-Mail für Schüler</button>";
 			echo "<button type=\"button\" onclick=\"anmeldung_lehrer()\" class=\"mybuttons\">Anmeldungs-E-Mail für Lehrer</button>";
+			echo "<button type=\"button\" onclick=\"neuesfinanzsystem_mail()\" class=\"mybuttons\">Erklärung des neuen Finanzsystems für Schüler</button>";
 		}
 		?>
 	<textarea name="text" rows="10" id="textarea1" placeholder="Schreibe den Text für die E-Mail hier hin..." style="width: 80%; padding: 5px;"><?php

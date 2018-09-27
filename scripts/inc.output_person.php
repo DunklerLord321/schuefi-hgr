@@ -70,7 +70,7 @@ function warn(string) {
 				}else if($person->user->has_valid_security_code()) {
 					echo "<td>Ausstehend</td>";
 				}else if($person->user->has_reference_to_person($person->id)) {
-					echo "<td><a href=\"index.php?page=output_person&send_registrate_link=1&person_id=$person->id\" class=\"links\">Sende Registrierungslink</a></td>";
+					echo "<td><a href=\"index.php?page=output_person&send_registrate_link=1&person_id=$person->id\" class=\"links2\">Sende Registrierungslink</a></td>";
 				}else{
 					echo "<td>Nein</td>";
 				}

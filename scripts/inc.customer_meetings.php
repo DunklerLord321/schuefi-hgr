@@ -12,14 +12,11 @@ if (isset($user) && $user->runscript()) {
 		if (!class_exists("paar")) {
 			require 'includes/class_paar.php';
 		}
-		var_dump($user);
 		$paar = new paar($_POST['paar_id']);
 		if (!isset($user->schueler_id) && !isset($user->lehrer_id)) {
 			echo "Ein Fehler ist aufgetreten! Bitte versuche es erneut";
 			die();
 		}
-		var_dump($paar);
-		var_dump($_POST);
 		if (isset($user->schueler_id)) {
 			$paar->add_meeting($user->schueler_id, NULL, $_POST['datum'], $_POST['comment']);	
 		}
@@ -75,7 +72,9 @@ if (isset($user) && $user->runscript()) {
 	}
 	while($return) {
 		$paar = new paar($return['id']);
-		$user->all_pairs = array();
+		if (!isset($user->all_pairs)) {
+			$user->all_pairs = array();			
+		}
 		$user->all_pairs[] = $paar->paarid;
 		if ($is_person_teacher) {
 			$user->lehrer_id = $lehrer->get_id();

@@ -141,13 +141,14 @@ if (isset($user) && $user->runscript()) {
 			echo "Die Daten des Lehrers wurden erfolgreich geändert.";
 		}
 		if ($_GET['change'] == 4) {
-			var_dump($_POST);
+			if (strlen($_POST['raum']) == 0 && $_POST['ridraum'] == -1) {
+				$_POST['raum'] = "Cafeteria";
+			}
 			if (isset($_POST['ridraum']) && $_POST['ridraum'] != -1) {
 				$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende, treff_raum = :treff_raum, `rid` = :rid WHERE id = :pid",
 						$_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum'], $_POST['ridraum'], $_POST['paar_id']);
 			}else{
-				$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende,
-						treff_raum = :treff_raum, `rid` = NULL WHERE id = :pid",
+				$return = query_db("UPDATE `unterricht` SET tag = :tag, treff_zeit = :treff_zeit, treff_zeit_ende = :treff_zeit_ende, treff_raum = :treff_raum, `rid` = NULL WHERE id = :pid",
 						$_POST['zeit']['tag'], $_POST['zeit']['from'], $_POST['zeit']['until'], $_POST['raum'],
 						$_POST['paar_id']);
 			}

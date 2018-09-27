@@ -66,6 +66,7 @@ if (isset($user) && $user->runscript()) {
 			'compare' => 'BETWEEN',
 			'label' => 'nur Einträge aus dem Jahr 2018'
 	);
+	var_dump($filter);
 	$aktiv_filter = "";
 	$params = "";
 	$get_string = (isset($_GET['filter']) ? $_GET['filter']:'');
